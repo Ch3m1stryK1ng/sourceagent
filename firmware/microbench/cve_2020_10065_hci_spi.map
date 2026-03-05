@@ -1,0 +1,168 @@
+Archive member included to satisfy reference by file (symbol)
+
+/home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a(libc_a-memset.o)
+                              /tmp/ccwp3lwc.o (memset)
+/home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a(libc_a-memcpy-stub.o)
+                              /tmp/ccwp3lwc.o (memcpy)
+
+Discarded input sections
+
+ .text          0x00000000        0x0 /tmp/ccwp3lwc.o
+ .data          0x00000000        0x0 /tmp/ccwp3lwc.o
+ .bss           0x00000000        0x0 /tmp/ccwp3lwc.o
+ .text          0x00000000        0x0 /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a(libc_a-memset.o)
+ .data          0x00000000        0x0 /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a(libc_a-memset.o)
+ .bss           0x00000000        0x0 /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a(libc_a-memset.o)
+ .text          0x00000000        0x0 /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a(libc_a-memcpy-stub.o)
+ .data          0x00000000        0x0 /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a(libc_a-memcpy-stub.o)
+ .bss           0x00000000        0x0 /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a(libc_a-memcpy-stub.o)
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+FLASH            0x08000000         0x00010000         xr
+RAM              0x20000000         0x00005000         xrw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD /tmp/ccwp3lwc.o
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m/nofp/libgcc.a
+START GROUP
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m/nofp/libgcc.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libg_nano.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a
+END GROUP
+START GROUP
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m/nofp/libgcc.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libnosys.a
+END GROUP
+START GROUP
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m/nofp/libgcc.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libnosys.a
+END GROUP
+                0x20005000                        _estack = (ORIGIN (RAM) + LENGTH (RAM))
+
+.isr_vector     0x08000000       0x40
+ *(.isr_vector)
+ .isr_vector    0x08000000       0x40 /tmp/ccwp3lwc.o
+                0x08000000                vector_table
+
+.text           0x08000040      0x15a
+ *(.text*)
+ .text.bt_spi_transceive
+                0x08000040       0x24 /tmp/ccwp3lwc.o
+ .text.Default_Handler
+                0x08000064        0x2 /tmp/ccwp3lwc.o
+                0x08000064                Default_Handler
+ .text.net_buf_add_mem
+                0x08000066       0x20 /tmp/ccwp3lwc.o
+ *fill*         0x08000086        0x2 
+ .text.bt_spi_rx_thread
+                0x08000088       0xd0 /tmp/ccwp3lwc.o
+ .text.main     0x08000158       0x10 /tmp/ccwp3lwc.o
+                0x08000158                main
+ .text.Reset_Handler
+                0x08000168        0x6 /tmp/ccwp3lwc.o
+                0x08000168                Reset_Handler
+ .text.memset   0x0800016e       0x10 /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a(libc_a-memset.o)
+                0x0800016e                memset
+ .text.memcpy   0x0800017e       0x1c /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a(libc_a-memcpy-stub.o)
+                0x0800017e                memcpy
+ *(.rodata*)
+
+.glue_7         0x0800019c        0x0
+ .glue_7        0x0800019c        0x0 linker stubs
+
+.glue_7t        0x0800019c        0x0
+ .glue_7t       0x0800019c        0x0 linker stubs
+
+.vfp11_veneer   0x0800019c        0x0
+ .vfp11_veneer  0x0800019c        0x0 linker stubs
+
+.v4_bx          0x0800019c        0x0
+ .v4_bx         0x0800019c        0x0 linker stubs
+
+.iplt           0x0800019c        0x0
+ .iplt          0x0800019c        0x0 /tmp/ccwp3lwc.o
+
+.rel.dyn        0x0800019c        0x0
+ .rel.iplt      0x0800019c        0x0 /tmp/ccwp3lwc.o
+
+.ARM.extab
+ *(.ARM.extab*)
+
+.ARM.exidx
+ *(.ARM.exidx*)
+                0x0800019a                        _sidata = .
+
+.data           0x20000000        0x0 load address 0x0800019a
+                0x20000000                        _sdata = .
+ *(.data*)
+                0x20000000                        _edata = .
+
+.igot.plt       0x20000000        0x0
+ .igot.plt      0x20000000        0x0 /tmp/ccwp3lwc.o
+
+.bss            0x20000000      0x2a0
+                0x20000000                        _sbss = .
+ *(.bss*)
+ .bss.txmsg     0x20000000       0xff /tmp/ccwp3lwc.o
+ *fill*         0x200000ff        0x1 
+ .bss.rxmsg     0x20000100       0xff /tmp/ccwp3lwc.o
+ *fill*         0x200001ff        0x1 
+ .bss.g_acl_buf
+                0x20000200       0x50 /tmp/ccwp3lwc.o
+ .bss.g_evt_buf
+                0x20000250       0x50 /tmp/ccwp3lwc.o
+ *(COMMON)
+                0x200002a0                        _ebss = .
+                0x20005000                        PROVIDE (__stack_top__ = _estack)
+                [!provide]                        PROVIDE (end = _ebss)
+                [!provide]                        PROVIDE (_end = _ebss)
+OUTPUT(cve_2020_10065_hci_spi.elf elf32-littlearm)
+LOAD linker stubs
+
+.debug_info     0x00000000      0x617
+ .debug_info    0x00000000      0x617 /tmp/ccwp3lwc.o
+
+.debug_abbrev   0x00000000      0x2a2
+ .debug_abbrev  0x00000000      0x2a2 /tmp/ccwp3lwc.o
+
+.debug_loc      0x00000000      0x2a0
+ .debug_loc     0x00000000      0x2a0 /tmp/ccwp3lwc.o
+
+.debug_aranges  0x00000000       0x48
+ .debug_aranges
+                0x00000000       0x48 /tmp/ccwp3lwc.o
+
+.debug_ranges   0x00000000       0x38
+ .debug_ranges  0x00000000       0x38 /tmp/ccwp3lwc.o
+
+.debug_line     0x00000000      0x415
+ .debug_line    0x00000000      0x415 /tmp/ccwp3lwc.o
+
+.debug_str      0x00000000      0x2a7
+ .debug_str     0x00000000      0x2a7 /tmp/ccwp3lwc.o
+                                0x302 (size before relaxing)
+
+.comment        0x00000000       0x45
+ .comment       0x00000000       0x45 /tmp/ccwp3lwc.o
+                                 0x46 (size before relaxing)
+
+.ARM.attributes
+                0x00000000       0x2e
+ .ARM.attributes
+                0x00000000       0x2e /tmp/ccwp3lwc.o
+ .ARM.attributes
+                0x0000002e       0x2e /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a(libc_a-memset.o)
+ .ARM.attributes
+                0x0000005c       0x2e /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a(libc_a-memcpy-stub.o)
+
+.debug_frame    0x00000000       0xec
+ .debug_frame   0x00000000       0xa4 /tmp/ccwp3lwc.o
+ .debug_frame   0x000000a4       0x20 /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a(libc_a-memset.o)
+ .debug_frame   0x000000c4       0x28 /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a(libc_a-memcpy-stub.o)

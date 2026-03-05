@@ -1,0 +1,140 @@
+
+Discarded input sections
+
+ .text          0x00000000        0x0 /tmp/cc5ROiDv.o
+ .data          0x00000000        0x0 /tmp/cc5ROiDv.o
+ .bss           0x00000000        0x0 /tmp/cc5ROiDv.o
+ .text.main     0x00000000        0xa /tmp/cc5ROiDv.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+FLASH            0x08000000         0x00010000         xr
+RAM              0x20000000         0x00005000         xrw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD /tmp/cc5ROiDv.o
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m/nofp/libgcc.a
+START GROUP
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m/nofp/libgcc.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libg_nano.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a
+END GROUP
+START GROUP
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m/nofp/libgcc.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libnosys.a
+END GROUP
+START GROUP
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m/nofp/libgcc.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libnosys.a
+END GROUP
+                0x20005000                        _estack = (ORIGIN (RAM) + LENGTH (RAM))
+
+.isr_vector     0x08000000       0x40
+ *(.isr_vector)
+ .isr_vector    0x08000000       0x40 /tmp/cc5ROiDv.o
+                0x08000000                vector_table
+
+.text           0x08000040       0x52
+ *(.text*)
+ .text.Default_Handler
+                0x08000040        0x2 /tmp/cc5ROiDv.o
+                0x08000040                Default_Handler
+ *fill*         0x08000042        0x2 
+ .text.uart_read_byte
+                0x08000044       0x18 /tmp/cc5ROiDv.o
+                0x08000044                uart_read_byte
+ .text.uart_receive
+                0x0800005c       0x18 /tmp/cc5ROiDv.o
+                0x0800005c                uart_receive
+ .text.protocol_handler
+                0x08000074       0x16 /tmp/cc5ROiDv.o
+                0x08000074                protocol_handler
+ .text.Reset_Handler
+                0x0800008a        0x8 /tmp/cc5ROiDv.o
+                0x0800008a                Reset_Handler
+ *(.rodata*)
+
+.glue_7         0x08000094        0x0
+ .glue_7        0x08000094        0x0 linker stubs
+
+.glue_7t        0x08000094        0x0
+ .glue_7t       0x08000094        0x0 linker stubs
+
+.vfp11_veneer   0x08000094        0x0
+ .vfp11_veneer  0x08000094        0x0 linker stubs
+
+.v4_bx          0x08000094        0x0
+ .v4_bx         0x08000094        0x0 linker stubs
+
+.iplt           0x08000094        0x0
+ .iplt          0x08000094        0x0 /tmp/cc5ROiDv.o
+
+.rel.dyn        0x08000094        0x0
+ .rel.iplt      0x08000094        0x0 /tmp/cc5ROiDv.o
+
+.ARM.extab
+ *(.ARM.extab*)
+
+.ARM.exidx
+ *(.ARM.exidx*)
+                0x08000092                        _sidata = .
+
+.data           0x20000000        0x0 load address 0x08000092
+                0x20000000                        _sdata = .
+ *(.data*)
+                0x20000000                        _edata = .
+
+.igot.plt       0x20000000        0x0
+ .igot.plt      0x20000000        0x0 /tmp/cc5ROiDv.o
+
+.bss            0x20000000        0x0
+                0x20000000                        _sbss = .
+ *(.bss*)
+ *(COMMON)
+                0x20000000                        _ebss = .
+                0x20005000                        PROVIDE (__stack_top__ = _estack)
+                [!provide]                        PROVIDE (end = _ebss)
+                [!provide]                        PROVIDE (_end = _ebss)
+OUTPUT(t0_uart_rx_overflow.elf elf32-littlearm)
+LOAD linker stubs
+
+.debug_info     0x00000000      0x217
+ .debug_info    0x00000000      0x217 /tmp/cc5ROiDv.o
+
+.debug_abbrev   0x00000000      0x17d
+ .debug_abbrev  0x00000000      0x17d /tmp/cc5ROiDv.o
+
+.debug_loc      0x00000000       0xf4
+ .debug_loc     0x00000000       0xf4 /tmp/cc5ROiDv.o
+
+.debug_aranges  0x00000000       0x48
+ .debug_aranges
+                0x00000000       0x48 /tmp/cc5ROiDv.o
+
+.debug_ranges   0x00000000       0x50
+ .debug_ranges  0x00000000       0x50 /tmp/cc5ROiDv.o
+
+.debug_line     0x00000000      0x225
+ .debug_line    0x00000000      0x225 /tmp/cc5ROiDv.o
+
+.debug_str      0x00000000      0x1c0
+ .debug_str     0x00000000      0x1c0 /tmp/cc5ROiDv.o
+                                0x205 (size before relaxing)
+
+.comment        0x00000000       0x45
+ .comment       0x00000000       0x45 /tmp/cc5ROiDv.o
+                                 0x46 (size before relaxing)
+
+.ARM.attributes
+                0x00000000       0x2e
+ .ARM.attributes
+                0x00000000       0x2e /tmp/cc5ROiDv.o
+
+.debug_frame    0x00000000       0xa0
+ .debug_frame   0x00000000       0xa0 /tmp/cc5ROiDv.o

@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+    "ghidra": {
+      "command": "/home/a347908610/pentestagent/venv/bin/pyghidra-mcp",
+      "args": [],
+      "env": {
+        "GHIDRA_INSTALL_DIR": "/home/a347908610/local/ghidra_12.0.2_PUBLIC",
+        "JAVA_HOME": "/home/a347908610/local/jdk-21.0.6+7",
+        "HOME": "/tmp",
+        "XDG_CONFIG_HOME": "/tmp/.config",
+        "XDG_CACHE_HOME": "/tmp/.cache",
+        "DISPLAY": "",
+        "JAVA_TOOL_OPTIONS": "-Djava.awt.headless=true"
+      },
+      "description": "Ghidra MCP (headless) - firmware binary analysis",
+      "timeout": 300,
+      "enabled": true,
+      "start_on_launch": false
+    }
+  }
+}

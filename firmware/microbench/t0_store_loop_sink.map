@@ -1,0 +1,156 @@
+Archive member included to satisfy reference by file (symbol)
+
+/home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a(libc_a-memset.o)
+                              /tmp/ccIQbY56.o (memset)
+
+Discarded input sections
+
+ .text          0x00000000        0x0 /tmp/ccIQbY56.o
+ .data          0x00000000        0x0 /tmp/ccIQbY56.o
+ .bss           0x00000000        0x0 /tmp/ccIQbY56.o
+ .text          0x00000000        0x0 /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a(libc_a-memset.o)
+ .data          0x00000000        0x0 /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a(libc_a-memset.o)
+ .bss           0x00000000        0x0 /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a(libc_a-memset.o)
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+FLASH            0x08000000         0x00010000         xr
+RAM              0x20000000         0x00005000         xrw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD /tmp/ccIQbY56.o
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m/nofp/libgcc.a
+START GROUP
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m/nofp/libgcc.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libg_nano.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a
+END GROUP
+START GROUP
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m/nofp/libgcc.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libnosys.a
+END GROUP
+START GROUP
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m/nofp/libgcc.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libnosys.a
+END GROUP
+                0x20005000                        _estack = (ORIGIN (RAM) + LENGTH (RAM))
+
+.isr_vector     0x08000000       0x40
+ *(.isr_vector)
+ .isr_vector    0x08000000       0x40 /tmp/ccIQbY56.o
+                0x08000000                vector_table
+
+.text           0x08000040       0x88
+ *(.text*)
+ .text.Default_Handler
+                0x08000040        0x2 /tmp/ccIQbY56.o
+                0x08000040                Default_Handler
+ .text.spi_read_byte
+                0x08000042       0x1a /tmp/ccIQbY56.o
+                0x08000042                spi_read_byte
+ .text.write_register
+                0x0800005c        0x4 /tmp/ccIQbY56.o
+                0x0800005c                write_register
+ .text.fill_buffer
+                0x08000060       0x1a /tmp/ccIQbY56.o
+                0x08000060                fill_buffer
+ .text.clear_buffer
+                0x0800007a        0xc /tmp/ccIQbY56.o
+                0x0800007a                clear_buffer
+ *fill*         0x08000086        0x2 
+ .text.main     0x08000088       0x28 /tmp/ccIQbY56.o
+                0x08000088                main
+ .text.Reset_Handler
+                0x080000b0        0x8 /tmp/ccIQbY56.o
+                0x080000b0                Reset_Handler
+ .text.memset   0x080000b8       0x10 /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a(libc_a-memset.o)
+                0x080000b8                memset
+ *(.rodata*)
+
+.glue_7         0x080000c8        0x0
+ .glue_7        0x080000c8        0x0 linker stubs
+
+.glue_7t        0x080000c8        0x0
+ .glue_7t       0x080000c8        0x0 linker stubs
+
+.vfp11_veneer   0x080000c8        0x0
+ .vfp11_veneer  0x080000c8        0x0 linker stubs
+
+.v4_bx          0x080000c8        0x0
+ .v4_bx         0x080000c8        0x0 linker stubs
+
+.iplt           0x080000c8        0x0
+ .iplt          0x080000c8        0x0 /tmp/ccIQbY56.o
+
+.rel.dyn        0x080000c8        0x0
+ .rel.iplt      0x080000c8        0x0 /tmp/ccIQbY56.o
+
+.ARM.extab
+ *(.ARM.extab*)
+
+.ARM.exidx
+ *(.ARM.exidx*)
+                0x080000c8                        _sidata = .
+
+.data           0x20000000        0x0 load address 0x080000c8
+                0x20000000                        _sdata = .
+ *(.data*)
+                0x20000000                        _edata = .
+
+.igot.plt       0x20000000        0x0
+ .igot.plt      0x20000000        0x0 /tmp/ccIQbY56.o
+
+.bss            0x20000000        0x0
+                0x20000000                        _sbss = .
+ *(.bss*)
+ *(COMMON)
+                0x20000000                        _ebss = .
+                0x20005000                        PROVIDE (__stack_top__ = _estack)
+                [!provide]                        PROVIDE (end = _ebss)
+                [!provide]                        PROVIDE (_end = _ebss)
+OUTPUT(t0_store_loop_sink.elf elf32-littlearm)
+LOAD linker stubs
+
+.debug_info     0x00000000      0x2dd
+ .debug_info    0x00000000      0x2dd /tmp/ccIQbY56.o
+
+.debug_abbrev   0x00000000      0x196
+ .debug_abbrev  0x00000000      0x196 /tmp/ccIQbY56.o
+
+.debug_loc      0x00000000      0x155
+ .debug_loc     0x00000000      0x155 /tmp/ccIQbY56.o
+
+.debug_aranges  0x00000000       0x50
+ .debug_aranges
+                0x00000000       0x50 /tmp/ccIQbY56.o
+
+.debug_ranges   0x00000000       0x58
+ .debug_ranges  0x00000000       0x58 /tmp/ccIQbY56.o
+
+.debug_line     0x00000000      0x31c
+ .debug_line    0x00000000      0x31c /tmp/ccIQbY56.o
+
+.debug_str      0x00000000      0x1da
+ .debug_str     0x00000000      0x1da /tmp/ccIQbY56.o
+                                0x224 (size before relaxing)
+
+.comment        0x00000000       0x45
+ .comment       0x00000000       0x45 /tmp/ccIQbY56.o
+                                 0x46 (size before relaxing)
+
+.ARM.attributes
+                0x00000000       0x2e
+ .ARM.attributes
+                0x00000000       0x2e /tmp/ccIQbY56.o
+ .ARM.attributes
+                0x0000002e       0x2e /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a(libc_a-memset.o)
+
+.debug_frame    0x00000000       0xd0
+ .debug_frame   0x00000000       0xb0 /tmp/ccIQbY56.o
+ .debug_frame   0x000000b0       0x20 /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a(libc_a-memset.o)

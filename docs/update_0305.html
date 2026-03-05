@@ -1,0 +1,233 @@
+<!DOCTYPE html><html><head>
+      <title>update_0305</title>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.css">
+      
+      
+      
+      
+      
+      <style>
+      code[class*=language-],pre[class*=language-]{color:#333;background:0 0;font-family:Consolas,"Liberation Mono",Menlo,Courier,monospace;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;word-wrap:normal;line-height:1.4;-moz-tab-size:8;-o-tab-size:8;tab-size:8;-webkit-hyphens:none;-moz-hyphens:none;-ms-hyphens:none;hyphens:none}pre[class*=language-]{padding:.8em;overflow:auto;border-radius:3px;background:#f5f5f5}:not(pre)>code[class*=language-]{padding:.1em;border-radius:.3em;white-space:normal;background:#f5f5f5}.token.blockquote,.token.comment{color:#969896}.token.cdata{color:#183691}.token.doctype,.token.macro.property,.token.punctuation,.token.variable{color:#333}.token.builtin,.token.important,.token.keyword,.token.operator,.token.rule{color:#a71d5d}.token.attr-value,.token.regex,.token.string,.token.url{color:#183691}.token.atrule,.token.boolean,.token.code,.token.command,.token.constant,.token.entity,.token.number,.token.property,.token.symbol{color:#0086b3}.token.prolog,.token.selector,.token.tag{color:#63a35c}.token.attr-name,.token.class,.token.class-name,.token.function,.token.id,.token.namespace,.token.pseudo-class,.token.pseudo-element,.token.url-reference .token.variable{color:#795da3}.token.entity{cursor:help}.token.title,.token.title .token.punctuation{font-weight:700;color:#1d3e81}.token.list{color:#ed6a43}.token.inserted{background-color:#eaffea;color:#55a532}.token.deleted{background-color:#ffecec;color:#bd2c00}.token.bold{font-weight:700}.token.italic{font-style:italic}.language-json .token.property{color:#183691}.language-markup .token.tag .token.punctuation{color:#333}.language-css .token.function,code.language-css{color:#0086b3}.language-yaml .token.atrule{color:#63a35c}code.language-yaml{color:#183691}.language-ruby .token.function{color:#333}.language-markdown .token.url{color:#795da3}.language-makefile .token.symbol{color:#795da3}.language-makefile .token.variable{color:#183691}.language-makefile .token.builtin{color:#0086b3}.language-bash .token.keyword{color:#0086b3}pre[data-line]{position:relative;padding:1em 0 1em 3em}pre[data-line] .line-highlight-wrapper{position:absolute;top:0;left:0;background-color:transparent;display:block;width:100%}pre[data-line] .line-highlight{position:absolute;left:0;right:0;padding:inherit 0;margin-top:1em;background:hsla(24,20%,50%,.08);background:linear-gradient(to right,hsla(24,20%,50%,.1) 70%,hsla(24,20%,50%,0));pointer-events:none;line-height:inherit;white-space:pre}pre[data-line] .line-highlight:before,pre[data-line] .line-highlight[data-end]:after{content:attr(data-start);position:absolute;top:.4em;left:.6em;min-width:1em;padding:0 .5em;background-color:hsla(24,20%,50%,.4);color:#f4f1ef;font:bold 65%/1.5 sans-serif;text-align:center;vertical-align:.3em;border-radius:999px;text-shadow:none;box-shadow:0 1px #fff}pre[data-line] .line-highlight[data-end]:after{content:attr(data-end);top:auto;bottom:.4em}html body{font-family:'Helvetica Neue',Helvetica,'Segoe UI',Arial,freesans,sans-serif;font-size:16px;line-height:1.6;color:#333;background-color:#fff;overflow:initial;box-sizing:border-box;word-wrap:break-word}html body>:first-child{margin-top:0}html body h1,html body h2,html body h3,html body h4,html body h5,html body h6{line-height:1.2;margin-top:1em;margin-bottom:16px;color:#000}html body h1{font-size:2.25em;font-weight:300;padding-bottom:.3em}html body h2{font-size:1.75em;font-weight:400;padding-bottom:.3em}html body h3{font-size:1.5em;font-weight:500}html body h4{font-size:1.25em;font-weight:600}html body h5{font-size:1.1em;font-weight:600}html body h6{font-size:1em;font-weight:600}html body h1,html body h2,html body h3,html body h4,html body h5{font-weight:600}html body h5{font-size:1em}html body h6{color:#5c5c5c}html body strong{color:#000}html body del{color:#5c5c5c}html body a:not([href]){color:inherit;text-decoration:none}html body a{color:#08c;text-decoration:none}html body a:hover{color:#00a3f5;text-decoration:none}html body img{max-width:100%}html body>p{margin-top:0;margin-bottom:16px;word-wrap:break-word}html body>ol,html body>ul{margin-bottom:16px}html body ol,html body ul{padding-left:2em}html body ol.no-list,html body ul.no-list{padding:0;list-style-type:none}html body ol ol,html body ol ul,html body ul ol,html body ul ul{margin-top:0;margin-bottom:0}html body li{margin-bottom:0}html body li.task-list-item{list-style:none}html body li>p{margin-top:0;margin-bottom:0}html body .task-list-item-checkbox{margin:0 .2em .25em -1.8em;vertical-align:middle}html body .task-list-item-checkbox:hover{cursor:pointer}html body blockquote{margin:16px 0;font-size:inherit;padding:0 15px;color:#5c5c5c;background-color:#f0f0f0;border-left:4px solid #d6d6d6}html body blockquote>:first-child{margin-top:0}html body blockquote>:last-child{margin-bottom:0}html body hr{height:4px;margin:32px 0;background-color:#d6d6d6;border:0 none}html body table{margin:10px 0 15px 0;border-collapse:collapse;border-spacing:0;display:block;width:100%;overflow:auto;word-break:normal;word-break:keep-all}html body table th{font-weight:700;color:#000}html body table td,html body table th{border:1px solid #d6d6d6;padding:6px 13px}html body dl{padding:0}html body dl dt{padding:0;margin-top:16px;font-size:1em;font-style:italic;font-weight:700}html body dl dd{padding:0 16px;margin-bottom:16px}html body code{font-family:Menlo,Monaco,Consolas,'Courier New',monospace;font-size:.85em;color:#000;background-color:#f0f0f0;border-radius:3px;padding:.2em 0}html body code::after,html body code::before{letter-spacing:-.2em;content:'\00a0'}html body pre>code{padding:0;margin:0;word-break:normal;white-space:pre;background:0 0;border:0}html body .highlight{margin-bottom:16px}html body .highlight pre,html body pre{padding:1em;overflow:auto;line-height:1.45;border:#d6d6d6;border-radius:3px}html body .highlight pre{margin-bottom:0;word-break:normal}html body pre code,html body pre tt{display:inline;max-width:initial;padding:0;margin:0;overflow:initial;line-height:inherit;word-wrap:normal;background-color:transparent;border:0}html body pre code:after,html body pre code:before,html body pre tt:after,html body pre tt:before{content:normal}html body blockquote,html body dl,html body ol,html body p,html body pre,html body ul{margin-top:0;margin-bottom:16px}html body kbd{color:#000;border:1px solid #d6d6d6;border-bottom:2px solid #c7c7c7;padding:2px 4px;background-color:#f0f0f0;border-radius:3px}@media print{html body{background-color:#fff}html body h1,html body h2,html body h3,html body h4,html body h5,html body h6{color:#000;page-break-after:avoid}html body blockquote{color:#5c5c5c}html body pre{page-break-inside:avoid}html body table{display:table}html body img{display:block;max-width:100%;max-height:100%}html body code,html body pre{word-wrap:break-word;white-space:pre}}.markdown-preview{width:100%;height:100%;box-sizing:border-box}.markdown-preview ul{list-style:disc}.markdown-preview ul ul{list-style:circle}.markdown-preview ul ul ul{list-style:square}.markdown-preview ol{list-style:decimal}.markdown-preview ol ol,.markdown-preview ul ol{list-style-type:lower-roman}.markdown-preview ol ol ol,.markdown-preview ol ul ol,.markdown-preview ul ol ol,.markdown-preview ul ul ol{list-style-type:lower-alpha}.markdown-preview .newpage,.markdown-preview .pagebreak{page-break-before:always}.markdown-preview pre.line-numbers{position:relative;padding-left:3.8em;counter-reset:linenumber}.markdown-preview pre.line-numbers>code{position:relative}.markdown-preview pre.line-numbers .line-numbers-rows{position:absolute;pointer-events:none;top:1em;font-size:100%;left:0;width:3em;letter-spacing:-1px;border-right:1px solid #999;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.markdown-preview pre.line-numbers .line-numbers-rows>span{pointer-events:none;display:block;counter-increment:linenumber}.markdown-preview pre.line-numbers .line-numbers-rows>span:before{content:counter(linenumber);color:#999;display:block;padding-right:.8em;text-align:right}.markdown-preview .mathjax-exps .MathJax_Display{text-align:center!important}.markdown-preview:not([data-for=preview]) .code-chunk .code-chunk-btn-group{display:none}.markdown-preview:not([data-for=preview]) .code-chunk .status{display:none}.markdown-preview:not([data-for=preview]) .code-chunk .output-div{margin-bottom:16px}.markdown-preview .md-toc{padding:0}.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link{display:inline;padding:.25rem 0}.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link div,.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link p{display:inline}.markdown-preview .md-toc .md-toc-link-wrapper.highlighted .md-toc-link{font-weight:800}.scrollbar-style::-webkit-scrollbar{width:8px}.scrollbar-style::-webkit-scrollbar-track{border-radius:10px;background-color:transparent}.scrollbar-style::-webkit-scrollbar-thumb{border-radius:5px;background-color:rgba(150,150,150,.66);border:4px solid rgba(150,150,150,.66);background-clip:content-box}html body[for=html-export]:not([data-presentation-mode]){position:relative;width:100%;height:100%;top:0;left:0;margin:0;padding:0;overflow:auto}html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{position:relative;top:0;min-height:100vh}@media screen and (min-width:914px){html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{padding:2em calc(50% - 457px + 2em)}}@media screen and (max-width:914px){html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{padding:2em}}@media screen and (max-width:450px){html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{font-size:14px!important;padding:1em}}@media print{html body[for=html-export]:not([data-presentation-mode]) #sidebar-toc-btn{display:none}}html body[for=html-export]:not([data-presentation-mode]) #sidebar-toc-btn{position:fixed;bottom:8px;left:8px;font-size:28px;cursor:pointer;color:inherit;z-index:99;width:32px;text-align:center;opacity:.4}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] #sidebar-toc-btn{opacity:1}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc{position:fixed;top:0;left:0;width:300px;height:100%;padding:32px 0 48px 0;font-size:14px;box-shadow:0 0 4px rgba(150,150,150,.33);box-sizing:border-box;overflow:auto;background-color:inherit}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar{width:8px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-track{border-radius:10px;background-color:transparent}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-thumb{border-radius:5px;background-color:rgba(150,150,150,.66);border:4px solid rgba(150,150,150,.66);background-clip:content-box}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc a{text-decoration:none}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc{padding:0 16px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link{display:inline;padding:.25rem 0}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link div,html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link p{display:inline}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper.highlighted .md-toc-link{font-weight:800}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{left:300px;width:calc(100% - 300px);padding:2em calc(50% - 457px - 300px / 2);margin:0;box-sizing:border-box}@media screen and (max-width:1274px){html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{padding:2em}}@media screen and (max-width:450px){html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{width:100%}}html body[for=html-export]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .markdown-preview{left:50%;transform:translateX(-50%)}html body[for=html-export]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .md-sidebar-toc{display:none}
+/* Please visit the URL below for more information: */
+/*   https://shd101wyy.github.io/markdown-preview-enhanced/#/customize-css */
+
+      </style>
+      <!-- The content below will be included at the end of the <head> element. --><script type="text/javascript">
+  document.addEventListener("DOMContentLoaded", function () {
+    // your code here
+  });
+</script></head><body for="html-export">
+    
+    
+      <div class="crossnote markdown-preview  ">
+      
+<h1 id="weekly-update">Weekly Update </h1>
+<h2 id="context-boundaries--sourcesink-identification-in-type-iiiii-monolithic-firmware">Context boundaries + Source/Sink identification in Type II/III monolithic firmware </h2>
+<h3 id="worked-example-code-style-cve-2020-10065-zephyr-hci-over-spi">Worked example (code-style): CVE-2020-10065 (Zephyr HCI over SPI) </h3>
+<h2 id="1-three-points-i-will-emphasize">1) Three points I will emphasize </h2>
+<h3 id="a-context-boundaries-are-the-ipc-of-type-iiiii">(A) Context boundaries are the “IPC” of Type II/III </h3>
+<p>Type II/III firmware is often a <strong>single monolithic binary</strong>, but it executes in multiple contexts:</p>
+<ul>
+<li><strong>ISR context</strong> (interrupt handlers)</li>
+<li><strong>Task/thread context</strong> (RTOS)</li>
+<li><strong>Main-loop context</strong> (bare-metal super-loop)</li>
+<li>optional <strong>workqueue/deferred handler</strong> context</li>
+<li><strong>DMA</strong> as a “hardware producer” (data written to RAM without CPU loads)</li>
+</ul>
+<p>The key Type-II/III obstacle is that important data flows cross these contexts via <strong>global buffers, ring buffers, queues, and state flags</strong>, not via a normal call chain.</p>
+<h3 id="b-why-we-look-for-sources-and-how-we-find-them">(B) Why we look for <strong>sources</strong>, and how we find them </h3>
+<p>In Type II/III, <strong>source = external / attacker-influenced input</strong>. Instead of syscalls (Type-I), the dominant sources are:</p>
+<ul>
+<li><strong>MMIO reads</strong> from FIFO/data registers (UART/SPI/I2C/USB/ETH)</li>
+<li><strong>DMA-backed buffers</strong> (peripheral/DMA writes RAM directly)</li>
+<li><strong>ISR-filled buffers</strong> (ISR writes a global/static buffer that later gets parsed in task/main)</li>
+</ul>
+<p><strong>Current SourceAgent approach (evidence-grounded labeling):</strong></p>
+<ol>
+<li>Lift the program to Ghidra p-code.</li>
+<li>Build a <strong>MemoryAccessIndex (MAI)</strong> of LOAD/STORE operations.</li>
+<li>Mine source candidates using bounded slicing over p-code:
+<ul>
+<li>For <strong>MMIO_READ</strong>: a LOAD where the address expression traces back to a <strong>constant base</strong> in the peripheral/MMIO range.</li>
+<li>Strengthen with context: if the site is in ISR context, mark <strong>ISR_MMIO_READ</strong>.</li>
+<li>For <strong>ISR_FILLED_BUFFER</strong>: find an object written in ISR context and read/parsed outside ISR.</li>
+<li>For <strong>DMA_BACKED_BUFFER</strong>: detect DMA configuration clusters and slice the destination pointer to a stable RAM object.</li>
+</ul>
+</li>
+</ol>
+<p><strong>Output:</strong> structured source labels with evidence (site, addr expr, slice roots) and a verifier verdict (fail-closed).</p>
+<h3 id="c-why-we-look-for-sinks-and-how-we-find-them">(C) Why we look for <strong>sinks</strong>, and how we find them </h3>
+<p>A <strong>sink</strong> is a program point that can cause memory corruption or dangerous control transfers when fed unsafe data. In our staged taxonomy:</p>
+<ul>
+<li><strong>COPY_SINK</strong>: memcpy/strcpy/memmove and copy-like wrappers (e.g., net_buf_add_mem)</li>
+<li><strong>MEMSET_SINK</strong>: memset/memclr with variable length/target</li>
+<li><strong>STORE_SINK</strong>: indirect stores through pointers or base+offset</li>
+<li><strong>LOOP_WRITE_SINK</strong>: loop-based writes (often inlined copy/write)</li>
+<li><strong>FUNC_PTR_SINK</strong>: indirect calls (CALLIND), handler tables</li>
+<li><strong>FORMAT_STRING_SINK</strong>: sprintf/vsnprintf with non-literal format</li>
+</ul>
+<p><strong>Current sink mining strategy (staged):</strong></p>
+<ol>
+<li><strong>API/signature-based sinks first</strong> (stable): find callsites to known routines; extract key args (dst/src/len/format) using p-code slices.</li>
+<li><strong>Hard-mode sinks later</strong> (loop/callind): detect STORE-in-loop or CALLIND patterns and emit candidates with conservative confidence until verified.</li>
+</ol>
+<p><strong>Important:</strong> source labels + sink labels are <em>building blocks</em>. To claim a vulnerability, we still need to connect them via cross-context channels and show missing/weak checks.</p>
+<h2 id="2-worked-example-cve-2020-10065-zephyr-hci-over-spi">2) Worked example: CVE-2020-10065 (Zephyr HCI over SPI) </h2>
+<h3 id="21-what-we-want-to-recover-chain-view">2.1 What we want to recover (chain view) </h3>
+<p>The vulnerability fits a common Type II/III pattern:</p>
+<p><strong>SPI FIFO (MMIO) -&gt; RX buffer -&gt; parse length -&gt; copy into fixed destination (COPY sink) -&gt; missing/weak bounds check</strong></p>
+<p>The important twist (vs Type-I) is that different parts of the chain can sit in different contexts (ISR vs task/worker), and communication happens through shared objects (flags, buffers, queues).</p>
+<h3 id="22-representative-pseudocode-decompiler-style">2.2 Representative pseudocode (decompiler-style) </h3>
+<p>This is a representative shape of the flow (names simplified to highlight the semantics):</p>
+<pre data-role="codeBlock" data-info="c" class="language-c c"><code><span class="token comment">// Producer side: short ISR/callback that wakes a consumer</span>
+<span class="token keyword keyword-void">void</span> <span class="token function">spi_ready_isr</span><span class="token punctuation">(</span><span class="token keyword keyword-void">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  rx_ready <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>             <span class="token comment">// flag or event</span>
+  <span class="token function">give</span><span class="token punctuation">(</span>rx_sem<span class="token punctuation">)</span><span class="token punctuation">;</span>             <span class="token comment">// optional RTOS signal</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// Consumer side: thread/task that reads SPI FIFO and parses a packet</span>
+<span class="token keyword keyword-void">void</span> <span class="token function">hci_spi_rx_thread</span><span class="token punctuation">(</span><span class="token keyword keyword-void">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token function">take</span><span class="token punctuation">(</span>rx_sem<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword keyword-if">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>rx_ready<span class="token punctuation">)</span> <span class="token keyword keyword-return">return</span><span class="token punctuation">;</span>
+  rx_ready <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// SOURCE: reads from SPI FIFO / data register (MMIO)</span>
+  <span class="token keyword keyword-for">for</span> <span class="token punctuation">(</span>i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> HDR_LEN<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    hdr<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token operator">*</span><span class="token punctuation">(</span><span class="token keyword keyword-volatile">volatile</span> <span class="token class-name">uint8_t</span><span class="token operator">*</span><span class="token punctuation">)</span>SPI1_DR<span class="token punctuation">;</span>    <span class="token comment">// MMIO_READ</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token comment">// PARSE: length derived from attacker-controlled header bytes</span>
+  payload_len <span class="token operator">=</span> <span class="token punctuation">(</span>hdr<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">&lt;&lt;</span> <span class="token number">8</span><span class="token punctuation">)</span> <span class="token operator">|</span> hdr<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">;</span>      <span class="token comment">// example: 16-bit length</span>
+
+  <span class="token keyword keyword-for">for</span> <span class="token punctuation">(</span>i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> payload_len<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    payload<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token operator">*</span><span class="token punctuation">(</span><span class="token keyword keyword-volatile">volatile</span> <span class="token class-name">uint8_t</span><span class="token operator">*</span><span class="token punctuation">)</span>SPI1_DR<span class="token punctuation">;</span> <span class="token comment">// MMIO_READ</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token comment">// SINK: copy into a destination buffer (direct or wrapper)</span>
+  <span class="token function">net_buf_add_mem</span><span class="token punctuation">(</span>dst<span class="token punctuation">,</span> payload<span class="token punctuation">,</span> payload_len<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// copy-like wrapper</span>
+  <span class="token comment">// internally: memcpy(dst_ptr, payload, payload_len);</span>
+<span class="token punctuation">}</span>
+</code></pre><h3 id="23-how-the-pipeline-identifies-each-part">2.3 How the pipeline identifies each part </h3>
+<h4 id="step-1-context-boundary-recovery-why--how">Step 1: Context boundary recovery (why + how) </h4>
+<p>Goal: distinguish ISR-context from task/main-context so we can talk about cross-context edges.</p>
+<ul>
+<li><strong>ISR entrypoints</strong>: parsed from Cortex-M vector table; functions reachable from these are tagged <code>ISR</code>.</li>
+<li><strong>Task/worker entrypoints</strong>: if symbols exist, locate RTOS creation calls; if stripped, fall back to wait/signal patterns (sem take/queue receive loops) to mark likely consumer threads.</li>
+</ul>
+<p>Output: a <strong>ContextIndex</strong> tagging functions as ISR/task/main/unknown.</p>
+<h4 id="step-2-source-detection-on-this-cve">Step 2: Source detection on this CVE </h4>
+<p>Goal: locate hardware-driven inputs.</p>
+<ul>
+<li>The FIFO read <code>*(volatile uint8_t*)SPI1_DR</code> is detected as <strong>MMIO_READ</strong> because the address expression slices to a constant peripheral-range base.</li>
+<li>If it happens in an ISR-tagged function, it becomes <strong>ISR_MMIO_READ</strong>.</li>
+</ul>
+<p>Output: evidence-grounded label like:</p>
+<ul>
+<li><code>MMIO_READ @ SPI1_DR</code> (with p-code slice showing <code>addr := CONST(0x40013000) + 0x0c</code> style pattern)</li>
+</ul>
+<h4 id="step-3-sink-detection-on-this-cve">Step 3: Sink detection on this CVE </h4>
+<p>Goal: locate the dangerous copy/write operation.</p>
+<ul>
+<li>If the copy is via a recognized API (<code>memcpy</code>) or a known wrapper (<code>net_buf_add_mem</code>), we emit <strong>COPY_SINK</strong> at the callsite.</li>
+<li>If the copy is inlined, we try to emit <strong>LOOP_WRITE_SINK</strong> / <code>COPY_SINK (idiom)</code> based on store-in-loop patterns.</li>
+</ul>
+<p>Output: evidence-grounded sink label like:</p>
+<ul>
+<li><code>COPY_SINK @ net_buf_add_mem(...)</code> or <code>COPY_SINK @ memcpy(...)</code></li>
+</ul>
+<h4 id="step-4-what-is-still-missing-to-make-this-a-vulnerability-finding">Step 4: What is still missing to make this a <em>vulnerability</em> finding </h4>
+<p>Source and sink are necessary but not sufficient. We still need these modules:</p>
+<ol>
+<li>
+<p><strong>ChannelGraph (IPC-equivalent object recovery)</strong></p>
+<ul>
+<li>Identify the objects that carry data across contexts:
+<ul>
+<li><code>rx_ready</code> flag, <code>rx_sem</code> semaphore/queue handle</li>
+<li>shared buffers (<code>hdr</code>, <code>payload</code>, ring buffers)</li>
+</ul>
+</li>
+<li>Build edges: <code>producer_context -&gt; object -&gt; consumer_context</code>.</li>
+</ul>
+</li>
+<li>
+<p><strong>Parse/Derive miner (taint -&gt; semantic variable transition)</strong></p>
+<ul>
+<li>Recognize that <code>payload_len</code> is derived from attacker-controlled bytes:
+<ul>
+<li><code>payload_len &lt;- hdr[k..k+1]</code> or <code>payload_len &lt;- buf[offset]</code>.</li>
+</ul>
+</li>
+<li>This is what links raw input bytes to the sink’s dangerous argument.</li>
+</ul>
+</li>
+<li>
+<p><strong>Check summarizer (is there a real bound?)</strong></p>
+<ul>
+<li>Detect clamps/guards that dominate the sink:
+<ul>
+<li><code>if (payload_len &lt;= MAX)</code> or <code>payload_len = MIN(payload_len, MAX)</code>.</li>
+</ul>
+</li>
+<li>Decide: CHECK present/weak/absent.</li>
+</ul>
+</li>
+<li>
+<p><strong>Evidence-chain linker (sink-first linking)</strong></p>
+<ul>
+<li>Starting from the sink, backward-slice <code>payload_len</code>.</li>
+<li>If the slice reaches a shared object, jump across ChannelGraph to the producer side.</li>
+<li>Stop when reaching a source (MMIO/DMA) or budget limit.</li>
+</ul>
+</li>
+</ol>
+<p>The final output becomes a chain like:</p>
+<ul>
+<li><code>MMIO_READ(SPI1_DR) -&gt; fills hdr[] -&gt; payload_len derived -&gt; COPY_SINK(len=payload_len) -&gt; missing/weak check</code></li>
+</ul>
+<h3 id="24-where-llm-helps-optional-but-useful-for-advisor-narrative">2.4 Where LLM helps (optional, but useful for advisor narrative) </h3>
+<p>LLM is not used to invent facts. It is used to reduce manual effort in the hardest-to-generalize semantic steps:</p>
+<ul>
+<li>Summarize parse logic (which header bytes form length/type?)</li>
+<li>Judge check adequacy (is the guard actually bounding the copy?)</li>
+<li>Classify ambiguous loops (copy loop vs benign loop)</li>
+</ul>
+<p>All LLM claims must be backed by evidence items and pass verifier obligations.</p>
+<h2 id="3-why-type-i-work-starts-from-syscallsipc-but-we-start-from-context-boundaries">3) Why Type-I work starts from syscalls/IPC, but we start from context boundaries </h2>
+<p>In Type-I (embedded Linux/service firmware), the OS provides stable, explicit input endpoints (e.g., file/socket reads, ioctl) and explicit IPC edges (socket/pipe/RPC). This means “source modeling” can start with syscalls and IPC semantics.</p>
+<p>In Type II/III, those abstractions are absent or blurred:</p>
+<ul>
+<li>hardware-driven inputs replace syscalls (MMIO, interrupts, DMA)</li>
+<li>propagation often crosses ISR/task/main via shared objects (flags, ring buffers, queues)</li>
+</ul>
+<p>So in Type II/III, <strong>context boundaries + async communication objects</strong> are necessary to connect a source label to a sink label.</p>
+<h2 id="4-what-remains-to-build-after-sourcesink-identification-short-list">4) What remains to build after source+sink identification (short list) </h2>
+<p>If the goal is “find more real vulnerabilities” (not just label sites), we need:</p>
+<ol>
+<li><strong>ContextIndex</strong> (done / baseline): ISR vs non-ISR tagging.</li>
+<li><strong>ChannelGraph MVP</strong> (next): recover cross-context producer-consumer objects.</li>
+<li><strong>Parse/Derive miner</strong> (next): recognize len/index/type derived from input buffers.</li>
+<li><strong>Check summarizer</strong> (next): identify effective bounds checks (or lack thereof).</li>
+<li><strong>Evidence-chain linker</strong> (next): sink-first linking from sink args back to sources (jump across channels).</li>
+<li>Optional: <strong>LLM triage on suspicious</strong> to summarize complex parsing and check adequacy, then verify with obligations.</li>
+</ol>
+<h2 id="5-minimal-tomorrow-ready-framing">5) Minimal “tomorrow-ready” framing </h2>
+<ul>
+<li>Today: we have a trustworthy, evidence-grounded layer that can label <strong>where input enters</strong> (sources) and <strong>where dangerous operations happen</strong> (sinks).</li>
+<li>Next: we connect them with a recovered async graph + short slicing to produce <strong>actionable source-to-sink chains</strong> (and reduce FP).</li>
+</ul>
+
+      </div>
+      
+      
+    
+    
+    
+    
+    
+    
+  
+    </body></html>

@@ -1,0 +1,39 @@
+# Environment (contains API keys)
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+
+# IDE
+.vscode/
+.idea/
+
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local crash / temp
+hs_err_pid*
+*.log
+
+# Local analysis/cache artifacts
+pyghidra_mcp_projects/
+
+# Firmware policy for GitHub upload:
+# keep only microbench as requested
+firmware/*
+!firmware/microbench/
+!firmware/microbench/**
+
+# Ignore nested Git metadata if any path gets included
+**/.git
