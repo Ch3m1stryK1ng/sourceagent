@@ -47,6 +47,8 @@ Instead, the next stage should calibrate the semantic verdict assigned to a chai
 - whether the active root remains attacker-controllable at the sink
 - whether parser/helper semantics make the chain closer to `SAFE_OR_LOW_RISK`, `SUSPICIOUS`, or `CONFIRMED`
 - whether a state predicate is a real exploit barrier or only a weak gate
+- whether a chain candidate is statically triggerable under some input/state sketch
+- whether a pipeline artifact bundle contains an internal inconsistency that should raise an audit flag
 
 ### What the LLM must not override directly
 
@@ -92,6 +94,18 @@ Suggested top-level structure:
   "channel_path": [...],
   "derive_facts": [...],
   "check_facts": [...],
+  "sink_semantics_hints": {
+    "dst_expr": "buf",
+    "src_expr": "&rxmsg[1]",
+    "len_expr": "rxmsg[2] + 2",
+    "dst_capacity_candidates": ["sizeof(buf)", "NET_BUF_AVAILABLE(buf)"]
+  },
+  "guard_context": [
+    {"expr": "payload_len < max_len", "site": "caller_bridge", "dominance": "unknown"}
+  ],
+  "capacity_evidence": [
+    {"expr": "sizeof(buf)", "site": "sink_function", "kind": "local_array_size"}
+  ],
   "evidence_refs": [...],
   "decompiled_snippets": {
     "sink_function": "...",
@@ -108,6 +122,12 @@ Suggested top-level structure:
 }
 ```
 
+Additional deterministic requirements:
+- `sink_semantics_hints` must be emitted when the sink class supports them.
+- `guard_context` should include nearby syntactic guards even when dominance is not yet proven.
+- `capacity_evidence` should include any deterministic capacity candidate that might matter for exploitability.
+- the pack should preserve the current deterministic verdict and the reason code that produced it.
+
 ## Deliverable B: LLM Input Filter
 
 Only a bounded subset should go to `BinAgent` / LLM.
@@ -117,21 +137,27 @@ Default candidate classes:
 - `verdict_over`
 - chains currently labeled `SUSPICIOUS`
 - samples whose suspicious ratio exceeds a threshold
+- optionally, all structurally valid matched chains if the user explicitly wants broader semantic review
 
 This boundary should be tunable.
 
 Suggested CLI/config knobs:
-- `--calibration-mode exact_mismatch|suspicious_only|all_non_exact`
+- `--calibration-mode exact_mismatch|suspicious_only|all_non_exact|audit_only|all_matched`
 - `--max-calibration-chains N`
 - `--sample-suspicious-ratio-threshold F`
 - `--allow-manual-llm-supervision`
 - `--llm-promote-budget N`
 - `--llm-demote-budget N`
+- `--llm-soft-budget N`
+- `--min-risk-score F`
+- `--review-needs-threshold F`
+- `--verdict-output-mode strict|soft|dual`
 
 Rationale:
 - the user may want broader LLM review than only strict exact mismatches
 - verifier runtime is not the main bottleneck
 - manual supervision should be allowed when deterministic boundaries are respected
+- the system should support a softer review boundary when the goal is to produce richer auditable material for `BinAgent`
 
 ## Deliverable C: LLM Question Contract
 
@@ -152,7 +178,36 @@ Disallowed questions:
 - Is the channel path real?
 - Is the chosen root the correct root?
 
-## Deliverable D: Manual Supervision Path
+## Deliverable D: Trigger Sketch Contract
+
+The LLM should not only return a verdict suggestion. It should also summarize the static trigger logic in a bounded, auditable format.
+
+Suggested output shape:
+
+```json
+{
+  "suggested_semantic_verdict": "SUSPICIOUS",
+  "confidence": 0.74,
+  "trigger_summary": "The attacker controls payload_len through rxmsg[2], the sink copies payload_len bytes into buf, and the visible guard does not constrain payload_len at the callsite.",
+  "preconditions": {
+    "state_predicates": ["rx_ready != 0"],
+    "root_constraints": ["payload_len > dst_capacity"],
+    "why_check_fails": ["visible check compares msg_type, not payload_len"]
+  },
+  "audit_flags": [],
+  "evidence_map": {
+    "trigger_summary": ["sink_function", "caller_bridge"],
+    "root_constraints": ["sink_function"],
+    "why_check_fails": ["caller_bridge"]
+  }
+}
+```
+
+Mandatory rule:
+- no semantic conclusion may be accepted without an `evidence_map`.
+- missing `evidence_map` means fail-closed and keep the deterministic verdict.
+
+## Deliverable E: Manual Supervision Path
 
 The user requested a supervised override path. That is reasonable as long as it does not bypass deterministic facts.
 
@@ -169,6 +224,51 @@ Suggested flow:
    - acceptance reason
 
 This preserves auditability.
+
+Recommended addition:
+- store whether the review was automatic or manually supervised
+- store the exact calibration mode and threshold values used for the decision
+
+## Deliverable F: Audit-Only Mode
+
+`BinAgent` should also support an audit-only path.
+
+Goal:
+- inspect pipeline artifacts
+- flag inconsistencies
+- request more context
+- do not change the verdict
+
+Typical audit flags:
+- `root_mismatch`
+- `sink_arg_mismatch`
+- `check_not_binding_root`
+- `channel_inconsistency`
+- `needs_more_context`
+
+This is the right place to let the LLM act as the "supervisor" you described without letting it replace deterministic fact extraction.
+
+## Verdict Representation
+
+Keep the existing three verdict classes:
+- `SAFE_OR_LOW_RISK`
+- `SUSPICIOUS`
+- `CONFIRMED`
+
+Do not expand the core class set.
+
+Instead, make the output softer by adding side-band fields:
+- `risk_score`
+- `confidence`
+- `reasons[]`
+- `needs_review`
+- `llm_reviewed`
+- `audit_flags[]`
+
+Recommended policy:
+- `strict` output remains the canonical evaluator-facing verdict.
+- `soft` output carries richer review material for `BinAgent`.
+- `dual` writes both forms side by side.
 
 ## Fail-Closed Policy
 
@@ -187,14 +287,18 @@ New files to add in a future implementation:
 - `summary/verdict_calibration_queue.json`
 - `summary/verdict_calibration_decisions.json`
 - `summary/verdict_calibration_report.md`
+- `summary/verdict_audit_flags.json`
+- `summary/verdict_soft_triage.json`
 
 ## Suggested Implementation Order
 
 1. Emit deterministic verdict feature packs from `SourceAgent`.
-2. Add queue selection with tunable boundaries.
-3. Add a local `BinAgent`/LLM adapter that reads only the feature packs.
-4. Add fail-closed post-checks.
-5. Compare:
+2. Add queue selection with tunable boundaries and output modes.
+3. Add trigger-sketch JSON output for the LLM path.
+4. Add a local `BinAgent`/LLM adapter that reads only the feature packs.
+5. Add fail-closed post-checks.
+6. Add audit-only mode.
+7. Compare:
    - exact verdict before calibration
    - exact verdict after calibration
    - any over-promotion regressions
@@ -209,3 +313,4 @@ Minimum success criteria:
 - no channel-required failures are introduced
 - `verdict_under` decreases materially
 - `verdict_over` does not increase
+- every accepted LLM-driven promotion includes evidence-backed trigger conditions
