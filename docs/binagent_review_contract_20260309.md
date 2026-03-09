@@ -1,14 +1,23 @@
-# BinAgent Review Contract on Top of SourceAgent (2026-03-09)
+# BinAgent-Compatible Review Contract on Top of SourceAgent (2026-03-09)
 
 ## Goal
 
-Reuse BinAgent for semantic review without preserving duplicated deterministic recovery stages.
+Reuse the useful semantic-review behavior historically explored in BinAgent without preserving duplicated deterministic recovery stages.
 
-## Proposed Contract
+## Default Execution Model
 
-### SourceAgent Input to BinAgent
+SourceAgent is now the default execution surface:
 
-Per sample, BinAgent receives:
+1. stages 1-10 run deterministically
+2. SourceAgent emits review artifacts
+3. SourceAgent runs internal review by default unless `--disable-review` is set
+4. external review decisions are optional overrides supplied via `--verdict-review-json`
+
+That means an external reviewer is no longer the primary path. It is a compatibility and experimentation path.
+
+## SourceAgent Input to a Reviewer
+
+Per sample, a reviewer consumes:
 
 - `raw_views/<sample>.verdict_feature_pack.json`
 - `raw_views/<sample>.verdict_calibration_queue.json`
@@ -17,10 +26,12 @@ Per sample, BinAgent receives:
   - `raw_views/<sample>.chain_eval.json`
   - `raw_views/<sample>.channel_graph.json`
   - `raw_views/<sample>.sink_roots.json`
+  - `raw_views/<sample>.verdict_soft_triage.json`
+  - `raw_views/<sample>.verdict_audit_flags.json`
 
-### Minimum Required Fields From SourceAgent
+## Minimum Required Fields Per Queued Chain
 
-For each queued chain, SourceAgent must expose:
+For each queued chain, SourceAgent exposes:
 
 - `chain_id`
 - `sample_id`
@@ -35,14 +46,17 @@ For each queued chain, SourceAgent must expose:
 - `decompiled_snippets`
 - `deterministic_constraints`
 - `review_reason`
+- `sink_semantics_hints`
+- `guard_context`
+- `capacity_evidence`
 
-## BinAgent Output
+## Review Decision Output
 
-BinAgent should write one JSON file per run:
+A compatible reviewer writes one JSON file per run:
 
 - `review_decisions.json`
 
-Each decision entry should include:
+Each decision item should include:
 
 - `sample_id`
 - `chain_id`
@@ -58,7 +72,7 @@ Each decision entry should include:
 
 ## Strict Rules
 
-BinAgent is not allowed to override deterministic facts:
+A reviewer is not allowed to override deterministic facts:
 
 - source reachability
 - object binding
@@ -66,11 +80,11 @@ BinAgent is not allowed to override deterministic facts:
 - root matching
 - chain existence
 
-If BinAgent believes any of those are wrong, it must emit an audit flag instead of rewriting them.
+If a reviewer believes any of those are wrong, it must emit an audit flag instead of rewriting them.
 
 ## Audit Flags
 
-Allowed audit flags:
+Allowed audit flags include:
 
 - `root_mismatch`
 - `sink_arg_mismatch`
@@ -83,9 +97,10 @@ Allowed audit flags:
 
 1. SourceAgent runs stages 1-10.
 2. SourceAgent writes feature pack and calibration queue.
-3. BinAgent reviews queued chains only.
-4. SourceAgent post-checks the review decisions.
-5. SourceAgent emits final strict/soft/dual verdict outputs.
+3. SourceAgent optionally runs internal review.
+4. SourceAgent optionally merges external review decisions.
+5. SourceAgent applies decisions via fail-closed post-check.
+6. SourceAgent emits final strict / soft / dual verdict outputs.
 
 ## What To Remove From BinAgent
 
@@ -95,11 +110,11 @@ The following deterministic functionality should not remain active in the long-t
 - stage2 callsite expansion as authority
 - stage3 deterministic verdicting as authority
 
-Those can remain temporarily for compatibility testing, but should be bypassed in the SourceAgent-backed path.
+Those can remain temporarily for compatibility testing, but should be bypassed whenever SourceAgent artifacts exist.
 
-## Recommended Near-Term Implementation
+## Recommended Compatibility Mode
 
-Add a new BinAgent mode:
+If BinAgent remains in use during transition, add a mode equivalent to:
 
 - `--input-sourceagent-review-queue <dir>`
 
@@ -107,7 +122,7 @@ Behavior:
 
 - load SourceAgent queue and feature packs
 - create review plan only from queued chains
-- skip BinAgent preflight/stage2/stage3 deterministic reconstruction
+- skip BinAgent preflight / stage2 / stage3 deterministic reconstruction
 - emit `review_decisions.json`
 
 This keeps BinAgent useful while avoiding duplicated recovery logic.

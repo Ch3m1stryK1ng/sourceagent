@@ -189,6 +189,23 @@ def load_review_decisions(path: Optional[str | Path]) -> List[Dict[str, Any]]:
     return []
 
 
+def merge_review_decisions(
+    internal_decisions: Sequence[Mapping[str, Any]],
+    external_decisions: Sequence[Mapping[str, Any]],
+) -> List[Dict[str, Any]]:
+    """Merge review decisions by chain_id, preferring explicit external overrides."""
+    merged: Dict[str, Dict[str, Any]] = {}
+    for raw in internal_decisions:
+        chain_id = str(raw.get("chain_id", "") or "")
+        if chain_id:
+            merged[chain_id] = dict(raw)
+    for raw in external_decisions:
+        chain_id = str(raw.get("chain_id", "") or "")
+        if chain_id:
+            merged[chain_id] = dict(raw)
+    return list(merged.values())
+
+
 def _build_feature_item(
     chain: Mapping[str, Any],
     *,
@@ -574,12 +591,14 @@ def _validate_and_apply_decision(
             "audit_flags": ["hard_block_reason_code"],
         }
 
+    accepted = True
+    final_suggested = suggested
     if calibration_mode == "audit_only":
-        accepted = True
-    else:
-        accepted = True
+        final_suggested = str(
+            feature_item.get("strict_verdict", feature_item.get("current_verdict", "DROP")) or "DROP"
+        )
 
-    return suggested, {
+    return final_suggested, {
         "accepted": accepted,
         "accept_reason": "ACCEPTED_REVIEW",
         "review_mode": str(raw_decision.get("review_mode", "external") or "external"),

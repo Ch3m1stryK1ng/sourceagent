@@ -4,14 +4,14 @@
 
 This note answers two practical questions:
 
-1. What information should SourceAgent pass to BinAgent before any LLM review?
-2. Should BinAgent's existing preflight / stage2 / stage3 logic be ported into SourceAgent, or should BinAgent consume SourceAgent artifacts instead?
+1. What information should SourceAgent expose to a semantic reviewer before any LLM review?
+2. Should BinAgent's existing preflight / stage2 / stage3 logic be ported into SourceAgent, or should SourceAgent become the single execution surface?
 
-The answer below is based on the current code in both repos, not on older planning notes.
+The answer below is based on the current code in both repos and on the current SourceAgent default review-on path.
 
 ## Current State
 
-SourceAgent now already produces the deterministic pre-flight materials that BinAgent needs:
+SourceAgent already produces the deterministic pre-flight materials needed for semantic review:
 
 - verified source/sink labels
 - evidence packs
@@ -24,8 +24,9 @@ SourceAgent now already produces the deterministic pre-flight materials that Bin
 - verdict calibration queue
 - verdict soft triage
 - verdict audit flags
+- internal review plan / review trace
 
-In other words, SourceAgent already owns the deterministic facts.
+In other words, SourceAgent already owns the deterministic facts and now also owns the default review execution path.
 
 BinAgent still contains its own deterministic pipeline:
 
@@ -33,7 +34,7 @@ BinAgent still contains its own deterministic pipeline:
 - `pentestagent/agents/stage2.py`
 - `pentestagent/agents/general_agent.py` stage3 flow
 
-This creates overlap.
+This is duplicated recovery logic if used in parallel with SourceAgent.
 
 ## Concrete Overlap
 
@@ -106,16 +107,16 @@ Do **not** keep two deterministic pipelines.
 
 Use this split:
 
-- SourceAgent = single deterministic pre-flight and structural recovery engine
-- BinAgent = semantic reviewer / auditor / verdict calibrator
+- SourceAgent = single execution surface, deterministic pre-flight owner, and default review runner
+- external reviewer (LLM / BinAgent-compatible implementation) = optional semantic reviewer only
 
 ### Why
 
-If both repos continue to recover roots, closures, evidence packs, and verdicts independently, three problems appear:
+If two repos both recover roots, closures, evidence packs, and verdicts independently, three problems appear:
 
 1. duplicated engineering effort
 2. inconsistent facts across repos
-3. unclear ownership when a review disagrees with a structural chain
+3. unclear ownership when review disagrees with the structural chain
 
 A single deterministic owner is cleaner and easier to debug.
 
@@ -126,8 +127,7 @@ SourceAgent is already the stronger candidate because it owns:
 - cross-context tunnel linking
 - microbench / mesobench GT-backed evaluation
 - deterministic verdict feature pack
-
-BinAgent should stop re-deriving those facts.
+- default review-on orchestration
 
 ## Recommended Architecture
 
@@ -143,10 +143,11 @@ SourceAgent should remain responsible for all deterministic facts:
 - derive/check extraction
 - deterministic verdict basis
 - queue building for semantic review
+- default in-process review planning / batching / result application
 
-### BinAgent Responsibilities
+### Semantic Review Responsibilities
 
-BinAgent should only perform semantic review on a narrowed candidate set:
+The semantic reviewer should only operate on a narrowed candidate set:
 
 - review non-exact verdicts
 - review suspicious-heavy samples
@@ -155,21 +156,21 @@ BinAgent should only perform semantic review on a narrowed candidate set:
 - produce trigger sketches
 - produce audit flags against deterministic artifacts
 
-### Artifacts to Pass from SourceAgent to BinAgent
+### Artifacts to Pass to a Semantic Reviewer
 
-Per sample, BinAgent should consume:
+Per sample, the reviewer should consume:
 
-- `*.pipeline.json`
-- `*.channel_graph.json`
-- `*.sink_roots.json`
-- `*.chains.json`
-- `*.chain_eval.json`
 - `*.verdict_feature_pack.json`
 - `*.verdict_calibration_queue.json`
-- `*.verdict_soft_triage.json`
-- `*.verdict_audit_flags.json`
+- optional:
+  - `*.chains.json`
+  - `*.chain_eval.json`
+  - `*.channel_graph.json`
+  - `*.sink_roots.json`
+  - `*.verdict_soft_triage.json`
+  - `*.verdict_audit_flags.json`
 
-Minimum required input for BinAgent review should be:
+Minimum required input for review should be:
 
 - `verdict_feature_pack.json`
 - `verdict_calibration_queue.json`
@@ -178,50 +179,51 @@ Everything else is optional context.
 
 ## Migration Options
 
-### Option A: Keep BinAgent As Semantic Review-Only Layer
+### Option A: Keep an External Reviewer Adapter
 
-This is the recommended near-term plan.
+This is the compatibility path, not the preferred end-state.
 
 Implementation:
 
-- leave SourceAgent deterministic pipeline as-is
-- add a BinAgent adapter that reads SourceAgent review queue
-- run LLM review only on queued chains
+- keep SourceAgent deterministic pipeline and default internal review-on behavior as-is
+- add an external adapter that reads SourceAgent review queue
+- run semantic review only on queued chains
 - emit `review_decisions.json`
-- feed that decision file back into SourceAgent fail-closed post-check
+- feed that decision file back into SourceAgent fail-closed post-check via `--verdict-review-json`
 
 Pros:
 
 - smallest code churn
-- preserves existing BinAgent LLM orchestration patterns
-- avoids deterministic duplication
-- easiest to test incrementally
+- preserves existing BinAgent prompt / orchestration experiments
+- useful for A/B testing reviewer prompts
 
 Cons:
 
 - two repos remain active
-- some artifact schema coordination is still needed
+- schema coordination is still needed
 
-### Option B: Port BinAgent Review Logic Into SourceAgent
+### Option B: Rebuild the Useful BinAgent Review Shell Inside SourceAgent
 
-This is reasonable only after the review loop stabilizes.
+This is the recommended end-state.
 
 Implementation:
 
-- move only LLM review planning / execution scaffolding
-- do **not** port BinAgent preflight / stage2 / stage3 deterministic logic
 - keep SourceAgent artifacts as single source of truth
+- keep review enabled by default in `eval` / `mine`
+- move only the useful LLM review planning / execution scaffolding in-process
+- do **not** port BinAgent preflight / stage2 / stage3 deterministic logic
 
 Pros:
 
 - one repo
-- simpler operational story
+- one authority for facts
+- one CLI path (`eval` / `mine`) for deterministic + review output
 - easier end-to-end evaluation
 
 Cons:
 
 - more immediate refactoring work
-- review workflow and prompts will need revalidation
+- review workflow and prompts must be revalidated inside SourceAgent
 
 ## What To Reuse From BinAgent
 
@@ -240,74 +242,25 @@ Poor reuse candidates:
 - `stage2.py` callsite extraction / closure building as an authority
 - `run_stage3(...)` deterministic verdicting as an authority
 
-In practice, BinAgent should keep the orchestration shell and drop the duplicated recovery core whenever SourceAgent artifacts are present.
+In practice, BinAgent should be treated as a source of reusable review ideas and prompt structure, not as a second analysis authority.
 
 ## Recommended Sequence
 
 ### Phase 1
 
-Keep BinAgent external.
+Keep the current SourceAgent review-on path as the default execution surface.
 
-Build a SourceAgent -> BinAgent review adapter:
+Stabilize:
 
-1. SourceAgent writes deterministic review queue
-2. BinAgent reads queue and feature packs
-3. BinAgent writes semantic review decisions
-4. SourceAgent applies those decisions via fail-closed post-check
+1. `verdict_feature_pack.json`
+2. `verdict_calibration_queue.json`
+3. internal review planning / batching
+4. fail-closed decision application
 
 ### Phase 2
 
-After the adapter is stable and the review contract stops changing, consider collapsing the review loop into SourceAgent.
+If an external reviewer is still useful, keep it as an optional adapter that only consumes SourceAgent artifacts and only emits `review_decisions.json`.
 
-## What Should Not Move Into BinAgent
+### Phase 3
 
-BinAgent should not become the authority for:
-
-- source reachability
-- object matching
-- channel recovery
-- root extraction
-- chain construction
-- deterministic verdict basis
-
-Those are pre-flight facts and should stay in SourceAgent.
-
-## What BinAgent Should Be Allowed To Override
-
-Only soft semantic fields, and only through post-check:
-
-- suggested semantic verdict
-- trigger summary
-- guard effectiveness comment
-- attacker controllability comment
-- audit flags
-
-Even then, the final applied result must remain fail-closed.
-
-## Practical Next Step
-
-The next implementation step should be a thin adapter contract, not another recovery stage.
-
-Suggested files:
-
-- SourceAgent output:
-  - `verdict_feature_pack.json`
-  - `verdict_calibration_queue.json`
-- BinAgent output:
-  - `review_decisions.json`
-  - optional `audit_decisions.json`
-
-Then measure:
-
-- verdict exactness improvement
-- under/over reduction
-- review acceptance rate
-- false promotion rate after post-check
-
-## Bottom Line
-
-SourceAgent should own deterministic pre-flight.
-
-BinAgent should be reduced to semantic review and audit only.
-
-That is the cleanest way to avoid duplicated recovery logic while still reusing BinAgent's review-oriented strengths.
+When prompt / decision schemas stop changing, retire BinAgent as an execution dependency and keep only prompt assets or review experiments that still provide value.

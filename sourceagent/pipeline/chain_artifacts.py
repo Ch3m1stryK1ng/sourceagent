@@ -87,6 +87,8 @@ def build_phase_a_artifacts(
     llm_demote_budget: int = DEFAULT_LLM_DEMOTE_BUDGET,
     llm_soft_budget: int = DEFAULT_LLM_SOFT_BUDGET,
     review_decisions: List[Dict[str, Any]] | None = None,
+    review_plan: Dict[str, Any] | None = None,
+    review_trace: Dict[str, Any] | None = None,
 ) -> Dict[str, Any]:
     """Build all phase-A artifacts from the current pipeline result."""
     max_stage = int(max_stage or 10)
@@ -117,6 +119,8 @@ def build_phase_a_artifacts(
     verdict_calibration_decisions = _empty_verdict_calibration_decisions(binary_name, binary_sha256, calibration_mode=calibration_mode, verdict_output_mode=verdict_output_mode)
     verdict_audit_flags = _empty_verdict_audit_flags(binary_name, binary_sha256)
     verdict_soft_triage = _empty_verdict_soft_triage(binary_name, binary_sha256, calibration_mode=calibration_mode, verdict_output_mode=verdict_output_mode)
+    verdict_review_plan = _empty_verdict_review_plan(binary_name, binary_sha256)
+    verdict_review_trace = _empty_verdict_review_trace(binary_name, binary_sha256)
 
     if max_stage >= 8:
         channel_graph = build_channel_graph(
@@ -254,6 +258,18 @@ def build_phase_a_artifacts(
         verdict_audit_flags = verdict_artifacts.get("verdict_audit_flags", verdict_audit_flags)
         verdict_soft_triage = verdict_artifacts.get("verdict_soft_triage", verdict_soft_triage)
 
+    if max_stage >= 10:
+        if review_plan is not None:
+            verdict_review_plan = dict(review_plan)
+            verdict_review_plan.setdefault("binary", binary_name)
+            verdict_review_plan.setdefault("binary_sha256", binary_sha256)
+            verdict_review_plan.setdefault("stage_required", 10)
+        if review_trace is not None:
+            verdict_review_trace = dict(review_trace)
+            verdict_review_trace.setdefault("binary", binary_name)
+            verdict_review_trace.setdefault("binary_sha256", binary_sha256)
+            verdict_review_trace.setdefault("stage_required", 10)
+
     return {
         "channel_graph": channel_graph,
         "refined_objects": refined_objects,
@@ -267,6 +283,8 @@ def build_phase_a_artifacts(
         "verdict_calibration_decisions": verdict_calibration_decisions,
         "verdict_audit_flags": verdict_audit_flags,
         "verdict_soft_triage": verdict_soft_triage,
+        "verdict_review_plan": verdict_review_plan,
+        "verdict_review_trace": verdict_review_trace,
     }
 
 
@@ -315,6 +333,29 @@ def _empty_verdict_audit_flags(binary_name: str, binary_sha256: str) -> Dict[str
         "binary": binary_name,
         "binary_sha256": binary_sha256,
         "items": [],
+        "status": "not_run",
+        "stage_required": 10,
+    }
+
+
+def _empty_verdict_review_plan(binary_name: str, binary_sha256: str) -> Dict[str, Any]:
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "binary": binary_name,
+        "binary_sha256": binary_sha256,
+        "items": [],
+        "batches": [],
+        "status": "not_run",
+        "stage_required": 10,
+    }
+
+
+def _empty_verdict_review_trace(binary_name: str, binary_sha256: str) -> Dict[str, Any]:
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "binary": binary_name,
+        "binary_sha256": binary_sha256,
+        "batches": [],
         "status": "not_run",
         "stage_required": 10,
     }

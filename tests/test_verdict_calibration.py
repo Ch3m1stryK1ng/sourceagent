@@ -168,3 +168,37 @@ def test_review_decision_can_promote_when_evidence_is_present():
     assert decision["accept_reason"] == "ACCEPTED_REVIEW"
     assert soft["soft_verdict"] == "CONFIRMED"
     assert soft["llm_reviewed"] is True
+
+
+def test_audit_only_keeps_strict_verdict_even_with_valid_review():
+    artifacts = build_verdict_calibration_artifacts(
+        binary_name="fw.elf",
+        binary_sha256="deadbeef",
+        chains=[_sample_chain()],
+        channel_graph={"object_nodes": [{"object_id": "obj_rx", "members": ["g_rx_buf"]}]},
+        sink_facts_by_pack={"p1": {"len_expr": "payload_len"}},
+        sink_pack_id_by_site={"0x08001000|copy_fn|COPY_SINK": "p1"},
+        decompiled_cache={
+            "copy_fn": "void copy_fn(char *dst, int payload_len) { memcpy(dst, src, payload_len); }",
+            "parse_packet": "void parse_packet(void) { copy_fn(dst, hdr->len); }",
+            "uart_receive": "int uart_receive(void) { return USART1_DR; }",
+        },
+        calibration_mode="audit_only",
+        verdict_output_mode="dual",
+        review_decisions=[
+            {
+                "chain_id": "chain_fw_0001_root000",
+                "suggested_semantic_verdict": "CONFIRMED",
+                "trigger_summary": "payload_len remains attacker-controlled at sink",
+                "evidence_map": {
+                    "trigger_summary": ["sink_function"],
+                },
+                "audit_flags": ["CHECK_NOT_BINDING_ROOT"],
+            },
+        ],
+    )
+
+    soft = artifacts["verdict_soft_triage"]["items"][0]
+    decision = artifacts["verdict_calibration_decisions"]["items"][0]
+    assert decision["accepted"] is True
+    assert soft["final_verdict"] == soft["strict_verdict"]

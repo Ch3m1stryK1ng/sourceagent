@@ -94,6 +94,8 @@ void process_packet(char *dst, unsigned int payload_len) {
         "verdict_calibration_decisions",
         "verdict_audit_flags",
         "verdict_soft_triage",
+        "verdict_review_plan",
+        "verdict_review_trace",
     }
 
     sink_roots = artifacts["sink_roots"]["sink_roots"]
@@ -113,6 +115,8 @@ void process_packet(char *dst, unsigned int payload_len) {
     assert artifacts["verdict_feature_pack"]["items"]
     assert artifacts["verdict_soft_triage"]["status"] == "ok"
     assert artifacts["verdict_calibration_queue"]["status"] == "ok"
+    assert artifacts["verdict_review_plan"]["status"] == "not_run"
+    assert artifacts["verdict_review_trace"]["status"] == "not_run"
 
 
 def test_phase_a_root_unresolved_generates_low_conf_item():
@@ -201,3 +205,5 @@ def test_phase_a_stage9_produces_linking_but_not_triage():
     assert artifacts["verdict_calibration_decisions"]["status"] == "not_run"
     assert artifacts["verdict_audit_flags"]["status"] == "not_run"
     assert artifacts["verdict_soft_triage"]["status"] == "not_run"
+    assert artifacts["verdict_review_plan"]["status"] == "not_run"
+    assert artifacts["verdict_review_trace"]["status"] == "not_run"

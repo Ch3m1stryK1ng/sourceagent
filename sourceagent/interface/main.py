@@ -33,12 +33,19 @@ from sourceagent.pipeline.verdict_calibration import (
     DEFAULT_SAMPLE_SUSPICIOUS_RATIO_THRESHOLD,
     DEFAULT_VERDICT_OUTPUT_MODE,
     load_review_decisions,
+    merge_review_decisions,
 )
 
 logger = logging.getLogger("sourceagent.pipeline")
 
 
 def _add_verdict_calibration_args(parser):
+    from sourceagent.agents.review_plan import (
+        DEFAULT_MAX_REVIEW_ITEMS,
+        DEFAULT_REVIEW_BATCH_SIZE,
+    )
+    from sourceagent.agents.review_runner import DEFAULT_REVIEW_TIMEOUT_SEC
+
     parser.add_argument(
         "--calibration-mode",
         default=DEFAULT_CALIBRATION_MODE,
@@ -103,6 +110,40 @@ def _add_verdict_calibration_args(parser):
         "--verdict-review-json",
         default=None,
         help="Optional JSON file containing external LLM/BinAgent review decisions for stage-10 verdict calibration",
+    )
+    parser.add_argument(
+        "--disable-review",
+        action="store_true",
+        help="Disable internal semantic review and keep stage-10 verdict calibration deterministic-only",
+    )
+    parser.add_argument(
+        "--review-mode",
+        default="semantic",
+        choices=["semantic", "audit_only"],
+        help="Internal review mode for stage-10 semantic calibration (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--review-model",
+        default=None,
+        help="Model name for internal semantic review (default: SOURCEAGENT_MODEL or --model)",
+    )
+    parser.add_argument(
+        "--max-review-items",
+        type=int,
+        default=DEFAULT_MAX_REVIEW_ITEMS,
+        help="Maximum queued chains per binary sent to the internal reviewer (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--review-batch-size",
+        type=int,
+        default=DEFAULT_REVIEW_BATCH_SIZE,
+        help="Number of queued chains per LLM review batch (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--review-timeout-sec",
+        type=int,
+        default=DEFAULT_REVIEW_TIMEOUT_SEC,
+        help="Timeout in seconds for each internal LLM review batch (default: %(default)s)",
     )
 
 
@@ -458,7 +499,7 @@ async def _cmd_mine(args):
     await _run_stage_7(proposals, mcp_manager, ghidra_binary_name, result)
 
     # ── Stage 8-10: Chain artifacts / linking / triage ───────────────────
-    _run_stage_8_10(result, max_stage=max_stage, args=args)
+    await _run_stage_8_10(result, max_stage=max_stage, args=args)
 
     # ── Cleanup ──────────────────────────────────────────────────────────
 
@@ -1167,21 +1208,25 @@ async def _run_stage_7(proposals, mcp_manager, ghidra_binary_name, result):
         result.stage_errors["M7"] = str(e)
 
 
-def _run_stage_8_10(result, *, max_stage: int, args=None):
-    """Stage 8-10: build chain artifacts with staged contracts."""
+async def _run_stage_8_10(result, *, max_stage: int, args=None):
+    """Stage 8-10: build chain artifacts with staged contracts and optional semantic review."""
     if max_stage < 8:
         return
 
+    from sourceagent.agents.review_plan import build_review_plan
+    from sourceagent.agents.review_runner import run_review_plan
     from sourceagent.pipeline.chain_artifacts import build_phase_a_artifacts
 
-    print("[Stage 8] Building ChannelGraph + refined objects...")
-    try:
-        review_decisions = load_review_decisions(getattr(args, "verdict_review_json", None))
-        artifacts = build_phase_a_artifacts(
+    calibration_mode = str(getattr(args, "calibration_mode", DEFAULT_CALIBRATION_MODE) or DEFAULT_CALIBRATION_MODE)
+    verdict_output_mode = str(getattr(args, "verdict_output_mode", DEFAULT_VERDICT_OUTPUT_MODE) or DEFAULT_VERDICT_OUTPUT_MODE)
+    external_review_decisions = load_review_decisions(getattr(args, "verdict_review_json", None))
+
+    def _build_artifacts(*, review_decisions=None, review_plan=None, review_trace=None):
+        return build_phase_a_artifacts(
             result,
             max_stage=max_stage,
-            calibration_mode=str(getattr(args, "calibration_mode", DEFAULT_CALIBRATION_MODE) or DEFAULT_CALIBRATION_MODE),
-            verdict_output_mode=str(getattr(args, "verdict_output_mode", DEFAULT_VERDICT_OUTPUT_MODE) or DEFAULT_VERDICT_OUTPUT_MODE),
+            calibration_mode=calibration_mode,
+            verdict_output_mode=verdict_output_mode,
             max_calibration_chains=int(getattr(args, "max_calibration_chains", DEFAULT_MAX_CALIBRATION_CHAINS) or DEFAULT_MAX_CALIBRATION_CHAINS),
             sample_suspicious_ratio_threshold=float(
                 getattr(args, "sample_suspicious_ratio_threshold", DEFAULT_SAMPLE_SUSPICIOUS_RATIO_THRESHOLD)
@@ -1198,12 +1243,79 @@ def _run_stage_8_10(result, *, max_stage: int, args=None):
             llm_promote_budget=int(getattr(args, "llm_promote_budget", DEFAULT_LLM_PROMOTE_BUDGET) or DEFAULT_LLM_PROMOTE_BUDGET),
             llm_demote_budget=int(getattr(args, "llm_demote_budget", DEFAULT_LLM_DEMOTE_BUDGET) or DEFAULT_LLM_DEMOTE_BUDGET),
             llm_soft_budget=int(getattr(args, "llm_soft_budget", DEFAULT_LLM_SOFT_BUDGET) or DEFAULT_LLM_SOFT_BUDGET),
-            review_decisions=review_decisions,
+            review_decisions=review_decisions or [],
+            review_plan=review_plan,
+            review_trace=review_trace,
         )
+
+    print("[Stage 8] Building ChannelGraph + refined objects...")
+    try:
+        artifacts = _build_artifacts()
     except Exception as e:
         print(f"[Stage 8] ERROR: {e}")
         result.stage_errors["M8"] = str(e)
         return
+
+    if max_stage >= 10:
+        review_enabled = not bool(getattr(args, "disable_review", False))
+        review_mode = str(getattr(args, "review_mode", "semantic") or "semantic")
+        review_model = str(
+            getattr(args, "review_model", None)
+            or getattr(args, "model", None)
+            or ""
+        ).strip() or None
+        review_plan_artifact = {
+            "schema_version": "0.1",
+            "binary": str(result.binary_path or ""),
+            "status": "disabled" if not review_enabled else "not_run",
+            "items": [],
+            "batches": [],
+        }
+        review_trace_artifact = {
+            "schema_version": "0.1",
+            "binary": str(result.binary_path or ""),
+            "status": "disabled" if not review_enabled else "not_run",
+            "batches": [],
+        }
+        internal_review_decisions = []
+
+        if review_enabled:
+            review_plan_artifact = build_review_plan(
+                artifacts.get("verdict_feature_pack", {}) or {},
+                artifacts.get("verdict_calibration_queue", {}) or {},
+                review_mode=review_mode,
+                max_items=int(getattr(args, "max_review_items", 8) or 8),
+                batch_size=int(getattr(args, "review_batch_size", 4) or 4),
+            )
+            if (review_plan_artifact.get("items", []) or []):
+                print(
+                    f"[Stage 10] Running internal review: mode={review_mode}, "
+                    f"items={len(review_plan_artifact.get('items', []) or [])}, "
+                    f"batches={len(review_plan_artifact.get('batches', []) or [])}"
+                )
+                review_run = await run_review_plan(
+                    review_plan_artifact,
+                    model=review_model,
+                    review_mode=review_mode,
+                    timeout_sec=int(getattr(args, "review_timeout_sec", 120) or 120),
+                )
+                internal_review_decisions = list(review_run.get("review_decisions", []) or [])
+                review_trace_artifact = dict(review_run.get("review_trace", {}) or review_trace_artifact)
+            else:
+                review_trace_artifact = {
+                    "schema_version": "0.1",
+                    "binary": str(result.binary_path or ""),
+                    "review_mode": review_mode,
+                    "status": "empty_queue",
+                    "batches": [],
+                }
+
+        merged_review_decisions = merge_review_decisions(internal_review_decisions, external_review_decisions)
+        artifacts = _build_artifacts(
+            review_decisions=merged_review_decisions,
+            review_plan=review_plan_artifact,
+            review_trace=review_trace_artifact,
+        )
 
     # Cache staged artifacts so output serialization does not rebuild.
     setattr(result, "_phase_a_artifacts", artifacts)
@@ -1231,9 +1343,12 @@ def _run_stage_8_10(result, *, max_stage: int, args=None):
         review_queue = (artifacts.get("verdict_calibration_queue", {}) or {}).get("items", []) or []
         soft_rows = (artifacts.get("verdict_soft_triage", {}) or {}).get("items", []) or []
         review_needed = sum(1 for row in soft_rows if row.get("needs_review"))
+        llm_reviewed = sum(1 for row in soft_rows if row.get("llm_reviewed"))
+        review_trace = artifacts.get("verdict_review_trace", {}) or {}
         print(
             f"[Stage 10] low_conf={len(low_conf)}, triage_topk={len(triage)}, "
-            f"review_queue={len(review_queue)}, review_needed={review_needed}"
+            f"review_queue={len(review_queue)}, review_needed={review_needed}, "
+            f"llm_reviewed={llm_reviewed}, review_status={review_trace.get('status', 'not_run')}"
         )
 
 
@@ -1317,6 +1432,8 @@ def _pipeline_result_to_dict(result) -> Dict[str, Any]:
                 "verdict_calibration_decisions": {},
                 "verdict_audit_flags": {},
                 "verdict_soft_triage": {},
+                "verdict_review_plan": {},
+                "verdict_review_trace": {},
                 "status": "failed",
                 "failure_code": "ARTIFACT_BUILD_ERROR",
                 "failure_detail": str(e),
@@ -2247,6 +2364,8 @@ async def _cmd_eval(args):
                     "verdict_calibration_decisions",
                     "verdict_audit_flags",
                     "verdict_soft_triage",
+                    "verdict_review_plan",
+                    "verdict_review_trace",
                 ):
                     (output_dir / "raw_views" / f"{output_stem}.{artifact_name}.json").write_text(
                         json.dumps(phase_a.get(artifact_name, {}), indent=2),
