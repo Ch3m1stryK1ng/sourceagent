@@ -481,7 +481,7 @@ def _materialize_chain(
     if force_failure_detail:
         failure_detail = force_failure_detail
 
-    verdict = _decide_verdict(
+    verdict, decision_basis = _decide_verdict(
         sink_label=sink_label,
         active_root_kind=str((active_root or {}).get("kind", "")),
         source_reached=source_reached,
@@ -520,11 +520,13 @@ def _materialize_chain(
         "checks": checks,
         "derive_facts": derive_facts,
         "verdict": verdict,
+        "current_verdict_reason": str(decision_basis.get("reason_code", "UNKNOWN") or "UNKNOWN"),
         "score": score,
         "status": status,
         "evidence_refs": sorted(evidence_refs),
         "has_app_anchor": bool(has_app_anchor),
         "root_source": str((active_root or {}).get("source", "") or sink_root.get("root_source", "none")),
+        "decision_basis": decision_basis,
         "link_debug": link_debug or {
             "root_source": str((active_root or {}).get("source", "") or sink_root.get("root_source", "none")),
             "object_hit_mode": "none",
@@ -1551,26 +1553,48 @@ def _decide_verdict(
     secondary_root_only: bool,
     channel_required_hint: bool,
     has_channel: bool,
-) -> str:
-    if has_contradiction:
-        return "DROP"
-    if control_path_only:
-        return "DROP"
-    if secondary_root_only:
-        return "DROP"
-    if channel_required_hint and not has_channel and not _is_strong_source_mode(source_resolve_mode):
-        return "DROP"
-
+) -> Tuple[str, Dict[str, Any]]:
     confirm_threshold = 0.80
     if str(active_root_kind or "").lower() in {"format_arg", "dispatch"}:
         confirm_threshold = 0.75
     if str(source_resolve_mode or "") in {"caller_bridge", "nested_caller_bridge", "transitive_caller_bridge"}:
         confirm_threshold = min(confirm_threshold, 0.78)
 
+    decision_basis = {
+        "sink_label": str(sink_label or ""),
+        "active_root_kind": str(active_root_kind or ""),
+        "source_reached": bool(source_reached),
+        "root_controllable": bool(root_controllable),
+        "check_strength": str(check_strength or "unknown"),
+        "chain_complete": bool(chain_complete),
+        "has_contradiction": bool(has_contradiction),
+        "has_app_anchor": bool(has_app_anchor),
+        "control_path_only": bool(control_path_only),
+        "chain_score": float(chain_score or 0.0),
+        "source_resolve_mode": str(source_resolve_mode or ""),
+        "secondary_root_only": bool(secondary_root_only),
+        "channel_required_hint": bool(channel_required_hint),
+        "has_channel": bool(has_channel),
+        "confirm_threshold": float(confirm_threshold),
+        "reason_code": "UNKNOWN",
+    }
+
+    if has_contradiction:
+        decision_basis["reason_code"] = "HARD_CONTRADICTION"
+        return "DROP", decision_basis
+    if control_path_only:
+        decision_basis["reason_code"] = "CONTROL_PATH_ONLY"
+        return "DROP", decision_basis
+    if secondary_root_only:
+        decision_basis["reason_code"] = "SECONDARY_ROOT_ONLY"
+        return "DROP", decision_basis
+    if channel_required_hint and not has_channel and not _is_strong_source_mode(source_resolve_mode):
+        decision_basis["reason_code"] = "CHANNEL_REQUIRED_MISSING"
+        return "DROP", decision_basis
+
     if (
         _is_confirmable_root_kind(sink_label, active_root_kind)
-        and
-        source_reached
+        and source_reached
         and root_controllable
         and check_strength == "absent"
         and chain_complete
@@ -1578,15 +1602,25 @@ def _decide_verdict(
         and has_app_anchor
         and chain_score >= confirm_threshold
     ):
-        return "CONFIRMED"
+        decision_basis["reason_code"] = "ABSENT_GUARD_CONTROLLABLE_ROOT"
+        return "CONFIRMED", decision_basis
 
     if check_strength == "effective" and has_app_anchor:
-        return "SAFE_OR_LOW_RISK"
+        decision_basis["reason_code"] = "EFFECTIVE_GUARD_PRESENT"
+        return "SAFE_OR_LOW_RISK", decision_basis
 
-    if chain_score < 0.45 or not has_app_anchor:
-        return "DROP"
+    if chain_score < 0.45:
+        decision_basis["reason_code"] = "LOW_CHAIN_SCORE"
+        return "DROP", decision_basis
+    if not has_app_anchor:
+        decision_basis["reason_code"] = "NO_APP_ANCHOR"
+        return "DROP", decision_basis
 
-    return "SUSPICIOUS"
+    if check_strength == "unknown":
+        decision_basis["reason_code"] = "CHECK_UNCERTAIN"
+    else:
+        decision_basis["reason_code"] = "SEMANTIC_REVIEW_NEEDED"
+    return "SUSPICIOUS", decision_basis
 
 
 def _is_control_root_expr(expr: str, root_kind: str) -> bool:

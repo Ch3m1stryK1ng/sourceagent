@@ -21,8 +21,89 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
 from sourceagent.config.constants import APP_NAME, APP_VERSION
+from sourceagent.pipeline.verdict_calibration import (
+    DEFAULT_ALLOW_MANUAL_LLM_SUPERVISION,
+    DEFAULT_CALIBRATION_MODE,
+    DEFAULT_LLM_DEMOTE_BUDGET,
+    DEFAULT_LLM_PROMOTE_BUDGET,
+    DEFAULT_LLM_SOFT_BUDGET,
+    DEFAULT_MAX_CALIBRATION_CHAINS,
+    DEFAULT_MIN_RISK_SCORE,
+    DEFAULT_REVIEW_NEEDS_THRESHOLD,
+    DEFAULT_SAMPLE_SUSPICIOUS_RATIO_THRESHOLD,
+    DEFAULT_VERDICT_OUTPUT_MODE,
+    load_review_decisions,
+)
 
 logger = logging.getLogger("sourceagent.pipeline")
+
+
+def _add_verdict_calibration_args(parser):
+    parser.add_argument(
+        "--calibration-mode",
+        default=DEFAULT_CALIBRATION_MODE,
+        choices=["exact_mismatch", "suspicious_only", "all_non_exact", "audit_only", "all_matched"],
+        help="Select which structurally matched chains enter verdict calibration (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--verdict-output-mode",
+        default=DEFAULT_VERDICT_OUTPUT_MODE,
+        choices=["strict", "soft", "dual"],
+        help="Write strict/soft/dual verdict calibration outputs (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--max-calibration-chains",
+        type=int,
+        default=DEFAULT_MAX_CALIBRATION_CHAINS,
+        help="Maximum chains per binary admitted to the verdict calibration queue (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--sample-suspicious-ratio-threshold",
+        type=float,
+        default=DEFAULT_SAMPLE_SUSPICIOUS_RATIO_THRESHOLD,
+        help="Sample-level suspicious ratio threshold for queue widening (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--min-risk-score",
+        type=float,
+        default=DEFAULT_MIN_RISK_SCORE,
+        help="Minimum deterministic risk score for soft widening candidates (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--review-needs-threshold",
+        type=float,
+        default=DEFAULT_REVIEW_NEEDS_THRESHOLD,
+        help="Risk-score threshold for marking a chain as review-needed (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--allow-manual-llm-supervision",
+        action="store_true",
+        default=DEFAULT_ALLOW_MANUAL_LLM_SUPERVISION,
+        help="Allow externally supplied LLM/BinAgent review decisions to adjust soft verdicts",
+    )
+    parser.add_argument(
+        "--llm-promote-budget",
+        type=int,
+        default=DEFAULT_LLM_PROMOTE_BUDGET,
+        help="Per-binary promotion budget for accepted external verdict suggestions (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--llm-demote-budget",
+        type=int,
+        default=DEFAULT_LLM_DEMOTE_BUDGET,
+        help="Per-binary demotion budget for accepted external verdict suggestions (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--llm-soft-budget",
+        type=int,
+        default=DEFAULT_LLM_SOFT_BUDGET,
+        help="Per-binary deterministic soft-widen budget for DROP -> SUSPICIOUS triage (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--verdict-review-json",
+        default=None,
+        help="Optional JSON file containing external LLM/BinAgent review decisions for stage-10 verdict calibration",
+    )
 
 
 def main():
@@ -57,6 +138,8 @@ def main():
         "--mcp-connect-timeout-sec", type=int, default=30,
         help="Max seconds to wait for MCP server connection (default: 30)",
     )
+
+    _add_verdict_calibration_args(mine_parser)
     mine_parser.add_argument(
         "--output", "-o", default=None,
         help="Write JSON results to this file",
@@ -139,6 +222,8 @@ def main():
         "--mcp-connect-timeout-sec", type=int, default=30,
         help="Max seconds to wait for MCP server connection per sample (default: 30)",
     )
+
+    _add_verdict_calibration_args(eval_parser)
 
     # gt-sinks subcommand
     gt_sinks_parser = subparsers.add_parser(
@@ -373,7 +458,7 @@ async def _cmd_mine(args):
     await _run_stage_7(proposals, mcp_manager, ghidra_binary_name, result)
 
     # ── Stage 8-10: Chain artifacts / linking / triage ───────────────────
-    _run_stage_8_10(result, max_stage=max_stage)
+    _run_stage_8_10(result, max_stage=max_stage, args=args)
 
     # ── Cleanup ──────────────────────────────────────────────────────────
 
@@ -1082,7 +1167,7 @@ async def _run_stage_7(proposals, mcp_manager, ghidra_binary_name, result):
         result.stage_errors["M7"] = str(e)
 
 
-def _run_stage_8_10(result, *, max_stage: int):
+def _run_stage_8_10(result, *, max_stage: int, args=None):
     """Stage 8-10: build chain artifacts with staged contracts."""
     if max_stage < 8:
         return
@@ -1091,7 +1176,30 @@ def _run_stage_8_10(result, *, max_stage: int):
 
     print("[Stage 8] Building ChannelGraph + refined objects...")
     try:
-        artifacts = build_phase_a_artifacts(result, max_stage=max_stage)
+        review_decisions = load_review_decisions(getattr(args, "verdict_review_json", None))
+        artifacts = build_phase_a_artifacts(
+            result,
+            max_stage=max_stage,
+            calibration_mode=str(getattr(args, "calibration_mode", DEFAULT_CALIBRATION_MODE) or DEFAULT_CALIBRATION_MODE),
+            verdict_output_mode=str(getattr(args, "verdict_output_mode", DEFAULT_VERDICT_OUTPUT_MODE) or DEFAULT_VERDICT_OUTPUT_MODE),
+            max_calibration_chains=int(getattr(args, "max_calibration_chains", DEFAULT_MAX_CALIBRATION_CHAINS) or DEFAULT_MAX_CALIBRATION_CHAINS),
+            sample_suspicious_ratio_threshold=float(
+                getattr(args, "sample_suspicious_ratio_threshold", DEFAULT_SAMPLE_SUSPICIOUS_RATIO_THRESHOLD)
+                or DEFAULT_SAMPLE_SUSPICIOUS_RATIO_THRESHOLD
+            ),
+            min_risk_score=float(getattr(args, "min_risk_score", DEFAULT_MIN_RISK_SCORE) or DEFAULT_MIN_RISK_SCORE),
+            review_needs_threshold=float(
+                getattr(args, "review_needs_threshold", DEFAULT_REVIEW_NEEDS_THRESHOLD)
+                or DEFAULT_REVIEW_NEEDS_THRESHOLD
+            ),
+            allow_manual_llm_supervision=bool(
+                getattr(args, "allow_manual_llm_supervision", DEFAULT_ALLOW_MANUAL_LLM_SUPERVISION)
+            ),
+            llm_promote_budget=int(getattr(args, "llm_promote_budget", DEFAULT_LLM_PROMOTE_BUDGET) or DEFAULT_LLM_PROMOTE_BUDGET),
+            llm_demote_budget=int(getattr(args, "llm_demote_budget", DEFAULT_LLM_DEMOTE_BUDGET) or DEFAULT_LLM_DEMOTE_BUDGET),
+            llm_soft_budget=int(getattr(args, "llm_soft_budget", DEFAULT_LLM_SOFT_BUDGET) or DEFAULT_LLM_SOFT_BUDGET),
+            review_decisions=review_decisions,
+        )
     except Exception as e:
         print(f"[Stage 8] ERROR: {e}")
         result.stage_errors["M8"] = str(e)
@@ -1120,7 +1228,13 @@ def _run_stage_8_10(result, *, max_stage: int):
     if max_stage >= 10:
         low_conf = (artifacts.get("low_conf_sinks", {}) or {}).get("items", []) or []
         triage = (artifacts.get("triage_queue", {}) or {}).get("items", []) or []
-        print(f"[Stage 10] low_conf={len(low_conf)}, triage_topk={len(triage)}")
+        review_queue = (artifacts.get("verdict_calibration_queue", {}) or {}).get("items", []) or []
+        soft_rows = (artifacts.get("verdict_soft_triage", {}) or {}).get("items", []) or []
+        review_needed = sum(1 for row in soft_rows if row.get("needs_review"))
+        print(
+            f"[Stage 10] low_conf={len(low_conf)}, triage_topk={len(triage)}, "
+            f"review_queue={len(review_queue)}, review_needed={review_needed}"
+        )
 
 
 # ── Output ─────────────────────────────────────────────────────────────────
@@ -1198,6 +1312,11 @@ def _pipeline_result_to_dict(result) -> Dict[str, Any]:
                 "chain_eval": {},
                 "low_conf_sinks": {},
                 "triage_queue": {},
+                "verdict_feature_pack": {},
+                "verdict_calibration_queue": {},
+                "verdict_calibration_decisions": {},
+                "verdict_audit_flags": {},
+                "verdict_soft_triage": {},
                 "status": "failed",
                 "failure_code": "ARTIFACT_BUILD_ERROR",
                 "failure_detail": str(e),
@@ -1489,6 +1608,18 @@ def _extract_chain_stats_from_result_dict(data: Dict[str, Any]) -> Dict[str, int
         .get("stats", {})
         or {}
     )
+    soft_triage = (
+        (data.get("phase_a_artifacts", {}) or {})
+        .get("verdict_soft_triage", {})
+        .get("stats", {})
+        or {}
+    )
+    review_queue = (
+        (data.get("phase_a_artifacts", {}) or {})
+        .get("verdict_calibration_queue", {})
+        .get("items", [])
+        or []
+    )
     return {
         "chain_count": int(stats.get("chain_count", 0) or 0),
         "chain_with_source": int(stats.get("with_source", 0) or 0),
@@ -1497,6 +1628,10 @@ def _extract_chain_stats_from_result_dict(data: Dict[str, Any]) -> Dict[str, int
         "chain_suspicious": int(stats.get("suspicious", 0) or 0),
         "chain_safe_or_low_risk": int(stats.get("safe_or_low_risk", 0) or 0),
         "chain_dropped": int(stats.get("dropped", 0) or 0),
+        "verdict_review_queue": len(review_queue),
+        "verdict_review_needed": int(soft_triage.get("needs_review", 0) or 0),
+        "verdict_soft_suspicious": int(soft_triage.get("soft_suspicious", 0) or 0),
+        "verdict_llm_reviewed": int(soft_triage.get("llm_reviewed", 0) or 0),
     }
 
 
@@ -1830,6 +1965,10 @@ async def _cmd_eval(args):
                 "chain_suspicious": 0,
                 "chain_safe_or_low_risk": 0,
                 "chain_dropped": 0,
+                "verdict_review_queue": 0,
+                "verdict_review_needed": 0,
+                "verdict_soft_suspicious": 0,
+                "verdict_llm_reviewed": 0,
             })
             continue
 
@@ -2103,6 +2242,11 @@ async def _cmd_eval(args):
                     "chain_eval",
                     "low_conf_sinks",
                     "triage_queue",
+                    "verdict_feature_pack",
+                    "verdict_calibration_queue",
+                    "verdict_calibration_decisions",
+                    "verdict_audit_flags",
+                    "verdict_soft_triage",
                 ):
                     (output_dir / "raw_views" / f"{output_stem}.{artifact_name}.json").write_text(
                         json.dumps(phase_a.get(artifact_name, {}), indent=2),
@@ -2186,6 +2330,10 @@ async def _cmd_eval(args):
                 "chain_suspicious": 0,
                 "chain_safe_or_low_risk": 0,
                 "chain_dropped": 0,
+                "verdict_review_queue": 0,
+                "verdict_review_needed": 0,
+                "verdict_soft_suspicious": 0,
+                "verdict_llm_reviewed": 0,
             })
         except Exception as e:
             print(f"[SourceAgent] Eval ERROR for {stem}: {e}")
@@ -2226,6 +2374,10 @@ async def _cmd_eval(args):
                 "chain_suspicious": 0,
                 "chain_safe_or_low_risk": 0,
                 "chain_dropped": 0,
+                "verdict_review_queue": 0,
+                "verdict_review_needed": 0,
+                "verdict_soft_suspicious": 0,
+                "verdict_llm_reviewed": 0,
             })
 
     if len(items) > 1:
@@ -2342,6 +2494,10 @@ async def _cmd_eval(args):
                 "chain_suspicious": 0,
                 "chain_safe_or_low_risk": 0,
                 "chain_dropped": 0,
+                "verdict_review_queue": 0,
+                "verdict_review_needed": 0,
+                "verdict_soft_suspicious": 0,
+                "verdict_llm_reviewed": 0,
             })
             acc["sample_count"] += 1
             status = str(row.get("status", ""))
@@ -2368,6 +2524,10 @@ async def _cmd_eval(args):
             acc["chain_suspicious"] += int(row.get("chain_suspicious") or 0)
             acc["chain_safe_or_low_risk"] += int(row.get("chain_safe_or_low_risk") or 0)
             acc["chain_dropped"] += int(row.get("chain_dropped") or 0)
+            acc["verdict_review_queue"] += int(row.get("verdict_review_queue") or 0)
+            acc["verdict_review_needed"] += int(row.get("verdict_review_needed") or 0)
+            acc["verdict_soft_suspicious"] += int(row.get("verdict_soft_suspicious") or 0)
+            acc["verdict_llm_reviewed"] += int(row.get("verdict_llm_reviewed") or 0)
 
         by_dataset_rows = []
         for _, acc in sorted(by_dataset.items(), key=lambda x: x[0]):
@@ -2461,6 +2621,10 @@ async def _cmd_eval(args):
             "chain_suspicious": sum(int(r.get("chain_suspicious") or 0) for r in per_file_rows),
             "chain_safe_or_low_risk": sum(int(r.get("chain_safe_or_low_risk") or 0) for r in per_file_rows),
             "chain_dropped": sum(int(r.get("chain_dropped") or 0) for r in per_file_rows),
+            "verdict_review_queue": sum(int(r.get("verdict_review_queue") or 0) for r in per_file_rows),
+            "verdict_review_needed": sum(int(r.get("verdict_review_needed") or 0) for r in per_file_rows),
+            "verdict_soft_suspicious": sum(int(r.get("verdict_soft_suspicious") or 0) for r in per_file_rows),
+            "verdict_llm_reviewed": sum(int(r.get("verdict_llm_reviewed") or 0) for r in per_file_rows),
         }
         (output_dir / "summary" / "eval_summary.json").write_text(
             json.dumps(summary, indent=2), encoding="utf-8",
@@ -2478,6 +2642,7 @@ async def _cmd_eval(args):
                 "detected_labels",
                 "chain_count", "chain_with_source", "chain_with_channel",
                 "chain_confirmed", "chain_suspicious", "chain_safe_or_low_risk", "chain_dropped",
+                "verdict_review_queue", "verdict_review_needed", "verdict_soft_suspicious", "verdict_llm_reviewed",
             ],
         )
         _write_csv(
@@ -2491,6 +2656,7 @@ async def _cmd_eval(args):
                 "detected_total", "detected_source", "detected_sink", "detected_other",
                 "chain_count", "chain_with_source", "chain_with_channel",
                 "chain_confirmed", "chain_suspicious", "chain_safe_or_low_risk", "chain_dropped",
+                "verdict_review_queue", "verdict_review_needed", "verdict_soft_suspicious", "verdict_llm_reviewed",
             ],
         )
         _write_csv(

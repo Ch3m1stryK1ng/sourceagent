@@ -20,6 +20,19 @@ from .channel_graph import build_channel_graph
 from .linker.sink_roots import extract_sink_roots
 from .linker.triage_queue import build_low_conf_sinks, build_triage_queue
 from .linker.tunnel_linker import link_chains, summarize_chain_eval
+from .verdict_calibration import (
+    DEFAULT_ALLOW_MANUAL_LLM_SUPERVISION,
+    DEFAULT_CALIBRATION_MODE,
+    DEFAULT_LLM_DEMOTE_BUDGET,
+    DEFAULT_LLM_PROMOTE_BUDGET,
+    DEFAULT_LLM_SOFT_BUDGET,
+    DEFAULT_MAX_CALIBRATION_CHAINS,
+    DEFAULT_MIN_RISK_SCORE,
+    DEFAULT_REVIEW_NEEDS_THRESHOLD,
+    DEFAULT_SAMPLE_SUSPICIOUS_RATIO_THRESHOLD,
+    DEFAULT_VERDICT_OUTPUT_MODE,
+    build_verdict_calibration_artifacts,
+)
 from .models import PipelineResult, SinkLabel, SourceLabel, VerificationVerdict
 from .object_refine import refine_object_boundaries
 
@@ -33,6 +46,7 @@ DEFAULT_TUNNEL_K = 2
 DEFAULT_MAX_DEPTH = 2
 DEFAULT_MAX_CHAINS_PER_SINK = 4
 DEFAULT_MAX_CHAINS_PER_BINARY = 200
+DEFAULT_CALIBRATION_MAX_CHAINS = DEFAULT_MAX_CALIBRATION_CHAINS
 
 SINK_LABELS = {
     SinkLabel.COPY_SINK.value,
@@ -62,6 +76,17 @@ def build_phase_a_artifacts(
     max_depth: int = DEFAULT_MAX_DEPTH,
     max_chains_per_sink: int = DEFAULT_MAX_CHAINS_PER_SINK,
     max_chains_per_binary: int = DEFAULT_MAX_CHAINS_PER_BINARY,
+    calibration_mode: str = DEFAULT_CALIBRATION_MODE,
+    verdict_output_mode: str = DEFAULT_VERDICT_OUTPUT_MODE,
+    max_calibration_chains: int = DEFAULT_MAX_CALIBRATION_CHAINS,
+    sample_suspicious_ratio_threshold: float = DEFAULT_SAMPLE_SUSPICIOUS_RATIO_THRESHOLD,
+    min_risk_score: float = DEFAULT_MIN_RISK_SCORE,
+    review_needs_threshold: float = DEFAULT_REVIEW_NEEDS_THRESHOLD,
+    allow_manual_llm_supervision: bool = DEFAULT_ALLOW_MANUAL_LLM_SUPERVISION,
+    llm_promote_budget: int = DEFAULT_LLM_PROMOTE_BUDGET,
+    llm_demote_budget: int = DEFAULT_LLM_DEMOTE_BUDGET,
+    llm_soft_budget: int = DEFAULT_LLM_SOFT_BUDGET,
+    review_decisions: List[Dict[str, Any]] | None = None,
 ) -> Dict[str, Any]:
     """Build all phase-A artifacts from the current pipeline result."""
     max_stage = int(max_stage or 10)
@@ -87,6 +112,11 @@ def build_phase_a_artifacts(
     chain_eval = _empty_chain_eval(binary_name, binary_sha256)
     low_conf_sinks = _empty_low_conf(binary_name, binary_sha256)
     triage_queue = _empty_triage(binary_name, binary_sha256, top_k=top_k)
+    verdict_feature_pack = _empty_verdict_feature_pack(binary_name, binary_sha256, calibration_mode=calibration_mode, verdict_output_mode=verdict_output_mode)
+    verdict_calibration_queue = _empty_verdict_calibration_queue(binary_name, binary_sha256, calibration_mode=calibration_mode, verdict_output_mode=verdict_output_mode)
+    verdict_calibration_decisions = _empty_verdict_calibration_decisions(binary_name, binary_sha256, calibration_mode=calibration_mode, verdict_output_mode=verdict_output_mode)
+    verdict_audit_flags = _empty_verdict_audit_flags(binary_name, binary_sha256)
+    verdict_soft_triage = _empty_verdict_soft_triage(binary_name, binary_sha256, calibration_mode=calibration_mode, verdict_output_mode=verdict_output_mode)
 
     if max_stage >= 8:
         channel_graph = build_channel_graph(
@@ -198,6 +228,32 @@ def build_phase_a_artifacts(
             "stage_required": 10,
         }
 
+        verdict_artifacts = build_verdict_calibration_artifacts(
+            binary_name=binary_name,
+            binary_sha256=binary_sha256,
+            chains=chains_rows,
+            channel_graph=channel_graph,
+            sink_facts_by_pack=sink_facts_by_pack,
+            sink_pack_id_by_site=_sink_pack_id_by_site(result),
+            decompiled_cache=getattr(getattr(result, "_mai", None), "decompiled_cache", None),
+            calibration_mode=calibration_mode,
+            verdict_output_mode=verdict_output_mode,
+            max_calibration_chains=max_calibration_chains,
+            sample_suspicious_ratio_threshold=sample_suspicious_ratio_threshold,
+            min_risk_score=min_risk_score,
+            review_needs_threshold=review_needs_threshold,
+            allow_manual_llm_supervision=allow_manual_llm_supervision,
+            llm_promote_budget=llm_promote_budget,
+            llm_demote_budget=llm_demote_budget,
+            llm_soft_budget=llm_soft_budget,
+            review_decisions=review_decisions or [],
+        )
+        verdict_feature_pack = verdict_artifacts.get("verdict_feature_pack", verdict_feature_pack)
+        verdict_calibration_queue = verdict_artifacts.get("verdict_calibration_queue", verdict_calibration_queue)
+        verdict_calibration_decisions = verdict_artifacts.get("verdict_calibration_decisions", verdict_calibration_decisions)
+        verdict_audit_flags = verdict_artifacts.get("verdict_audit_flags", verdict_audit_flags)
+        verdict_soft_triage = verdict_artifacts.get("verdict_soft_triage", verdict_soft_triage)
+
     return {
         "channel_graph": channel_graph,
         "refined_objects": refined_objects,
@@ -206,6 +262,75 @@ def build_phase_a_artifacts(
         "chain_eval": chain_eval,
         "low_conf_sinks": low_conf_sinks,
         "triage_queue": triage_queue,
+        "verdict_feature_pack": verdict_feature_pack,
+        "verdict_calibration_queue": verdict_calibration_queue,
+        "verdict_calibration_decisions": verdict_calibration_decisions,
+        "verdict_audit_flags": verdict_audit_flags,
+        "verdict_soft_triage": verdict_soft_triage,
+    }
+
+
+def _empty_verdict_feature_pack(binary_name: str, binary_sha256: str, *, calibration_mode: str, verdict_output_mode: str) -> Dict[str, Any]:
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "binary": binary_name,
+        "binary_sha256": binary_sha256,
+        "mode": calibration_mode,
+        "output_mode": verdict_output_mode,
+        "items": [],
+        "status": "not_run",
+        "stage_required": 10,
+    }
+
+
+def _empty_verdict_calibration_queue(binary_name: str, binary_sha256: str, *, calibration_mode: str, verdict_output_mode: str) -> Dict[str, Any]:
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "binary": binary_name,
+        "binary_sha256": binary_sha256,
+        "mode": calibration_mode,
+        "output_mode": verdict_output_mode,
+        "items": [],
+        "status": "not_run",
+        "stage_required": 10,
+    }
+
+
+def _empty_verdict_calibration_decisions(binary_name: str, binary_sha256: str, *, calibration_mode: str, verdict_output_mode: str) -> Dict[str, Any]:
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "binary": binary_name,
+        "binary_sha256": binary_sha256,
+        "mode": calibration_mode,
+        "output_mode": verdict_output_mode,
+        "items": [],
+        "status": "not_run",
+        "stage_required": 10,
+    }
+
+
+def _empty_verdict_audit_flags(binary_name: str, binary_sha256: str) -> Dict[str, Any]:
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "binary": binary_name,
+        "binary_sha256": binary_sha256,
+        "items": [],
+        "status": "not_run",
+        "stage_required": 10,
+    }
+
+
+def _empty_verdict_soft_triage(binary_name: str, binary_sha256: str, *, calibration_mode: str, verdict_output_mode: str) -> Dict[str, Any]:
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "binary": binary_name,
+        "binary_sha256": binary_sha256,
+        "mode": calibration_mode,
+        "output_mode": verdict_output_mode,
+        "items": [],
+        "stats": {},
+        "status": "not_run",
+        "stage_required": 10,
     }
 
 
