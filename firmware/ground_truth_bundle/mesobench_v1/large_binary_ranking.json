@@ -1,0 +1,499 @@
+[
+  {
+    "sample_id": "usbs_udp_echo_server_bof_instrumented",
+    "dataset": "uSBS",
+    "role": "hard_mode_chain_driver",
+    "source_repo_id": "stm32cubef4",
+    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_instrumented/STM32469I_EVAL_stm32_udp_echo_server.elf",
+    "elf_size_bytes": 4727683,
+    "elf_size_mb": 4.51,
+    "chain_depth": "deep",
+    "chain_breadth": "wide",
+    "expected_channel_mode": "likely",
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "STORE_SINK",
+      "LOOP_WRITE_SINK"
+    ]
+  },
+  {
+    "sample_id": "usbs_udp_echo_server_bof_instrumented_patched",
+    "dataset": "uSBS",
+    "role": "hard_mode_chain_driver",
+    "source_repo_id": "stm32cubef4",
+    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_instrumented_patched/STM32469I_EVAL_stm32_udp_echo_server.elf",
+    "elf_size_bytes": 4727683,
+    "elf_size_mb": 4.51,
+    "chain_depth": "deep",
+    "chain_breadth": "wide",
+    "expected_channel_mode": "likely",
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "STORE_SINK",
+      "LOOP_WRITE_SINK"
+    ]
+  },
+  {
+    "sample_id": "usbs_test_printf_fw",
+    "dataset": "uSBS",
+    "role": "primary_chain_driver",
+    "source_repo_id": "stm32cubef4",
+    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/test_printf_fw/STM32469I_EVAL_stm32_udp_echo_server.elf",
+    "elf_size_bytes": 4476133,
+    "elf_size_mb": 4.27,
+    "chain_depth": "deep",
+    "chain_breadth": "medium",
+    "expected_channel_mode": "optional",
+    "likely_sink_labels": [
+      "FORMAT_STRING_SINK",
+      "COPY_SINK"
+    ]
+  },
+  {
+    "sample_id": "usbs_tcp_echo_client_vuln_bof_dhcp",
+    "dataset": "uSBS",
+    "role": "primary_chain_driver",
+    "source_repo_id": "stm32cubef4",
+    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_bof/STM32469I_EVAL_tcp_echo_base_DHCP/STM32469I_EVAL_tcp_echo_base.elf",
+    "elf_size_bytes": 2312772,
+    "elf_size_mb": 2.21,
+    "chain_depth": "deep",
+    "chain_breadth": "wide",
+    "expected_channel_mode": "likely",
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "LOOP_WRITE_SINK"
+    ]
+  },
+  {
+    "sample_id": "usbs_tcp_echo_client_vuln_off_by_one_dhcp",
+    "dataset": "uSBS",
+    "role": "primary_chain_driver",
+    "source_repo_id": "stm32cubef4",
+    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one/STM32469I_EVAL_tcp_echo_base_DHCP/STM32469I_EVAL_tcp_echo_base.elf",
+    "elf_size_bytes": 2312772,
+    "elf_size_mb": 2.21,
+    "chain_depth": "deep",
+    "chain_breadth": "wide",
+    "expected_channel_mode": "likely",
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "LOOP_WRITE_SINK"
+    ]
+  },
+  {
+    "sample_id": "usbs_tcp_echo_client_vuln_bof",
+    "dataset": "uSBS",
+    "role": "primary_chain_driver",
+    "source_repo_id": "stm32cubef4",
+    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_bof/STM32469I_EVAL_tcp_echo_base.elf",
+    "elf_size_bytes": 2187784,
+    "elf_size_mb": 2.09,
+    "chain_depth": "deep",
+    "chain_breadth": "wide",
+    "expected_channel_mode": "optional",
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "LOOP_WRITE_SINK"
+    ]
+  },
+  {
+    "sample_id": "usbs_tcp_echo_client_vuln_off_by_one",
+    "dataset": "uSBS",
+    "role": "primary_chain_driver",
+    "source_repo_id": "stm32cubef4",
+    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one/STM32469I_EVAL_tcp_echo_base.elf",
+    "elf_size_bytes": 2187772,
+    "elf_size_mb": 2.09,
+    "chain_depth": "deep",
+    "chain_breadth": "wide",
+    "expected_channel_mode": "optional",
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "LOOP_WRITE_SINK"
+    ]
+  },
+  {
+    "sample_id": "usbs_tcp_echo_client_payload_len_variant",
+    "dataset": "uSBS",
+    "role": "primary_chain_driver",
+    "source_repo_id": "stm32cubef4",
+    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one_test_payload_len/STM32469I_EVAL_tcp_echo_base.elf",
+    "elf_size_bytes": 2187764,
+    "elf_size_mb": 2.09,
+    "chain_depth": "deep",
+    "chain_breadth": "wide",
+    "expected_channel_mode": "optional",
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "LOOP_WRITE_SINK"
+    ]
+  },
+  {
+    "sample_id": "usbs_udp_echo_server_bof",
+    "dataset": "uSBS",
+    "role": "primary_chain_driver",
+    "source_repo_id": "stm32cubef4",
+    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof/STM32469I_EVAL_stm32_udp_echo_server.elf",
+    "elf_size_bytes": 2180844,
+    "elf_size_mb": 2.08,
+    "chain_depth": "deep",
+    "chain_breadth": "wide",
+    "expected_channel_mode": "optional",
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "LOOP_WRITE_SINK",
+      "STORE_SINK"
+    ]
+  },
+  {
+    "sample_id": "stm32cube_lwip_tcp_echo_client",
+    "dataset": "monolithic-firmware-collection",
+    "role": "primary_chain_driver",
+    "source_repo_id": "stm32cubef4",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/stm32_tcp_echo_client/stm32_tcp_echo_client.elf",
+    "elf_size_bytes": 2180556,
+    "elf_size_mb": 2.08,
+    "chain_depth": "deep",
+    "chain_breadth": "wide",
+    "expected_channel_mode": "likely",
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "STORE_SINK",
+      "LOOP_WRITE_SINK"
+    ]
+  },
+  {
+    "sample_id": "usbs_udp_echo_server_off_by_one",
+    "dataset": "uSBS",
+    "role": "primary_chain_driver",
+    "source_repo_id": "stm32cubef4",
+    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_off_by_one/STM32469I_EVAL_stm32_udp_echo_server.elf",
+    "elf_size_bytes": 2180476,
+    "elf_size_mb": 2.08,
+    "chain_depth": "deep",
+    "chain_breadth": "wide",
+    "expected_channel_mode": "optional",
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "LOOP_WRITE_SINK"
+    ]
+  },
+  {
+    "sample_id": "stm32cube_lwip_udp_echo_client",
+    "dataset": "monolithic-firmware-collection",
+    "role": "primary_chain_driver",
+    "source_repo_id": "stm32cubef4",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/stm32_udp_echo_client/stm32_udp_echo_client.elf",
+    "elf_size_bytes": 2177268,
+    "elf_size_mb": 2.08,
+    "chain_depth": "deep",
+    "chain_breadth": "medium",
+    "expected_channel_mode": "likely",
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "STORE_SINK"
+    ]
+  },
+  {
+    "sample_id": "stm32cube_lwip_tcp_echo_server",
+    "dataset": "monolithic-firmware-collection",
+    "role": "primary_chain_driver",
+    "source_repo_id": "stm32cubef4",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/stm32_tcp_echo_server/stm32_tcp_echo_server.elf",
+    "elf_size_bytes": 2144368,
+    "elf_size_mb": 2.05,
+    "chain_depth": "deep",
+    "chain_breadth": "wide",
+    "expected_channel_mode": "likely",
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "STORE_SINK",
+      "LOOP_WRITE_SINK"
+    ]
+  },
+  {
+    "sample_id": "stm32cube_lwip_udp_echo_server",
+    "dataset": "monolithic-firmware-collection",
+    "role": "primary_chain_driver",
+    "source_repo_id": "stm32cubef4",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/stm32_udp_echo_server/stm32_udp_echo_server.elf",
+    "elf_size_bytes": 2141812,
+    "elf_size_mb": 2.04,
+    "chain_depth": "deep",
+    "chain_breadth": "wide",
+    "expected_channel_mode": "likely",
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "STORE_SINK",
+      "LOOP_WRITE_SINK"
+    ]
+  },
+  {
+    "sample_id": "usbs_udp_echo_server_bof_expl",
+    "dataset": "uSBS",
+    "role": "primary_chain_driver",
+    "source_repo_id": "stm32cubef4",
+    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_expl/STM32469I_EVAL_stm32_udp_echo_server.elf",
+    "elf_size_bytes": 2031656,
+    "elf_size_mb": 1.94,
+    "chain_depth": "deep",
+    "chain_breadth": "wide",
+    "expected_channel_mode": "optional",
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "STORE_SINK",
+      "LOOP_WRITE_SINK"
+    ]
+  },
+  {
+    "sample_id": "zephyr_cve_2020_10064",
+    "dataset": "monolithic-firmware-collection",
+    "role": "primary_chain_driver",
+    "source_repo_id": "zephyr",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10064/zephyr-CVE-2020-10064.elf",
+    "elf_size_bytes": 1886152,
+    "elf_size_mb": 1.8,
+    "chain_depth": "medium",
+    "chain_breadth": "medium",
+    "expected_channel_mode": "optional",
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "STORE_SINK"
+    ]
+  },
+  {
+    "sample_id": "zephyr_false_positive_rf_size_check",
+    "dataset": "monolithic-firmware-collection",
+    "role": "negative_control",
+    "source_repo_id": "zephyr",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-no-CVE-false-positive-rf-size-check/zephyr-CVE-no-CVE-false-positive-rf-size-check.elf",
+    "elf_size_bytes": 1863332,
+    "elf_size_mb": 1.78,
+    "chain_depth": "medium",
+    "chain_breadth": "medium",
+    "expected_channel_mode": "optional",
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "STORE_SINK"
+    ]
+  },
+  {
+    "sample_id": "zephyr_cve_2021_3320",
+    "dataset": "monolithic-firmware-collection",
+    "role": "primary_chain_driver",
+    "source_repo_id": "zephyr",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3320/zephyr-CVE-2021-3320.elf",
+    "elf_size_bytes": 1863324,
+    "elf_size_mb": 1.78,
+    "chain_depth": "deep",
+    "chain_breadth": "wide",
+    "expected_channel_mode": "optional",
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "STORE_SINK",
+      "LOOP_WRITE_SINK"
+    ]
+  },
+  {
+    "sample_id": "zephyr_false_positive_watchdog_callback",
+    "dataset": "monolithic-firmware-collection",
+    "role": "negative_control",
+    "source_repo_id": "zephyr",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-no-CVE-false-positive-watchdog-callback/zephyr-CVE-no-CVE-false-positive-watchdog-callback.elf",
+    "elf_size_bytes": 1863292,
+    "elf_size_mb": 1.78,
+    "chain_depth": "medium",
+    "chain_breadth": "medium",
+    "expected_channel_mode": "optional",
+    "likely_sink_labels": [
+      "FUNC_PTR_SINK",
+      "STORE_SINK"
+    ]
+  },
+  {
+    "sample_id": "zephyr_cve_2021_3321",
+    "dataset": "monolithic-firmware-collection",
+    "role": "primary_chain_driver",
+    "source_repo_id": "zephyr",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3321/zephyr-CVE-2021-3321.elf",
+    "elf_size_bytes": 1863244,
+    "elf_size_mb": 1.78,
+    "chain_depth": "deep",
+    "chain_breadth": "wide",
+    "expected_channel_mode": "optional",
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "STORE_SINK",
+      "LOOP_WRITE_SINK"
+    ]
+  },
+  {
+    "sample_id": "zephyr_cve_2021_3323",
+    "dataset": "monolithic-firmware-collection",
+    "role": "primary_chain_driver",
+    "source_repo_id": "zephyr",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3323/zephyr-CVE-2021-3323.elf",
+    "elf_size_bytes": 1862916,
+    "elf_size_mb": 1.78,
+    "chain_depth": "deep",
+    "chain_breadth": "wide",
+    "expected_channel_mode": "optional",
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "STORE_SINK",
+      "LOOP_WRITE_SINK"
+    ]
+  },
+  {
+    "sample_id": "zephyr_cve_2021_3319",
+    "dataset": "monolithic-firmware-collection",
+    "role": "primary_chain_driver",
+    "source_repo_id": "zephyr",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3319/zephyr-CVE-2021-3319.elf",
+    "elf_size_bytes": 1862764,
+    "elf_size_mb": 1.78,
+    "chain_depth": "deep",
+    "chain_breadth": "wide",
+    "expected_channel_mode": "optional",
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "STORE_SINK",
+      "FORMAT_STRING_SINK",
+      "FUNC_PTR_SINK"
+    ]
+  },
+  {
+    "sample_id": "zephyr_cve_2021_3322",
+    "dataset": "monolithic-firmware-collection",
+    "role": "primary_chain_driver",
+    "source_repo_id": "zephyr",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3322/zephyr-CVE-2021-3322.elf",
+    "elf_size_bytes": 1862596,
+    "elf_size_mb": 1.78,
+    "chain_depth": "deep",
+    "chain_breadth": "wide",
+    "expected_channel_mode": "optional",
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "STORE_SINK",
+      "LOOP_WRITE_SINK"
+    ]
+  },
+  {
+    "sample_id": "zephyr_cve_2021_3330",
+    "dataset": "monolithic-firmware-collection",
+    "role": "primary_chain_driver",
+    "source_repo_id": "zephyr",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3330/zephyr-CVE-2021-3330.elf",
+    "elf_size_bytes": 1854184,
+    "elf_size_mb": 1.77,
+    "chain_depth": "deep",
+    "chain_breadth": "medium",
+    "expected_channel_mode": "optional",
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "STORE_SINK",
+      "FORMAT_STRING_SINK"
+    ]
+  },
+  {
+    "sample_id": "zephyr_cve_2020_10066",
+    "dataset": "monolithic-firmware-collection",
+    "role": "primary_chain_driver",
+    "source_repo_id": "zephyr",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10066/zephyr-CVE-2020-10066.elf",
+    "elf_size_bytes": 1256644,
+    "elf_size_mb": 1.2,
+    "chain_depth": "deep",
+    "chain_breadth": "medium",
+    "expected_channel_mode": "optional",
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "LOOP_WRITE_SINK",
+      "STORE_SINK"
+    ]
+  },
+  {
+    "sample_id": "zephyr_cve_2020_10065",
+    "dataset": "monolithic-firmware-collection",
+    "role": "primary_chain_driver",
+    "source_repo_id": "zephyr",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10065/zephyr-CVE-2020-10065.elf",
+    "elf_size_bytes": 1256292,
+    "elf_size_mb": 1.2,
+    "chain_depth": "deep",
+    "chain_breadth": "wide",
+    "expected_channel_mode": "optional",
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "STORE_SINK"
+    ]
+  },
+  {
+    "sample_id": "zephyr_cve_2021_3329",
+    "dataset": "monolithic-firmware-collection",
+    "role": "primary_chain_driver",
+    "source_repo_id": "zephyr",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3329/zephyr-CVE-2021-3329.elf",
+    "elf_size_bytes": 1225668,
+    "elf_size_mb": 1.17,
+    "chain_depth": "deep",
+    "chain_breadth": "medium",
+    "expected_channel_mode": "optional",
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "STORE_SINK",
+      "FUNC_PTR_SINK"
+    ]
+  },
+  {
+    "sample_id": "contiki_cve_2020_12140_hello_world",
+    "dataset": "monolithic-firmware-collection",
+    "role": "primary_chain_driver",
+    "source_repo_id": "contiki-ng",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-2020-12140/hello-world.elf",
+    "elf_size_bytes": 547448,
+    "elf_size_mb": 0.52,
+    "chain_depth": "medium",
+    "chain_breadth": "medium",
+    "expected_channel_mode": "optional",
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "LOOP_WRITE_SINK"
+    ]
+  },
+  {
+    "sample_id": "contiki_cve_2020_12141_snmp_server",
+    "dataset": "monolithic-firmware-collection",
+    "role": "primary_chain_driver",
+    "source_repo_id": "contiki-ng",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-2020-12141/snmp-server.elf",
+    "elf_size_bytes": 472156,
+    "elf_size_mb": 0.45,
+    "chain_depth": "deep",
+    "chain_breadth": "wide",
+    "expected_channel_mode": "optional",
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "STORE_SINK",
+      "LOOP_WRITE_SINK"
+    ]
+  },
+  {
+    "sample_id": "contiki_halucinator_cve_2019_9183_hello_world",
+    "dataset": "monolithic-firmware-collection",
+    "role": "primary_chain_driver",
+    "source_repo_id": "contiki-ng",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-HALucinator-CVE-2019-9183/hello-world.elf",
+    "elf_size_bytes": 452860,
+    "elf_size_mb": 0.43,
+    "chain_depth": "medium",
+    "chain_breadth": "medium",
+    "expected_channel_mode": "optional",
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "STORE_SINK"
+    ]
+  }
+]

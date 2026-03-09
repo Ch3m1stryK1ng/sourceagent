@@ -1,0 +1,932 @@
+{
+  "schema_version": "1.0-seed",
+  "sample_id": "usbs_tcp_echo_client_payload_len_variant",
+  "binary_stem": "STM32469I_EVAL_tcp_echo_base",
+  "annotation_level": "full_gt",
+  "dataset": "uSBS",
+  "subset": "Ground-truth Benchmark/fw",
+  "priority": "high",
+  "role": "primary_chain_driver",
+  "type_family": "type_ii_or_iii_ready",
+  "title": "uSBS TCP echo client payload-length variant",
+  "binary_artifacts": {
+    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one_test_payload_len/STM32469I_EVAL_tcp_echo_base.elf",
+    "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one_test_payload_len/STM32469I_EVAL_tcp_echo_base.bin",
+    "formats": [
+      "elf",
+      "bin"
+    ]
+  },
+  "source_code": {
+    "source_repo_id": "stm32cubef4",
+    "source_repo_url": "https://github.com/STMicroelectronics/STM32CubeF4",
+    "local_checkout": "firmware/source_repos/STM32CubeF4",
+    "source_code_level": "upstream_base_plus_overlay",
+    "source_locator": [
+      "firmware/source_repos/STM32CubeF4",
+      "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one_test_payload_len",
+      "firmware/ground_truth_bundle/references/uSBS/injected_snippets_vulns.c"
+    ],
+    "repo_notes": "Base source anchor for STM32469I_EVAL networking examples used by uSBS; combine with uSBS injected snippets and trigger inputs."
+  },
+  "analysis_hints": {
+    "chain_depth": "deep",
+    "chain_breadth": "wide",
+    "expected_channel_mode": "optional",
+    "likely_source_labels": [
+      "MMIO_READ",
+      "ISR_MMIO_READ",
+      "DMA_BACKED_BUFFER"
+    ],
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "LOOP_WRITE_SINK"
+    ],
+    "current_support_status": "target_for_artifact_gt"
+  },
+  "sources": [
+    {
+      "source_id": "R_AUTO_001",
+      "label": "MMIO_READ",
+      "function_name": "I2C_IsAcknowledgeFailed",
+      "address": 1073763348,
+      "address_hex": "0x40005414",
+      "site_kind": "mmio_read",
+      "context": "MAIN",
+      "role": "control",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain in /tmp/eval_mesobench_missing18_20260308_153906."
+    },
+    {
+      "source_id": "R_AUTO_002",
+      "label": "MMIO_READ",
+      "function_name": "I2C_WaitOnMasterAddressFlagUntilTimeout",
+      "address": 1073763328,
+      "address_hex": "0x40005400",
+      "site_kind": "mmio_read",
+      "context": "MAIN",
+      "role": "control",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain in /tmp/eval_mesobench_missing18_20260308_153906."
+    },
+    {
+      "source_id": "R_AUTO_003",
+      "label": "MMIO_READ",
+      "function_name": "I2C_WaitOnRXNEFlagUntilTimeout",
+      "address": 1073763348,
+      "address_hex": "0x40005414",
+      "site_kind": "mmio_read",
+      "context": "MAIN",
+      "role": "control",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain in /tmp/eval_mesobench_missing18_20260308_153906."
+    }
+  ],
+  "objects": [
+    {
+      "object_id": "obj_sram_20000000_200000ff",
+      "region_kind": "DMA_BUFFER",
+      "addr_range": [
+        "0x20000000",
+        "0x200000ff"
+      ],
+      "members": [
+        "BUTTON_PORT",
+        "COM_RX_PORT",
+        "COM_TX_PORT",
+        "COM_USART",
+        "iss",
+        "lcd_x_size",
+        "lcd_y_size",
+        "mfxstm32l152_idd_drv",
+        "mfxstm32l152_io_drv",
+        "mfxstm32l152_ts_drv",
+        "tcp_port",
+        "udp_port"
+      ],
+      "producer_contexts": [
+        "MAIN",
+        "DMA"
+      ],
+      "consumer_contexts": [
+        "MAIN"
+      ],
+      "writer_sites": [
+        "HAL_GPIO_Init",
+        "HAL_RCC_OscConfig",
+        "HAL_SYSTICK_Config",
+        "I2Cx_Init",
+        "Reset_Handler"
+      ],
+      "reader_sites": [
+        "BSP_IO_Init",
+        "BSP_LCD_DisplayStringAt",
+        "BSP_LCD_DrawPixel",
+        "BSP_PB_Init",
+        "tcp_connect",
+        "tcp_input",
+        "tcp_new_port",
+        "udp_bind"
+      ],
+      "evidence_refs": [
+        "E1",
+        "E2"
+      ],
+      "confidence": 1.0,
+      "notes": "Auto-promoted from channel_graph object node."
+    }
+  ],
+  "channels": [
+    {
+      "channel_id": "CH_AUTO_001",
+      "src_context": "DMA",
+      "object_id": "obj_sram_20000000_200000ff",
+      "dst_context": "MAIN",
+      "edge_kind": "DATA",
+      "constraints": [],
+      "evidence_refs": [
+        "E1",
+        "E2"
+      ],
+      "score": 1.0,
+      "notes": "Auto-promoted from non-drop chain channel step."
+    }
+  ],
+  "sinks": [
+    {
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0002",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "pbuf_take",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0003",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "icmp_input",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0004",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "tcp_write",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0005",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "pbuf_copy",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0013",
+      "label": "STORE_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "I2C_IsAcknowledgeFailed",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0014",
+      "label": "STORE_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "I2C_WaitOnMasterAddressFlagUntilTimeout",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0015",
+      "label": "STORE_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "I2C_WaitOnBTFFlagUntilTimeout",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0016",
+      "label": "STORE_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "I2C_WaitOnRXNEFlagUntilTimeout",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0017",
+      "label": "STORE_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "I2C_WaitOnTXEFlagUntilTimeout",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0018",
+      "label": "STORE_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "I2C_RequestMemoryWrite",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0019",
+      "label": "STORE_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "I2C_RequestMemoryRead",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    }
+  ],
+  "sink_roots": [
+    {
+      "root_id": "SR_AUTO_001_SINK_STM32469I_EVAL_tcp_echo_base_0002_primary",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0002",
+      "root_role": "primary",
+      "expr": "(size_t)__n",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_002_SINK_STM32469I_EVAL_tcp_echo_base_0002_secondary",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0002",
+      "root_role": "secondary",
+      "expr": "buf->payload",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_003_SINK_STM32469I_EVAL_tcp_echo_base_0002_secondary",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0002",
+      "root_role": "secondary",
+      "expr": "(void *)((int)dataptr + (int)pvVar5)",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_004_SINK_STM32469I_EVAL_tcp_echo_base_0003_primary",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0003",
+      "root_role": "primary",
+      "expr": "__n",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_005_SINK_STM32469I_EVAL_tcp_echo_base_0003_secondary",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0003",
+      "root_role": "secondary",
+      "expr": "p_00->payload",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_006_SINK_STM32469I_EVAL_tcp_echo_base_0003_secondary",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0003",
+      "root_role": "secondary",
+      "expr": "__src",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_007_SINK_STM32469I_EVAL_tcp_echo_base_0004_primary",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0004",
+      "root_role": "primary",
+      "expr": "uVar11",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_008_SINK_STM32469I_EVAL_tcp_echo_base_0004_secondary",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0004",
+      "root_role": "secondary",
+      "expr": "ppVar15->payload",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_009_SINK_STM32469I_EVAL_tcp_echo_base_0004_secondary",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0004",
+      "root_role": "secondary",
+      "expr": "(void *)((int)arg + uVar13)",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_010_SINK_STM32469I_EVAL_tcp_echo_base_0005_primary",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0005",
+      "root_role": "primary",
+      "expr": "__n",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_011_SINK_STM32469I_EVAL_tcp_echo_base_0005_secondary",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0005",
+      "root_role": "secondary",
+      "expr": "(void *)((int)p_to->payload + uVar5)",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_012_SINK_STM32469I_EVAL_tcp_echo_base_0005_secondary",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0005",
+      "root_role": "secondary",
+      "expr": "(void *)((int)p_from->payload + uVar4)",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_013_SINK_STM32469I_EVAL_tcp_echo_base_0013_primary",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0013",
+      "root_role": "primary",
+      "expr": "hi2c",
+      "root_kind": "dst_ptr",
+      "root_source": "param_name",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_014_SINK_STM32469I_EVAL_tcp_echo_base_0014_primary",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0014",
+      "root_role": "primary",
+      "expr": "hi2c",
+      "root_kind": "dst_ptr",
+      "root_source": "param_name",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_015_SINK_STM32469I_EVAL_tcp_echo_base_0015_primary",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0015",
+      "root_role": "primary",
+      "expr": "hi2c",
+      "root_kind": "dst_ptr",
+      "root_source": "param_name",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_016_SINK_STM32469I_EVAL_tcp_echo_base_0016_primary",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0016",
+      "root_role": "primary",
+      "expr": "hi2c",
+      "root_kind": "dst_ptr",
+      "root_source": "param_name",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_017_SINK_STM32469I_EVAL_tcp_echo_base_0017_primary",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0017",
+      "root_role": "primary",
+      "expr": "hi2c",
+      "root_kind": "dst_ptr",
+      "root_source": "param_name",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_018_SINK_STM32469I_EVAL_tcp_echo_base_0018_primary",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0018",
+      "root_role": "primary",
+      "expr": "hi2c",
+      "root_kind": "dst_ptr",
+      "root_source": "param_name",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_019_SINK_STM32469I_EVAL_tcp_echo_base_0019_primary",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0019",
+      "root_role": "primary",
+      "expr": "hi2c",
+      "root_kind": "dst_ptr",
+      "root_source": "param_name",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    }
+  ],
+  "derive_checks": [
+    {
+      "derive_check_id": "D_AUTO_001_SINK_STM32469I_EVAL_tcp_echo_base_0002",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0002",
+      "root_id": "SR_AUTO_002_SINK_STM32469I_EVAL_tcp_echo_base_0002_secondary",
+      "derive_facts": [
+        {
+          "expr": "buf->payload",
+          "kind": "root_expr",
+          "site": "pbuf_take"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "absent",
+          "site": "pbuf_take"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_002_SINK_STM32469I_EVAL_tcp_echo_base_0003",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0003",
+      "root_id": "SR_AUTO_005_SINK_STM32469I_EVAL_tcp_echo_base_0003_secondary",
+      "derive_facts": [
+        {
+          "expr": "p_00->payload",
+          "kind": "root_expr",
+          "site": "icmp_input"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "absent",
+          "site": "icmp_input"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_003_SINK_STM32469I_EVAL_tcp_echo_base_0004",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0004",
+      "root_id": "SR_AUTO_008_SINK_STM32469I_EVAL_tcp_echo_base_0004_secondary",
+      "derive_facts": [
+        {
+          "expr": "ppVar15->payload",
+          "kind": "root_expr",
+          "site": "tcp_write"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "absent",
+          "site": "tcp_write"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_004_SINK_STM32469I_EVAL_tcp_echo_base_0005",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0005",
+      "root_id": "SR_AUTO_012_SINK_STM32469I_EVAL_tcp_echo_base_0005_secondary",
+      "derive_facts": [
+        {
+          "expr": "(void *)((int)p_from->payload + uVar4)",
+          "kind": "root_expr",
+          "site": "pbuf_copy"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "absent",
+          "site": "pbuf_copy"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_005_SINK_STM32469I_EVAL_tcp_echo_base_0013",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0013",
+      "root_id": "SR_AUTO_013_SINK_STM32469I_EVAL_tcp_echo_base_0013_primary",
+      "derive_facts": [
+        {
+          "expr": "hi2c",
+          "kind": "root_expr",
+          "site": "I2C_IsAcknowledgeFailed"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "param_store_without_explicit_guard",
+          "strength": "weak",
+          "site": "I2C_IsAcknowledgeFailed"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_006_SINK_STM32469I_EVAL_tcp_echo_base_0014",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0014",
+      "root_id": "SR_AUTO_014_SINK_STM32469I_EVAL_tcp_echo_base_0014_primary",
+      "derive_facts": [
+        {
+          "expr": "hi2c",
+          "kind": "root_expr",
+          "site": "I2C_WaitOnMasterAddressFlagUntilTimeout"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "param_store_without_explicit_guard",
+          "strength": "weak",
+          "site": "I2C_WaitOnMasterAddressFlagUntilTimeout"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_007_SINK_STM32469I_EVAL_tcp_echo_base_0015",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0015",
+      "root_id": "SR_AUTO_015_SINK_STM32469I_EVAL_tcp_echo_base_0015_primary",
+      "derive_facts": [
+        {
+          "expr": "hi2c",
+          "kind": "root_expr",
+          "site": "I2C_WaitOnBTFFlagUntilTimeout"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "param_store_without_explicit_guard",
+          "strength": "weak",
+          "site": "I2C_WaitOnBTFFlagUntilTimeout"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_008_SINK_STM32469I_EVAL_tcp_echo_base_0016",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0016",
+      "root_id": "SR_AUTO_016_SINK_STM32469I_EVAL_tcp_echo_base_0016_primary",
+      "derive_facts": [
+        {
+          "expr": "hi2c",
+          "kind": "root_expr",
+          "site": "I2C_WaitOnRXNEFlagUntilTimeout"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "param_store_without_explicit_guard",
+          "strength": "weak",
+          "site": "I2C_WaitOnRXNEFlagUntilTimeout"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_009_SINK_STM32469I_EVAL_tcp_echo_base_0017",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0017",
+      "root_id": "SR_AUTO_017_SINK_STM32469I_EVAL_tcp_echo_base_0017_primary",
+      "derive_facts": [
+        {
+          "expr": "hi2c",
+          "kind": "root_expr",
+          "site": "I2C_WaitOnTXEFlagUntilTimeout"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "param_store_without_explicit_guard",
+          "strength": "weak",
+          "site": "I2C_WaitOnTXEFlagUntilTimeout"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_010_SINK_STM32469I_EVAL_tcp_echo_base_0018",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0018",
+      "root_id": "SR_AUTO_018_SINK_STM32469I_EVAL_tcp_echo_base_0018_primary",
+      "derive_facts": [
+        {
+          "expr": "hi2c",
+          "kind": "root_expr",
+          "site": "I2C_RequestMemoryWrite"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "param_store_without_explicit_guard",
+          "strength": "weak",
+          "site": "I2C_RequestMemoryWrite"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_011_SINK_STM32469I_EVAL_tcp_echo_base_0019",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0019",
+      "root_id": "SR_AUTO_019_SINK_STM32469I_EVAL_tcp_echo_base_0019_primary",
+      "derive_facts": [
+        {
+          "expr": "hi2c",
+          "kind": "root_expr",
+          "site": "I2C_RequestMemoryRead"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "param_store_without_explicit_guard",
+          "strength": "weak",
+          "site": "I2C_RequestMemoryRead"
+        }
+      ],
+      "status": "complete"
+    }
+  ],
+  "chains": [
+    {
+      "chain_id": "chain_STM32469I_EVAL_tcp_echo_base_SINK_STM32469I_EVAL_tcp_echo_base_0002_253f1287",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0002",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20000000_200000ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_001_SINK_STM32469I_EVAL_tcp_echo_base_0002_primary",
+        "SR_AUTO_002_SINK_STM32469I_EVAL_tcp_echo_base_0002_secondary",
+        "SR_AUTO_003_SINK_STM32469I_EVAL_tcp_echo_base_0002_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_001_SINK_STM32469I_EVAL_tcp_echo_base_0002"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: pbuf_take"
+    },
+    {
+      "chain_id": "chain_STM32469I_EVAL_tcp_echo_base_SINK_STM32469I_EVAL_tcp_echo_base_0003_8dc5fc5a",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0003",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20000000_200000ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_004_SINK_STM32469I_EVAL_tcp_echo_base_0003_primary",
+        "SR_AUTO_005_SINK_STM32469I_EVAL_tcp_echo_base_0003_secondary",
+        "SR_AUTO_006_SINK_STM32469I_EVAL_tcp_echo_base_0003_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_002_SINK_STM32469I_EVAL_tcp_echo_base_0003"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: icmp_input"
+    },
+    {
+      "chain_id": "chain_STM32469I_EVAL_tcp_echo_base_SINK_STM32469I_EVAL_tcp_echo_base_0004_0008b0b7",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0004",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20000000_200000ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_007_SINK_STM32469I_EVAL_tcp_echo_base_0004_primary",
+        "SR_AUTO_008_SINK_STM32469I_EVAL_tcp_echo_base_0004_secondary",
+        "SR_AUTO_009_SINK_STM32469I_EVAL_tcp_echo_base_0004_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_003_SINK_STM32469I_EVAL_tcp_echo_base_0004"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: tcp_write"
+    },
+    {
+      "chain_id": "chain_STM32469I_EVAL_tcp_echo_base_SINK_STM32469I_EVAL_tcp_echo_base_0005_e93c4e56",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0005",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20000000_200000ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_010_SINK_STM32469I_EVAL_tcp_echo_base_0005_primary",
+        "SR_AUTO_011_SINK_STM32469I_EVAL_tcp_echo_base_0005_secondary",
+        "SR_AUTO_012_SINK_STM32469I_EVAL_tcp_echo_base_0005_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_004_SINK_STM32469I_EVAL_tcp_echo_base_0005"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: pbuf_copy"
+    },
+    {
+      "chain_id": "chain_STM32469I_EVAL_tcp_echo_base_SINK_STM32469I_EVAL_tcp_echo_base_0013_868a9c71",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0013",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [
+        "R_AUTO_001"
+      ],
+      "required_object_ids": [],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR_AUTO_013_SINK_STM32469I_EVAL_tcp_echo_base_0013_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_005_SINK_STM32469I_EVAL_tcp_echo_base_0013"
+      ],
+      "must_use_channel": false,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: I2C_IsAcknowledgeFailed"
+    },
+    {
+      "chain_id": "chain_STM32469I_EVAL_tcp_echo_base_SINK_STM32469I_EVAL_tcp_echo_base_0014_4d54b968",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0014",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [
+        "R_AUTO_002"
+      ],
+      "required_object_ids": [],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR_AUTO_014_SINK_STM32469I_EVAL_tcp_echo_base_0014_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_006_SINK_STM32469I_EVAL_tcp_echo_base_0014"
+      ],
+      "must_use_channel": false,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: I2C_WaitOnMasterAddressFlagUntilTimeout"
+    },
+    {
+      "chain_id": "chain_STM32469I_EVAL_tcp_echo_base_SINK_STM32469I_EVAL_tcp_echo_base_0015_2cdda380",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0015",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [
+        "R_AUTO_001"
+      ],
+      "required_object_ids": [],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR_AUTO_015_SINK_STM32469I_EVAL_tcp_echo_base_0015_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_007_SINK_STM32469I_EVAL_tcp_echo_base_0015"
+      ],
+      "must_use_channel": false,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: I2C_WaitOnBTFFlagUntilTimeout"
+    },
+    {
+      "chain_id": "chain_STM32469I_EVAL_tcp_echo_base_SINK_STM32469I_EVAL_tcp_echo_base_0016_ced1b90b",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0016",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [
+        "R_AUTO_003"
+      ],
+      "required_object_ids": [],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR_AUTO_016_SINK_STM32469I_EVAL_tcp_echo_base_0016_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_008_SINK_STM32469I_EVAL_tcp_echo_base_0016"
+      ],
+      "must_use_channel": false,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: I2C_WaitOnRXNEFlagUntilTimeout"
+    },
+    {
+      "chain_id": "chain_STM32469I_EVAL_tcp_echo_base_SINK_STM32469I_EVAL_tcp_echo_base_0017_be363994",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0017",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [
+        "R_AUTO_001"
+      ],
+      "required_object_ids": [],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR_AUTO_017_SINK_STM32469I_EVAL_tcp_echo_base_0017_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_009_SINK_STM32469I_EVAL_tcp_echo_base_0017"
+      ],
+      "must_use_channel": false,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: I2C_WaitOnTXEFlagUntilTimeout"
+    },
+    {
+      "chain_id": "chain_STM32469I_EVAL_tcp_echo_base_SINK_STM32469I_EVAL_tcp_echo_base_0018_1b14f6b1",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0018",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [
+        "R_AUTO_002"
+      ],
+      "required_object_ids": [],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR_AUTO_018_SINK_STM32469I_EVAL_tcp_echo_base_0018_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_010_SINK_STM32469I_EVAL_tcp_echo_base_0018"
+      ],
+      "must_use_channel": false,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: I2C_RequestMemoryWrite"
+    },
+    {
+      "chain_id": "chain_STM32469I_EVAL_tcp_echo_base_SINK_STM32469I_EVAL_tcp_echo_base_0019_ea5aa148",
+      "sink_id": "SINK_STM32469I_EVAL_tcp_echo_base_0019",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [
+        "R_AUTO_002"
+      ],
+      "required_object_ids": [],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR_AUTO_019_SINK_STM32469I_EVAL_tcp_echo_base_0019_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_011_SINK_STM32469I_EVAL_tcp_echo_base_0019"
+      ],
+      "must_use_channel": false,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: I2C_RequestMemoryRead"
+    }
+  ],
+  "negative_expectations": [],
+  "todo_items": [],
+  "notes": [
+    "Specifically useful for length-derived chains; prioritize root and derive/check annotation.",
+    "Auto-promoted to full_gt from current pipeline eval outputs; exhaustive within declared pipeline_scope."
+  ],
+  "chain_gt_scope": "exhaustive",
+  "gt_provenance": {
+    "mode": "auto_promoted_from_eval",
+    "eval_dir": "/tmp/eval_mesobench_missing18_20260308_153906",
+    "scope": "pipeline_scope",
+    "warning": "This full GT is exhaustive within the current SourceAgent pipeline scope and source-backed focus region; manual semantic refinement may still improve subtype fidelity."
+  }
+}

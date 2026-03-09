@@ -1,0 +1,216 @@
+{
+  "schema_version": "2.0-seed",
+  "binary_stem": "t0_indirect_memcpy",
+  "binary_paths": {
+    "source_file": "firmware/microbench/t0_indirect_memcpy.c",
+    "map_file": "firmware/microbench/t0_indirect_memcpy.map",
+    "elf_file": "firmware/microbench/t0_indirect_memcpy.elf",
+    "bin_file": "firmware/microbench/t0_indirect_memcpy.bin"
+  },
+  "sample_meta": {
+    "title": "Caller-bridge into memcpy helper",
+    "mechanism_group": "same_context_bridge",
+    "runtime_style": "baremetal_polling",
+    "inspiration": "toy_indirect_copy",
+    "arch": "ARM_CORTEX_M",
+    "expected_channel_mode": "none",
+    "chain_shape": "caller_bridge_copy"
+  },
+  "annotation_status": {
+    "sources": "complete",
+    "objects": "complete",
+    "channels": "n/a",
+    "sinks": "complete",
+    "sink_roots": "complete",
+    "derive_checks": "complete",
+    "chains": "complete",
+    "negative_expectations": "complete",
+    "overall": "complete"
+  },
+  "todo_items": [
+    "Annotate bridge from caller parse_packet into do_copy.",
+    "Mark which roots can be confirmed only through caller_bridge evidence."
+  ],
+  "sources": [
+    {
+      "source_id": "R1",
+      "label": "MMIO_READ",
+      "function_name": "spi_read_byte",
+      "address": 1073759232,
+      "address_hex": "0x40004400",
+      "site_kind": "mmio_read",
+      "context": "MAIN",
+      "role": "control",
+      "notes": "SPI1_SR polling gate.",
+      "status": "complete",
+      "source_file": "t0_indirect_memcpy.c",
+      "map_file": "t0_indirect_memcpy.map"
+    },
+    {
+      "source_id": "R2",
+      "label": "MMIO_READ",
+      "function_name": "spi_read_byte",
+      "address": 1073759236,
+      "address_hex": "0x40004404",
+      "site_kind": "mmio_read",
+      "context": "MAIN",
+      "role": "data",
+      "notes": "SPI1_DR payload byte read.",
+      "status": "complete",
+      "source_file": "t0_indirect_memcpy.c",
+      "map_file": "t0_indirect_memcpy.map"
+    }
+  ],
+  "objects": [
+    {
+      "object_id": "O1_g_staging",
+      "region_kind": "SRAM_CLUSTER",
+      "addr_range": [
+        "0x20000000",
+        "0x200000ff"
+      ],
+      "members": [
+        "g_staging"
+      ],
+      "producer_contexts": [
+        "MAIN"
+      ],
+      "consumer_contexts": [
+        "MAIN"
+      ],
+      "writer_sites": [
+        {
+          "function_name": "parse_packet",
+          "address_hex": "0x08000070",
+          "kind": "buffer_fill"
+        }
+      ],
+      "reader_sites": [
+        {
+          "function_name": "do_copy",
+          "address_hex": "0x0800005c",
+          "kind": "memcpy_src"
+        }
+      ],
+      "evidence_refs": [
+        "c:t0_indirect_memcpy:54",
+        "m:t0_indirect_memcpy:108"
+      ],
+      "confidence": 1.0,
+      "notes": "Global staging buffer filled from SPI and then copied by helper."
+    }
+  ],
+  "channels": [],
+  "sinks": [
+    {
+      "sink_id": "S1",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "do_copy",
+      "address": 134217820,
+      "address_hex": "0x0800005c",
+      "site_kind": "copy_call_or_copy_idiom",
+      "notes": "2-hop taint to memcpy length",
+      "status": "complete",
+      "source_file": "t0_indirect_memcpy.c",
+      "map_file": "t0_indirect_memcpy.map"
+    }
+  ],
+  "sink_roots": [
+    {
+      "root_id": "SR1_payload_len",
+      "sink_id": "S1",
+      "root_role": "len",
+      "expr": "payload_len",
+      "status": "complete",
+      "controllability": "source_derived_via_bridge",
+      "evidence_refs": [
+        "c:t0_indirect_memcpy:72",
+        "c:t0_indirect_memcpy:80"
+      ]
+    }
+  ],
+  "derive_checks": [
+    {
+      "derive_check_id": "D1_indirect_copy",
+      "sink_id": "S1",
+      "root_id": "SR1_payload_len",
+      "status": "complete",
+      "derive_facts": [
+        {
+          "expr": "payload_len = read_header()",
+          "site": "parse_packet",
+          "evidence_refs": [
+            "c:t0_indirect_memcpy:72"
+          ]
+        },
+        {
+          "expr": "read_header returns spi_read_byte()",
+          "site": "read_header",
+          "evidence_refs": [
+            "c:t0_indirect_memcpy:58"
+          ]
+        },
+        {
+          "expr": "do_copy(g_staging, payload_len)",
+          "site": "parse_packet",
+          "evidence_refs": [
+            "c:t0_indirect_memcpy:80"
+          ]
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "No upper bound against local[32] before memcpy in do_copy",
+          "strength": "absent",
+          "site": "do_copy",
+          "evidence_refs": [
+            "c:t0_indirect_memcpy:66"
+          ]
+        },
+        {
+          "expr": "g_staging fill loop bounds payload_len by 256, but sink bound remains unchecked for local[32]",
+          "strength": "weak",
+          "site": "parse_packet",
+          "evidence_refs": [
+            "c:t0_indirect_memcpy:75"
+          ]
+        }
+      ]
+    }
+  ],
+  "chains": [
+    {
+      "chain_id": "C1_two_hop_copy_overflow",
+      "sink_id": "S1",
+      "expected_verdict": "CONFIRMED",
+      "required_source_ids": [
+        "R2"
+      ],
+      "required_object_ids": [
+        "O1_g_staging"
+      ],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR1_payload_len"
+      ],
+      "required_derive_check_ids": [
+        "D1_indirect_copy"
+      ],
+      "must_use_channel": false,
+      "notes": "Two-hop chain: SPI DR -> read_header -> parse_packet -> do_copy."
+    }
+  ],
+  "negative_expectations": [
+    {
+      "negative_id": "N1_status_not_payload",
+      "target_kind": "source",
+      "target_id": "R1",
+      "expected_verdict": "DROP",
+      "reason": "SPI status read should not anchor the chain."
+    }
+  ],
+  "notes": [
+    "Annotated two-hop same-context chain with explicit caller bridge semantics in derive facts."
+  ]
+}

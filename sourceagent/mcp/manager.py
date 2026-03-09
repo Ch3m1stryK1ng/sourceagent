@@ -515,9 +515,30 @@ class MCPManager:
         transport = None
         try:
             env = {**os.environ, **config.env}
+            effective_args = list(config.args or [])
+            # Optional runtime override for pyghidra-mcp project path to avoid
+            # expensive startup on very large stale projects.
+            ghidra_proj = os.environ.get("SOURCEAGENT_GHIDRA_PROJECT_PATH")
+            if (
+                ghidra_proj
+                and self._is_ghidra_server(config.name, config)
+                and "--project-path" not in effective_args
+            ):
+                effective_args.extend(["--project-path", ghidra_proj])
+                print(f"[MCP] Ghidra project override: {ghidra_proj}")
             # Use per-server timeout (default 15s) for initialize/tools handshake.
-            # Ghidra-backed servers can need significantly longer cold-start time.
+            # Ghidra-backed servers can need longer cold-start time.
             connect_timeout = float(getattr(config, "timeout", 15) or 15)
+            # Optional runtime cap so caller and transport timeouts stay aligned.
+            # Prevents outer wait_for cancellation from leaving child processes alive.
+            timeout_cap_raw = os.environ.get("SOURCEAGENT_MCP_CONNECT_TIMEOUT_SEC")
+            if timeout_cap_raw:
+                try:
+                    timeout_cap = float(timeout_cap_raw)
+                    if timeout_cap > 0:
+                        connect_timeout = max(1.0, min(connect_timeout, timeout_cap))
+                except Exception:
+                    pass
 
             # Decide transport type:
             # - If args contain a http/sse transport or a --server http:// URL, use SSETransport
@@ -565,7 +586,7 @@ class MCPManager:
                 await transport.connect()
             else:
                 transport = StdioTransport(
-                    command=config.command, args=config.args, env=env
+                    command=config.command, args=effective_args, env=env
                 )
                 await transport.connect()
 
@@ -599,14 +620,50 @@ class MCPManager:
                 tools=tools,
                 connected=True,
             )
+        except asyncio.CancelledError:
+            # Ensure child stdio process is terminated when caller timeout cancels.
+            if transport:
+                try:
+                    await transport.disconnect()
+                except Exception:
+                    pass
+            raise
         except Exception as e:
+            detail = ""
+            try:
+                if isinstance(transport, StdioTransport) and transport.process:
+                    proc = transport.process
+                    rc = proc.returncode
+                    if rc is None:
+                        await asyncio.sleep(0.05)
+                        rc = proc.returncode
+                    stderr_tail = ""
+                    if proc.stderr:
+                        try:
+                            err_bytes = await asyncio.wait_for(
+                                proc.stderr.read(4096), timeout=0.2
+                            )
+                            if err_bytes:
+                                stderr_tail = err_bytes.decode(errors="ignore").strip()
+                        except Exception:
+                            pass
+                    if rc is not None or stderr_tail:
+                        if stderr_tail:
+                            one_line = " ".join(stderr_tail.split())
+                            if len(one_line) > 240:
+                                one_line = "..." + one_line[-240:]
+                            detail = f" (rc={rc}, stderr={one_line})"
+                        else:
+                            detail = f" (rc={rc})"
+            except Exception:
+                detail = ""
             # Clean up transport on failure
             if transport:
                 try:
                     await transport.disconnect()
                 except Exception:
                     pass
-            print(f"[MCP] Failed to connect to {config.name}: {e}")
+            print(f"[MCP] Failed to connect to {config.name}: {e}{detail}")
             return None
 
     async def call_tool(self, server_name: str, tool_name: str, arguments: dict) -> Any:

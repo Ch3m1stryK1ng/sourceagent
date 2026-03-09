@@ -1,0 +1,374 @@
+{
+  "schema_version": "2.0-seed",
+  "binary_stem": "cve_2021_34259_usb_host",
+  "binary_paths": {
+    "source_file": "firmware/microbench/cve_2021_34259_usb_host.c",
+    "map_file": "firmware/microbench/cve_2021_34259_usb_host.map",
+    "elf_file": "firmware/microbench/cve_2021_34259_usb_host.elf",
+    "bin_file": "firmware/microbench/cve_2021_34259_usb_host.bin"
+  },
+  "sample_meta": {
+    "title": "STM32Cube USB host descriptor parsing overflow reproduction",
+    "mechanism_group": "real_cve_semantic",
+    "runtime_style": "baremetal_polling",
+    "inspiration": "stm32cube_usb",
+    "arch": "ARM_CORTEX_M",
+    "expected_channel_mode": "none",
+    "chain_shape": "same_context_parser_overflow"
+  },
+  "annotation_status": {
+    "sources": "complete",
+    "objects": "complete",
+    "channels": "n/a",
+    "sinks": "complete",
+    "sink_roots": "complete",
+    "derive_checks": "complete",
+    "chains": "complete",
+    "negative_expectations": "complete",
+    "overall": "complete"
+  },
+  "todo_items": [
+    "Annotate descriptor objects for cfg/interface/endpoint parsing.",
+    "Promote STORE_SINK sites into parser-overflow semantic chains.",
+    "Record which roots come from descriptor length/offset fields."
+  ],
+  "sources": [
+    {
+      "source_id": "R1",
+      "label": "MMIO_READ",
+      "function_name": "USB_ReadPacket",
+      "address": 1342181376,
+      "address_hex": "0x50001000",
+      "site_kind": "mmio_read",
+      "context": "MAIN",
+      "role": "data",
+      "notes": "USB OTG EP0 FIFO supplies attacker-controlled descriptor bytes into CfgDesc_Raw.",
+      "status": "complete",
+      "source_file": "cve_2021_34259_usb_host.c",
+      "map_file": "cve_2021_34259_usb_host.map"
+    }
+  ],
+  "objects": [
+    {
+      "object_id": "O1_g_usbh_host",
+      "region_kind": "SRAM_CLUSTER",
+      "addr_range": [
+        "0x20000000",
+        "0x20000249"
+      ],
+      "members": [
+        "g_usbh_host",
+        "g_usbh_host.device.CfgDesc",
+        "g_usbh_host.device.CfgDesc_Raw"
+      ],
+      "producer_contexts": [
+        "MAIN"
+      ],
+      "consumer_contexts": [
+        "MAIN"
+      ],
+      "writer_sites": [
+        {
+          "function_name": "USB_ReadPacket",
+          "address_hex": "0x08000040",
+          "kind": "fifo_fill"
+        },
+        {
+          "function_name": "USBH_ParseCfgDesc",
+          "address_hex": "0x080000b8",
+          "kind": "cfg_parse"
+        },
+        {
+          "function_name": "USBH_ParseInterfaceDesc",
+          "address_hex": "0x08000092",
+          "kind": "if_parse"
+        },
+        {
+          "function_name": "USBH_ParseEPDesc",
+          "address_hex": "0x08000072",
+          "kind": "ep_parse"
+        }
+      ],
+      "reader_sites": [
+        {
+          "function_name": "USBH_Process_Enumeration",
+          "address_hex": "0x08000198",
+          "kind": "wTotalLength_read"
+        }
+      ],
+      "evidence_refs": [
+        "c:cve_2021_34259_usb_host:155",
+        "m:cve_2021_34259_usb_host:114"
+      ],
+      "confidence": 1.0,
+      "notes": "Host handle containing both raw descriptor bytes and parsed configuration/interface/endpoint structs."
+    }
+  ],
+  "channels": [],
+  "sinks": [
+    {
+      "sink_id": "S1",
+      "label": "PARSING_OVERFLOW_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "USBH_ParseCfgDesc",
+      "address": 134217912,
+      "address_hex": "0x080000b8",
+      "site_kind": "parser_write",
+      "notes": "wTotalLength-driven overflow path",
+      "status": "complete",
+      "source_file": "cve_2021_34259_usb_host.c",
+      "map_file": "cve_2021_34259_usb_host.map"
+    },
+    {
+      "sink_id": "S3",
+      "label": "PARSING_OVERFLOW_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "USBH_ParseEPDesc",
+      "address": 134217842,
+      "address_hex": "0x08000072",
+      "site_kind": "parser_write",
+      "notes": "endpoint descriptor overflow path",
+      "status": "complete",
+      "source_file": "cve_2021_34259_usb_host.c",
+      "map_file": "cve_2021_34259_usb_host.map"
+    },
+    {
+      "sink_id": "S2",
+      "label": "PARSING_OVERFLOW_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "USBH_ParseInterfaceDesc",
+      "address": 134217874,
+      "address_hex": "0x08000092",
+      "site_kind": "parser_write",
+      "notes": "bNumEndpoints not clamped",
+      "status": "complete",
+      "source_file": "cve_2021_34259_usb_host.c",
+      "map_file": "cve_2021_34259_usb_host.map"
+    }
+  ],
+  "sink_roots": [
+    {
+      "root_id": "SR1_wTotalLength",
+      "sink_id": "S1",
+      "root_role": "length_bound",
+      "expr": "cfg_desc->wTotalLength / LE16(buf + 2)",
+      "status": "complete",
+      "controllability": "source_derived",
+      "evidence_refs": [
+        "c:cve_2021_34259_usb_host:279",
+        "c:cve_2021_34259_usb_host:297"
+      ]
+    },
+    {
+      "root_id": "SR2_bNumEndpoints",
+      "sink_id": "S2",
+      "root_role": "loop_bound",
+      "expr": "if_descriptor->bNumEndpoints",
+      "status": "complete",
+      "controllability": "source_derived",
+      "evidence_refs": [
+        "c:cve_2021_34259_usb_host:244",
+        "c:cve_2021_34259_usb_host:321"
+      ]
+    },
+    {
+      "root_id": "SR3_wMaxPacketSize",
+      "sink_id": "S3",
+      "root_role": "size_field",
+      "expr": "ep_descriptor->wMaxPacketSize / LE16(buf + 4)",
+      "status": "complete",
+      "controllability": "source_derived",
+      "evidence_refs": [
+        "c:cve_2021_34259_usb_host:220"
+      ]
+    }
+  ],
+  "derive_checks": [
+    {
+      "derive_check_id": "D1_cfg_total_len",
+      "sink_id": "S1",
+      "root_id": "SR1_wTotalLength",
+      "status": "complete",
+      "derive_facts": [
+        {
+          "expr": "USB_ReadPacket(phost->device.CfgDesc_Raw, length)",
+          "site": "USBH_Get_CfgDesc",
+          "evidence_refs": [
+            "c:cve_2021_34259_usb_host:359"
+          ]
+        },
+        {
+          "expr": "cfg_desc->wTotalLength = LE16(buf + 2)",
+          "site": "USBH_ParseCfgDesc",
+          "evidence_refs": [
+            "c:cve_2021_34259_usb_host:279"
+          ]
+        },
+        {
+          "expr": "while (ptr < cfg_desc->wTotalLength)",
+          "site": "USBH_ParseCfgDesc",
+          "evidence_refs": [
+            "c:cve_2021_34259_usb_host:296"
+          ]
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "No MIN(wTotalLength, USBH_MAX_SIZE_CONFIGURATION) before parser walk",
+          "strength": "absent",
+          "site": "USBH_ParseCfgDesc",
+          "evidence_refs": [
+            "c:cve_2021_34259_usb_host:279"
+          ]
+        }
+      ]
+    },
+    {
+      "derive_check_id": "D2_num_eps",
+      "sink_id": "S2",
+      "root_id": "SR2_bNumEndpoints",
+      "status": "complete",
+      "derive_facts": [
+        {
+          "expr": "if_descriptor->bNumEndpoints = *(buf + 4)",
+          "site": "USBH_ParseInterfaceDesc",
+          "evidence_refs": [
+            "c:cve_2021_34259_usb_host:244"
+          ]
+        },
+        {
+          "expr": "while (ep_ix < pif->bNumEndpoints)",
+          "site": "USBH_ParseCfgDesc",
+          "evidence_refs": [
+            "c:cve_2021_34259_usb_host:321"
+          ]
+        },
+        {
+          "expr": "pep = &cfg_desc->Itf_Desc[if_ix].Ep_Desc[ep_ix]",
+          "site": "USBH_ParseCfgDesc",
+          "evidence_refs": [
+            "c:cve_2021_34259_usb_host:329"
+          ]
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "No clamp against USBH_MAX_NUM_ENDPOINTS before endpoint loop",
+          "strength": "absent",
+          "site": "USBH_ParseInterfaceDesc/USBH_ParseCfgDesc",
+          "evidence_refs": [
+            "c:cve_2021_34259_usb_host:244",
+            "c:cve_2021_34259_usb_host:321"
+          ]
+        }
+      ]
+    },
+    {
+      "derive_check_id": "D3_mps",
+      "sink_id": "S3",
+      "root_id": "SR3_wMaxPacketSize",
+      "status": "complete",
+      "derive_facts": [
+        {
+          "expr": "ep_descriptor->wMaxPacketSize = LE16(buf + 4)",
+          "site": "USBH_ParseEPDesc",
+          "evidence_refs": [
+            "c:cve_2021_34259_usb_host:220"
+          ]
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "No validation against USBH_MAX_EP_PACKET_SIZE before storing wMaxPacketSize",
+          "strength": "absent",
+          "site": "USBH_ParseEPDesc",
+          "evidence_refs": [
+            "c:cve_2021_34259_usb_host:220"
+          ]
+        }
+      ]
+    }
+  ],
+  "chains": [
+    {
+      "chain_id": "C1_cfg_total_length_overwalk",
+      "sink_id": "S1",
+      "expected_verdict": "CONFIRMED",
+      "required_source_ids": [
+        "R1"
+      ],
+      "required_object_ids": [
+        "O1_g_usbh_host"
+      ],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR1_wTotalLength"
+      ],
+      "required_derive_check_ids": [
+        "D1_cfg_total_len"
+      ],
+      "must_use_channel": false,
+      "notes": "Attacker-controlled wTotalLength drives descriptor walk past the 512-byte raw buffer.",
+      "optional_object_ids": [
+        "O1_g_usbh_host"
+      ]
+    },
+    {
+      "chain_id": "C2_endpoint_count_overflow",
+      "sink_id": "S2",
+      "expected_verdict": "CONFIRMED",
+      "required_source_ids": [
+        "R1"
+      ],
+      "required_object_ids": [
+        "O1_g_usbh_host"
+      ],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR2_bNumEndpoints"
+      ],
+      "required_derive_check_ids": [
+        "D2_num_eps"
+      ],
+      "must_use_channel": false,
+      "notes": "Attacker-controlled bNumEndpoints expands endpoint loop beyond Ep_Desc[2].",
+      "optional_object_ids": [
+        "O1_g_usbh_host"
+      ]
+    },
+    {
+      "chain_id": "C3_ep_packet_size_risky_state",
+      "sink_id": "S3",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [
+        "R1"
+      ],
+      "required_object_ids": [
+        "O1_g_usbh_host"
+      ],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR3_wMaxPacketSize"
+      ],
+      "required_derive_check_ids": [
+        "D3_mps"
+      ],
+      "must_use_channel": false,
+      "notes": "Unchecked wMaxPacketSize is stored for downstream transfer sizing; immediate overflow is not fully materialized in this benchmark.",
+      "optional_object_ids": [
+        "O1_g_usbh_host"
+      ]
+    }
+  ],
+  "negative_expectations": [
+    {
+      "negative_id": "N1_no_channel_required",
+      "target_kind": "sample",
+      "expected_verdict": "DROP",
+      "reason": "This benchmark is same-context parser logic; channel edges should not be required."
+    }
+  ],
+  "notes": [
+    "Annotated semantic USB descriptor parsing sample with three subtype chains and differentiated verdicts."
+  ]
+}

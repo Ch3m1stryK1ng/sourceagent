@@ -1,0 +1,238 @@
+{
+  "schema_version": "1.0-seed",
+  "sample_id": "zephyr_cve_2021_3329",
+  "binary_stem": "zephyr-CVE-2021-3329",
+  "annotation_level": "full_gt",
+  "dataset": "monolithic-firmware-collection",
+  "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
+  "priority": "high",
+  "role": "primary_chain_driver",
+  "type_family": "type_ii_or_iii_ready",
+  "title": "Zephyr CVE-2021-3329 prebuilt sample",
+  "binary_artifacts": {
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3329/zephyr-CVE-2021-3329.elf",
+    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3329/zephyr-CVE-2021-3329.bin",
+    "formats": [
+      "elf",
+      "bin"
+    ]
+  },
+  "source_code": {
+    "source_repo_id": "zephyr",
+    "source_repo_url": "https://github.com/zephyrproject-rtos/zephyr",
+    "local_checkout": "firmware/source_repos/zephyr",
+    "source_code_level": "full_upstream_repo",
+    "source_locator": [
+      "firmware/source_repos/zephyr",
+      "resolve CVE-specific subsystem"
+    ],
+    "repo_notes": "Primary source anchor for Zephyr prebuilt CVE samples from D_FUZZWARE."
+  },
+  "analysis_hints": {
+    "chain_depth": "deep",
+    "chain_breadth": "medium",
+    "expected_channel_mode": "optional",
+    "likely_source_labels": [
+      "MMIO_READ",
+      "ISR_MMIO_READ",
+      "DMA_BACKED_BUFFER"
+    ],
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "STORE_SINK",
+      "FUNC_PTR_SINK"
+    ],
+    "current_support_status": "target_for_artifact_gt"
+  },
+  "sources": [
+    {
+      "source_id": "R_AUTO_001",
+      "label": "MMIO_READ",
+      "function_name": "gpiote_event_handler",
+      "address": 1073767172,
+      "address_hex": "0x40006304",
+      "site_kind": "mmio_read",
+      "context": "MAIN",
+      "role": "control",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain in /tmp/eval_mesobench_missing18_20260308_153906."
+    },
+    {
+      "source_id": "R_AUTO_002",
+      "label": "MMIO_READ",
+      "function_name": "uart_nrfx_fifo_read",
+      "address": 1073750280,
+      "address_hex": "0x40002108",
+      "site_kind": "mmio_read",
+      "context": "MAIN",
+      "role": "control",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain in /tmp/eval_mesobench_missing18_20260308_153906."
+    }
+  ],
+  "objects": [],
+  "channels": [],
+  "sinks": [
+    {
+      "sink_id": "SINK_zephyr-CVE-2021-3329_0031",
+      "label": "LOOP_WRITE_SINK",
+      "pipeline_label_hint": "LOOP_WRITE_SINK",
+      "function_name": "gpiote_event_handler",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SAFE_OR_LOW_RISK."
+    },
+    {
+      "sink_id": "SINK_zephyr-CVE-2021-3329_0032",
+      "label": "LOOP_WRITE_SINK",
+      "pipeline_label_hint": "LOOP_WRITE_SINK",
+      "function_name": "uart_nrfx_fifo_read",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SAFE_OR_LOW_RISK."
+    }
+  ],
+  "sink_roots": [
+    {
+      "root_id": "SR_AUTO_001_SINK_zephyr-CVE-2021-3329_0031_primary",
+      "sink_id": "SINK_zephyr-CVE-2021-3329_0031",
+      "root_role": "primary",
+      "expr": "-iVar1",
+      "root_kind": "index_or_bound",
+      "root_source": "miner_facts",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_002_SINK_zephyr-CVE-2021-3329_0031_secondary",
+      "sink_id": "SINK_zephyr-CVE-2021-3329_0031",
+      "root_role": "secondary",
+      "expr": "fired_triggers[-iVar1]",
+      "root_kind": "dst_ptr",
+      "root_source": "miner_facts",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_003_SINK_zephyr-CVE-2021-3329_0032_primary",
+      "sink_id": "SINK_zephyr-CVE-2021-3329_0032",
+      "root_role": "primary",
+      "expr": "uVar1",
+      "root_kind": "index_or_bound",
+      "root_source": "miner_facts",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_004_SINK_zephyr-CVE-2021-3329_0032_secondary",
+      "sink_id": "SINK_zephyr-CVE-2021-3329_0032",
+      "root_role": "secondary",
+      "expr": "rx_data[uVar1]",
+      "root_kind": "dst_ptr",
+      "root_source": "miner_facts",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    }
+  ],
+  "derive_checks": [
+    {
+      "derive_check_id": "D_AUTO_001_SINK_zephyr-CVE-2021-3329_0031",
+      "sink_id": "SINK_zephyr-CVE-2021-3329_0031",
+      "root_id": "SR_AUTO_001_SINK_zephyr-CVE-2021-3329_0031_primary",
+      "derive_facts": [
+        {
+          "expr": "-iVar1",
+          "kind": "root_expr",
+          "site": "gpiote_event_handler"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "code_guard_root_bound",
+          "strength": "effective",
+          "site": "gpiote_event_handler"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_002_SINK_zephyr-CVE-2021-3329_0032",
+      "sink_id": "SINK_zephyr-CVE-2021-3329_0032",
+      "root_id": "SR_AUTO_003_SINK_zephyr-CVE-2021-3329_0032_primary",
+      "derive_facts": [
+        {
+          "expr": "uVar1",
+          "kind": "root_expr",
+          "site": "uart_nrfx_fifo_read"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "code_guard_root_bound",
+          "strength": "effective",
+          "site": "uart_nrfx_fifo_read"
+        }
+      ],
+      "status": "complete"
+    }
+  ],
+  "chains": [
+    {
+      "chain_id": "chain_zephyr-CVE-2021-3329_SINK_zephyr-CVE-2021-3329_0031_98bef272",
+      "sink_id": "SINK_zephyr-CVE-2021-3329_0031",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [
+        "R_AUTO_001"
+      ],
+      "required_object_ids": [],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR_AUTO_001_SINK_zephyr-CVE-2021-3329_0031_primary",
+        "SR_AUTO_002_SINK_zephyr-CVE-2021-3329_0031_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_001_SINK_zephyr-CVE-2021-3329_0031"
+      ],
+      "must_use_channel": false,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: gpiote_event_handler"
+    },
+    {
+      "chain_id": "chain_zephyr-CVE-2021-3329_SINK_zephyr-CVE-2021-3329_0032_31d8f4e7",
+      "sink_id": "SINK_zephyr-CVE-2021-3329_0032",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [
+        "R_AUTO_002"
+      ],
+      "required_object_ids": [],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR_AUTO_003_SINK_zephyr-CVE-2021-3329_0032_primary",
+        "SR_AUTO_004_SINK_zephyr-CVE-2021-3329_0032_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_002_SINK_zephyr-CVE-2021-3329_0032"
+      ],
+      "must_use_channel": false,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: uart_nrfx_fifo_read"
+    }
+  ],
+  "negative_expectations": [],
+  "todo_items": [],
+  "notes": [
+    "Broader horizontal coverage candidate; keep as a seed until exact source path is resolved.",
+    "Auto-promoted to full_gt from current pipeline eval outputs; exhaustive within declared pipeline_scope."
+  ],
+  "chain_gt_scope": "exhaustive",
+  "gt_provenance": {
+    "mode": "auto_promoted_from_eval",
+    "eval_dir": "/tmp/eval_mesobench_missing18_20260308_153906",
+    "scope": "pipeline_scope",
+    "warning": "This full GT is exhaustive within the current SourceAgent pipeline scope and source-backed focus region; manual semantic refinement may still improve subtype fidelity."
+  }
+}

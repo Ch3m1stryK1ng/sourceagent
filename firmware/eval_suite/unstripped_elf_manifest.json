@@ -1,0 +1,391 @@
+{
+  "name": "eval_suite_unstripped_elf",
+  "created_at": "2026-03-05",
+  "description": "Mixed unstripped ELF suite for source/sink detection across microbench + p2im + uSBS + monolithic.",
+  "samples": [
+    {
+      "dataset": "microbench",
+      "sample_id": "cve_2018_16525_freertos_dns",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench/cve_2018_16525_freertos_dns.elf",
+      "has_gt": true,
+      "gt_stem": "cve_2018_16525_freertos_dns",
+      "notes": ""
+    },
+    {
+      "dataset": "microbench",
+      "sample_id": "cve_2020_10065_hci_spi",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench/cve_2020_10065_hci_spi.elf",
+      "has_gt": true,
+      "gt_stem": "cve_2020_10065_hci_spi",
+      "notes": ""
+    },
+    {
+      "dataset": "microbench",
+      "sample_id": "cve_2021_34259_usb_host",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench/cve_2021_34259_usb_host.elf",
+      "has_gt": true,
+      "gt_stem": "cve_2021_34259_usb_host",
+      "notes": ""
+    },
+    {
+      "dataset": "microbench",
+      "sample_id": "t0_copy_sink",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench/t0_copy_sink.elf",
+      "has_gt": true,
+      "gt_stem": "t0_copy_sink",
+      "notes": ""
+    },
+    {
+      "dataset": "microbench",
+      "sample_id": "t0_dma_backed_buffer",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench/t0_dma_backed_buffer.elf",
+      "has_gt": true,
+      "gt_stem": "t0_dma_backed_buffer",
+      "notes": ""
+    },
+    {
+      "dataset": "microbench",
+      "sample_id": "t0_dma_length_overflow",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench/t0_dma_length_overflow.elf",
+      "has_gt": true,
+      "gt_stem": "t0_dma_length_overflow",
+      "notes": ""
+    },
+    {
+      "dataset": "microbench",
+      "sample_id": "t0_format_string",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench/t0_format_string.elf",
+      "has_gt": true,
+      "gt_stem": "t0_format_string",
+      "notes": ""
+    },
+    {
+      "dataset": "microbench",
+      "sample_id": "t0_func_ptr_dispatch",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench/t0_func_ptr_dispatch.elf",
+      "has_gt": true,
+      "gt_stem": "t0_func_ptr_dispatch",
+      "notes": ""
+    },
+    {
+      "dataset": "microbench",
+      "sample_id": "t0_indirect_memcpy",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench/t0_indirect_memcpy.elf",
+      "has_gt": true,
+      "gt_stem": "t0_indirect_memcpy",
+      "notes": ""
+    },
+    {
+      "dataset": "microbench",
+      "sample_id": "t0_isr_filled_buffer",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench/t0_isr_filled_buffer.elf",
+      "has_gt": true,
+      "gt_stem": "t0_isr_filled_buffer",
+      "notes": ""
+    },
+    {
+      "dataset": "microbench",
+      "sample_id": "t0_isr_mmio_read",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench/t0_isr_mmio_read.elf",
+      "has_gt": true,
+      "gt_stem": "t0_isr_mmio_read",
+      "notes": ""
+    },
+    {
+      "dataset": "microbench",
+      "sample_id": "t0_mmio_read",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench/t0_mmio_read.elf",
+      "has_gt": true,
+      "gt_stem": "t0_mmio_read",
+      "notes": ""
+    },
+    {
+      "dataset": "microbench",
+      "sample_id": "t0_store_loop_sink",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench/t0_store_loop_sink.elf",
+      "has_gt": true,
+      "gt_stem": "t0_store_loop_sink",
+      "notes": ""
+    },
+    {
+      "dataset": "microbench",
+      "sample_id": "t0_uart_rx_overflow",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench/t0_uart_rx_overflow.elf",
+      "has_gt": true,
+      "gt_stem": "t0_uart_rx_overflow",
+      "notes": ""
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "ARDUINO-F103-Serial",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/Arduino/USART/ARDUINO-F103-Serial.elf",
+      "has_gt": false,
+      "gt_stem": "ARDUINO-F103-Serial",
+      "notes": ""
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "ARDUINO-SAM3-Serial",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/Arduino/USART/ARDUINO-SAM3-Serial.elf",
+      "has_gt": false,
+      "gt_stem": "ARDUINO-SAM3-Serial",
+      "notes": ""
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "ARDUINO-F103-SPI",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/Arduino/SPI/ARDUINO-F103-SPI.elf",
+      "has_gt": false,
+      "gt_stem": "ARDUINO-F103-SPI",
+      "notes": ""
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "ARDUINO-SAM3-SPI",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/Arduino/SPI/ARDUINO-SAM3-SPI.elf",
+      "has_gt": false,
+      "gt_stem": "ARDUINO-SAM3-SPI",
+      "notes": ""
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "ARDUINO-F103-I2C",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/Arduino/I2C/ARDUINO-F103-I2C.elf",
+      "has_gt": false,
+      "gt_stem": "ARDUINO-F103-I2C",
+      "notes": ""
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "ARDUINO-SAM3-I2C",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/Arduino/I2C/ARDUINO-SAM3-I2C.elf",
+      "has_gt": false,
+      "gt_stem": "ARDUINO-SAM3-I2C",
+      "notes": ""
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "F103-NUTTX-USART",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/NUTTX/USART/F103-NUTTX-USART.elf",
+      "has_gt": false,
+      "gt_stem": "F103-NUTTX-USART",
+      "notes": ""
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "F103-NUTTX-SPI",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/NUTTX/SPI/F103-NUTTX-SPI.elf",
+      "has_gt": false,
+      "gt_stem": "F103-NUTTX-SPI",
+      "notes": ""
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "F103-NUTTX-I2C",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/NUTTX/I2C/F103-NUTTX-I2C.elf",
+      "has_gt": false,
+      "gt_stem": "F103-NUTTX-I2C",
+      "notes": ""
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "F103-RIOT-USART",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/RIOT/USART/F103-RIOT-USART.elf",
+      "has_gt": false,
+      "gt_stem": "F103-RIOT-USART",
+      "notes": ""
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "K64F-RIOT-USART",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/RIOT/USART/K64F-RIOT-USART.elf",
+      "has_gt": false,
+      "gt_stem": "K64F-RIOT-USART",
+      "notes": ""
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "SAM3-RIOT-USART",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/RIOT/USART/SAM3-RIOT-USART.elf",
+      "has_gt": false,
+      "gt_stem": "SAM3-RIOT-USART",
+      "notes": ""
+    },
+    {
+      "dataset": "uSBS",
+      "sample_id": "STM32469I_EVAL_tcp_echo_base",
+      "binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_bof/STM32469I_EVAL_tcp_echo_base.elf",
+      "has_gt": false,
+      "gt_stem": "STM32469I_EVAL_tcp_echo_base",
+      "notes": ""
+    },
+    {
+      "dataset": "uSBS",
+      "sample_id": "STM32469I_EVAL_tcp_echo_base",
+      "binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one/STM32469I_EVAL_tcp_echo_base.elf",
+      "has_gt": false,
+      "gt_stem": "STM32469I_EVAL_tcp_echo_base",
+      "notes": ""
+    },
+    {
+      "dataset": "uSBS",
+      "sample_id": "STM32469I_EVAL_tcp_echo_base",
+      "binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one_test_payload_len/STM32469I_EVAL_tcp_echo_base.elf",
+      "has_gt": false,
+      "gt_stem": "STM32469I_EVAL_tcp_echo_base",
+      "notes": ""
+    },
+    {
+      "dataset": "uSBS",
+      "sample_id": "STM32469I_EVAL_stm32_udp_echo_server",
+      "binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/test_printf_fw/STM32469I_EVAL_stm32_udp_echo_server.elf",
+      "has_gt": false,
+      "gt_stem": "STM32469I_EVAL_stm32_udp_echo_server",
+      "notes": ""
+    },
+    {
+      "dataset": "uSBS",
+      "sample_id": "STM32469I_EVAL_stm32_udp_echo_server",
+      "binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof/STM32469I_EVAL_stm32_udp_echo_server.elf",
+      "has_gt": false,
+      "gt_stem": "STM32469I_EVAL_stm32_udp_echo_server",
+      "notes": ""
+    },
+    {
+      "dataset": "uSBS",
+      "sample_id": "STM32469I_EVAL_stm32_udp_echo_server",
+      "binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_expl/STM32469I_EVAL_stm32_udp_echo_server.elf",
+      "has_gt": false,
+      "gt_stem": "STM32469I_EVAL_stm32_udp_echo_server",
+      "notes": ""
+    },
+    {
+      "dataset": "uSBS",
+      "sample_id": "STM32469I_EVAL_stm32_udp_echo_server",
+      "binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_off_by_one/STM32469I_EVAL_stm32_udp_echo_server.elf",
+      "has_gt": false,
+      "gt_stem": "STM32469I_EVAL_stm32_udp_echo_server",
+      "notes": ""
+    },
+    {
+      "dataset": "uSBS",
+      "sample_id": "STM32469I_EVAL_stm32_udp_echo_server",
+      "binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_double_free/STM32469I_EVAL_stm32_udp_echo_server.elf",
+      "has_gt": false,
+      "gt_stem": "STM32469I_EVAL_stm32_udp_echo_server",
+      "notes": ""
+    },
+    {
+      "dataset": "uSBS",
+      "sample_id": "STM32469I_EVAL_stm32_udp_echo_server",
+      "binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_uaf/STM32469I_EVAL_stm32_udp_echo_server.elf",
+      "has_gt": false,
+      "gt_stem": "STM32469I_EVAL_stm32_udp_echo_server",
+      "notes": ""
+    },
+    {
+      "dataset": "uSBS",
+      "sample_id": "STM32469I_EVAL_stm32_udp_echo_server",
+      "binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_instrumented/STM32469I_EVAL_stm32_udp_echo_server.elf",
+      "has_gt": false,
+      "gt_stem": "STM32469I_EVAL_stm32_udp_echo_server",
+      "notes": ""
+    },
+    {
+      "dataset": "monolithic-firmware-collection",
+      "sample_id": "zephyr-CVE-2020-10064",
+      "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10064/zephyr-CVE-2020-10064.elf",
+      "has_gt": false,
+      "gt_stem": "zephyr-CVE-2020-10064",
+      "notes": ""
+    },
+    {
+      "dataset": "monolithic-firmware-collection",
+      "sample_id": "zephyr-CVE-2020-10065",
+      "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10065/zephyr-CVE-2020-10065.elf",
+      "has_gt": false,
+      "gt_stem": "zephyr-CVE-2020-10065",
+      "notes": ""
+    },
+    {
+      "dataset": "monolithic-firmware-collection",
+      "sample_id": "zephyr-CVE-2020-10066",
+      "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10066/zephyr-CVE-2020-10066.elf",
+      "has_gt": false,
+      "gt_stem": "zephyr-CVE-2020-10066",
+      "notes": ""
+    },
+    {
+      "dataset": "monolithic-firmware-collection",
+      "sample_id": "zephyr-CVE-2021-3319",
+      "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3319/zephyr-CVE-2021-3319.elf",
+      "has_gt": false,
+      "gt_stem": "zephyr-CVE-2021-3319",
+      "notes": ""
+    },
+    {
+      "dataset": "monolithic-firmware-collection",
+      "sample_id": "zephyr-CVE-2021-3320",
+      "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3320/zephyr-CVE-2021-3320.elf",
+      "has_gt": false,
+      "gt_stem": "zephyr-CVE-2021-3320",
+      "notes": ""
+    },
+    {
+      "dataset": "monolithic-firmware-collection",
+      "sample_id": "zephyr-CVE-2021-3321",
+      "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3321/zephyr-CVE-2021-3321.elf",
+      "has_gt": false,
+      "gt_stem": "zephyr-CVE-2021-3321",
+      "notes": ""
+    },
+    {
+      "dataset": "monolithic-firmware-collection",
+      "sample_id": "hello-world",
+      "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-2020-12140/hello-world.elf",
+      "has_gt": false,
+      "gt_stem": "hello-world",
+      "notes": ""
+    },
+    {
+      "dataset": "monolithic-firmware-collection",
+      "sample_id": "snmp-server",
+      "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-2020-12141/snmp-server.elf",
+      "has_gt": false,
+      "gt_stem": "snmp-server",
+      "notes": ""
+    },
+    {
+      "dataset": "monolithic-firmware-collection",
+      "sample_id": "p2im_gateway",
+      "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/p2im_gateway/p2im_gateway.elf",
+      "has_gt": false,
+      "gt_stem": "p2im_gateway",
+      "notes": ""
+    },
+    {
+      "dataset": "monolithic-firmware-collection",
+      "sample_id": "p2im_drone",
+      "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/p2im_drone/p2im_drone.elf",
+      "has_gt": false,
+      "gt_stem": "p2im_drone",
+      "notes": ""
+    },
+    {
+      "dataset": "monolithic-firmware-collection",
+      "sample_id": "p2im_console",
+      "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/p2im_console/p2im_console.elf",
+      "has_gt": false,
+      "gt_stem": "p2im_console",
+      "notes": ""
+    },
+    {
+      "dataset": "monolithic-firmware-collection",
+      "sample_id": "stm32_udp_echo_server",
+      "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/stm32_udp_echo_server/stm32_udp_echo_server.elf",
+      "has_gt": false,
+      "gt_stem": "stm32_udp_echo_server",
+      "notes": ""
+    }
+  ]
+}

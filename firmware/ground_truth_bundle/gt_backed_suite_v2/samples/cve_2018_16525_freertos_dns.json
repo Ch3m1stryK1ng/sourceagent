@@ -1,0 +1,399 @@
+{
+  "schema_version": "2.0-seed",
+  "binary_stem": "cve_2018_16525_freertos_dns",
+  "binary_paths": {
+    "source_file": "firmware/microbench/cve_2018_16525_freertos_dns.c",
+    "map_file": "firmware/microbench/cve_2018_16525_freertos_dns.map",
+    "elf_file": "firmware/microbench/cve_2018_16525_freertos_dns.elf",
+    "bin_file": "firmware/microbench/cve_2018_16525_freertos_dns.bin"
+  },
+  "sample_meta": {
+    "title": "FreeRTOS DNS parser overflow reproduction",
+    "mechanism_group": "real_cve_semantic",
+    "runtime_style": "baremetal_polling",
+    "inspiration": "freertos",
+    "arch": "ARM_CORTEX_M",
+    "expected_channel_mode": "none",
+    "chain_shape": "same_context_parser_overflow"
+  },
+  "annotation_status": {
+    "sources": "complete",
+    "objects": "complete",
+    "channels": "n/a",
+    "sinks": "complete",
+    "sink_roots": "complete",
+    "derive_checks": "complete",
+    "chains": "complete",
+    "negative_expectations": "complete",
+    "overall": "complete"
+  },
+  "todo_items": [
+    "Annotate packet buffer object and length/name-walk fields.",
+    "Split COPY_SINK, LENGTH_TRUST_SINK, and UNBOUNDED_WALK_SINK chains.",
+    "Mark trusted-length and walk-bound checks as absent or weak."
+  ],
+  "sources": [
+    {
+      "source_id": "R1",
+      "label": "MMIO_READ",
+      "function_name": "ETH_ReadFrame",
+      "address": 1073909760,
+      "address_hex": "0x40029000",
+      "site_kind": "mmio_read",
+      "context": "MAIN",
+      "role": "data",
+      "notes": "ETH RX FIFO supplies attacker-controlled frame bytes into g_rx_buffer.",
+      "status": "complete",
+      "source_file": "cve_2018_16525_freertos_dns.c",
+      "map_file": "cve_2018_16525_freertos_dns.map"
+    }
+  ],
+  "objects": [
+    {
+      "object_id": "O1_g_net_buf",
+      "region_kind": "SRAM_CLUSTER",
+      "addr_range": [
+        "0x20000000",
+        "0x2000000f"
+      ],
+      "members": [
+        "g_net_buf"
+      ],
+      "producer_contexts": [
+        "MAIN"
+      ],
+      "consumer_contexts": [
+        "MAIN"
+      ],
+      "writer_sites": [
+        {
+          "function_name": "prvIPTask",
+          "address_hex": "0x08000178",
+          "kind": "descriptor_setup"
+        },
+        {
+          "function_name": "prvProcessIPPacket",
+          "address_hex": "0x0800011c",
+          "kind": "xDataLength_overwrite"
+        }
+      ],
+      "reader_sites": [
+        {
+          "function_name": "prvProcessIPPacket",
+          "address_hex": "0x0800011c",
+          "kind": "copy_len_read"
+        }
+      ],
+      "evidence_refs": [
+        "c:cve_2018_16525_freertos_dns:167",
+        "m:cve_2018_16525_freertos_dns:116"
+      ],
+      "confidence": 1.0,
+      "notes": "Network buffer descriptor holding xDataLength and Ethernet buffer pointer."
+    },
+    {
+      "object_id": "O2_g_rx_buffer",
+      "region_kind": "SRAM_CLUSTER",
+      "addr_range": [
+        "0x20000010",
+        "0x2000060f"
+      ],
+      "members": [
+        "g_rx_buffer"
+      ],
+      "producer_contexts": [
+        "MAIN"
+      ],
+      "consumer_contexts": [
+        "MAIN"
+      ],
+      "writer_sites": [
+        {
+          "function_name": "ETH_ReadFrame",
+          "address_hex": "0x08000040",
+          "kind": "fifo_fill"
+        }
+      ],
+      "reader_sites": [
+        {
+          "function_name": "prvProcessIPPacket",
+          "address_hex": "0x0800011c",
+          "kind": "packet_parse"
+        },
+        {
+          "function_name": "prvParseDNSReply",
+          "address_hex": "0x080000a0",
+          "kind": "dns_parse"
+        }
+      ],
+      "evidence_refs": [
+        "c:cve_2018_16525_freertos_dns:166",
+        "m:cve_2018_16525_freertos_dns:118"
+      ],
+      "confidence": 1.0,
+      "notes": "Ethernet frame buffer containing attacker-controlled UDP/DNS payload."
+    }
+  ],
+  "channels": [],
+  "sinks": [
+    {
+      "sink_id": "S3",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "prvParseDNSReply",
+      "address": 134217888,
+      "address_hex": "0x080000a0",
+      "site_kind": "copy_call_or_copy_idiom",
+      "notes": "memcpy with corrupted length",
+      "status": "complete",
+      "source_file": "cve_2018_16525_freertos_dns.c",
+      "map_file": "cve_2018_16525_freertos_dns.map"
+    },
+    {
+      "sink_id": "S1",
+      "label": "LENGTH_TRUST_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "prvProcessIPPacket",
+      "address": 134218012,
+      "address_hex": "0x0800011c",
+      "site_kind": "length_trust",
+      "notes": "trusted UDP length propagates unsafe size",
+      "status": "complete",
+      "source_file": "cve_2018_16525_freertos_dns.c",
+      "map_file": "cve_2018_16525_freertos_dns.map"
+    },
+    {
+      "sink_id": "S2",
+      "label": "UNBOUNDED_WALK_SINK",
+      "pipeline_label_hint": "LOOP_WRITE_SINK",
+      "function_name": "prvSkipNameField",
+      "address": 134217856,
+      "address_hex": "0x08000080",
+      "site_kind": "unbounded_walk",
+      "notes": "DNS name walk without bounds",
+      "status": "complete",
+      "source_file": "cve_2018_16525_freertos_dns.c",
+      "map_file": "cve_2018_16525_freertos_dns.map"
+    }
+  ],
+  "sink_roots": [
+    {
+      "root_id": "SR1_xDataLength",
+      "sink_id": "S1",
+      "root_role": "length_state",
+      "expr": "pxNetworkBuffer->xDataLength = ntohs(usLength) - sizeof(UDPHeader_t)",
+      "status": "complete",
+      "controllability": "source_derived",
+      "evidence_refs": [
+        "c:cve_2018_16525_freertos_dns:344"
+      ]
+    },
+    {
+      "root_id": "SR2_dns_name_walk",
+      "sink_id": "S2",
+      "root_role": "walk_step",
+      "expr": "*pucByte + 1u / compressed-name offset",
+      "status": "complete",
+      "controllability": "source_derived",
+      "evidence_refs": [
+        "c:cve_2018_16525_freertos_dns:227",
+        "c:cve_2018_16525_freertos_dns:229"
+      ]
+    },
+    {
+      "root_id": "SR3_copy_len",
+      "sink_id": "S3",
+      "root_role": "len",
+      "expr": "copy_len = pxNetworkBuffer->xDataLength",
+      "status": "complete",
+      "controllability": "source_derived_via_state",
+      "evidence_refs": [
+        "c:cve_2018_16525_freertos_dns:373"
+      ]
+    }
+  ],
+  "derive_checks": [
+    {
+      "derive_check_id": "D1_trusted_udp_len",
+      "sink_id": "S1",
+      "root_id": "SR1_xDataLength",
+      "status": "complete",
+      "derive_facts": [
+        {
+          "expr": "frame bytes from ETH_ReadFrame populate g_rx_buffer",
+          "site": "prvIPTask",
+          "evidence_refs": [
+            "c:cve_2018_16525_freertos_dns:395"
+          ]
+        },
+        {
+          "expr": "xDataLength = ntohs(pxUDPPacket->xUDPHeader.usLength) - sizeof(UDPHeader_t)",
+          "site": "prvProcessIPPacket",
+          "evidence_refs": [
+            "c:cve_2018_16525_freertos_dns:344"
+          ]
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "No validation against actual frame length before overwriting xDataLength",
+          "strength": "absent",
+          "site": "prvProcessIPPacket",
+          "evidence_refs": [
+            "c:cve_2018_16525_freertos_dns:344"
+          ]
+        }
+      ]
+    },
+    {
+      "derive_check_id": "D2_unbounded_walk",
+      "sink_id": "S2",
+      "root_id": "SR2_dns_name_walk",
+      "status": "complete",
+      "derive_facts": [
+        {
+          "expr": "while (*pucByte != 0x00u) pucByte += (*pucByte + 1u)",
+          "site": "prvSkipNameField",
+          "evidence_refs": [
+            "c:cve_2018_16525_freertos_dns:227"
+          ]
+        },
+        {
+          "expr": "Compressed names advance by 2 bytes without checking remaining buffer",
+          "site": "prvSkipNameField",
+          "evidence_refs": [
+            "c:cve_2018_16525_freertos_dns:222"
+          ]
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "No buffer length parameter is available to bound the walk",
+          "strength": "absent",
+          "site": "prvSkipNameField",
+          "evidence_refs": [
+            "c:cve_2018_16525_freertos_dns:217"
+          ]
+        }
+      ]
+    },
+    {
+      "derive_check_id": "D3_copy_len",
+      "sink_id": "S3",
+      "root_id": "SR3_copy_len",
+      "status": "complete",
+      "derive_facts": [
+        {
+          "expr": "copy_len = pxNetworkBuffer->xDataLength",
+          "site": "prvProcessIPPacket",
+          "evidence_refs": [
+            "c:cve_2018_16525_freertos_dns:373"
+          ]
+        },
+        {
+          "expr": "memcpy(response, pucUDPPayloadBuffer, copy_len)",
+          "site": "prvProcessIPPacket",
+          "evidence_refs": [
+            "c:cve_2018_16525_freertos_dns:379"
+          ]
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "No upper bound against response[128] before memcpy",
+          "strength": "absent",
+          "site": "prvProcessIPPacket",
+          "evidence_refs": [
+            "c:cve_2018_16525_freertos_dns:378"
+          ]
+        }
+      ]
+    }
+  ],
+  "chains": [
+    {
+      "chain_id": "C1_trusted_udp_length",
+      "sink_id": "S1",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [
+        "R1"
+      ],
+      "required_object_ids": [
+        "O1_g_net_buf",
+        "O2_g_rx_buffer"
+      ],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR1_xDataLength"
+      ],
+      "required_derive_check_ids": [
+        "D1_trusted_udp_len"
+      ],
+      "must_use_channel": false,
+      "notes": "Attacker-controlled UDP length corrupts xDataLength state, enabling downstream overflow.",
+      "optional_object_ids": [
+        "O1_g_net_buf",
+        "O2_g_rx_buffer"
+      ]
+    },
+    {
+      "chain_id": "C2_dns_name_walk_oob",
+      "sink_id": "S2",
+      "expected_verdict": "CONFIRMED",
+      "required_source_ids": [
+        "R1"
+      ],
+      "required_object_ids": [
+        "O2_g_rx_buffer"
+      ],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR2_dns_name_walk"
+      ],
+      "required_derive_check_ids": [
+        "D2_unbounded_walk"
+      ],
+      "must_use_channel": false,
+      "notes": "DNS label walk reads attacker-controlled step sizes with no bounds.",
+      "optional_object_ids": [
+        "O2_g_rx_buffer"
+      ]
+    },
+    {
+      "chain_id": "C3_llmnr_copy_overflow",
+      "sink_id": "S3",
+      "expected_verdict": "CONFIRMED",
+      "required_source_ids": [
+        "R1"
+      ],
+      "required_object_ids": [
+        "O1_g_net_buf",
+        "O2_g_rx_buffer"
+      ],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR3_copy_len"
+      ],
+      "required_derive_check_ids": [
+        "D3_copy_len"
+      ],
+      "must_use_channel": false,
+      "notes": "Corrupted xDataLength drives memcpy into fixed response[128].",
+      "optional_object_ids": [
+        "O1_g_net_buf",
+        "O2_g_rx_buffer"
+      ]
+    }
+  ],
+  "negative_expectations": [
+    {
+      "negative_id": "N1_no_channel_required",
+      "target_kind": "sample",
+      "expected_verdict": "DROP",
+      "reason": "This benchmark is same-context packet parsing; channel edges should not be required."
+    }
+  ],
+  "notes": [
+    "Annotated semantic DNS parsing sample with one state-corruption chain and two direct memory-safety chains."
+  ]
+}

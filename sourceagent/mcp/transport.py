@@ -115,7 +115,7 @@ class StdioTransport(MCPTransport):
                 )
 
                 if not response_line:
-                    raise RuntimeError("Server closed connection")
+                    raise RuntimeError(await self._build_server_closed_error())
 
                 return json.loads(response_line.decode())
 
@@ -123,6 +123,39 @@ class StdioTransport(MCPTransport):
                 raise RuntimeError("Timeout waiting for MCP response") from e
             except json.JSONDecodeError as e:
                 raise RuntimeError(f"Invalid JSON response: {e}") from e
+
+    async def _build_server_closed_error(self) -> str:
+        """Build a diagnostic error string when child process closes stdio.
+
+        Includes process return code and a short stderr tail when available.
+        """
+        if not self.process:
+            return "Server closed connection"
+
+        rc = self.process.returncode
+        if rc is None:
+            await asyncio.sleep(0.05)
+            rc = self.process.returncode
+
+        stderr_tail = ""
+        if rc is not None and self.process.stderr:
+            try:
+                err_bytes = await asyncio.wait_for(
+                    self.process.stderr.read(4096), timeout=0.2
+                )
+                if err_bytes:
+                    stderr_tail = err_bytes.decode(errors="ignore").strip()
+            except Exception:
+                pass
+
+        if stderr_tail:
+            one_line = " ".join(stderr_tail.split())
+            if len(one_line) > 240:
+                one_line = "..." + one_line[-240:]
+            return f"Server closed connection (rc={rc}; stderr={one_line})"
+        if rc is not None:
+            return f"Server closed connection (rc={rc})"
+        return "Server closed connection"
 
     async def disconnect(self):
         """Terminate the MCP server process cleanly."""

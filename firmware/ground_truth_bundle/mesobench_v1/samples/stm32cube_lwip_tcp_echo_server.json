@@ -1,0 +1,586 @@
+{
+  "schema_version": "1.0-seed",
+  "sample_id": "stm32cube_lwip_tcp_echo_server",
+  "binary_stem": "stm32_tcp_echo_server",
+  "eval_stem": "stm32cube_lwip_tcp_echo_server",
+  "annotation_level": "full_gt",
+  "chain_gt_scope": "exhaustive",
+  "dataset": "monolithic-firmware-collection",
+  "subset": "ARMCortex-M",
+  "priority": "high",
+  "role": "primary_chain_driver",
+  "type_family": "type_ii_or_iii_ready",
+  "title": "STM32CubeF4 LwIP TCP echo server",
+  "binary_artifacts": {
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/stm32_tcp_echo_server/stm32_tcp_echo_server.elf",
+    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/stm32_tcp_echo_server/stm32_tcp_echo_server.bin",
+    "formats": [
+      "elf",
+      "bin"
+    ]
+  },
+  "source_code": {
+    "source_repo_id": "stm32cubef4",
+    "source_repo_url": "https://github.com/STMicroelectronics/STM32CubeF4",
+    "local_checkout": "firmware/source_repos/STM32CubeF4",
+    "source_code_level": "full_upstream_repo",
+    "source_locator": [
+      "firmware/source_repos/STM32CubeF4/Projects/STM32469I_EVAL/Applications/LwIP/LwIP_TCP_Echo_Server",
+      "focus on tcp_echoserver.c, app_ethernet.c, ethernetif.c"
+    ],
+    "repo_notes": "Base source anchor for STM32469I_EVAL networking examples used by uSBS; combine with uSBS injected snippets and trigger inputs."
+  },
+  "analysis_hints": {
+    "chain_depth": "deep",
+    "chain_breadth": "wide",
+    "expected_channel_mode": "likely",
+    "likely_source_labels": [
+      "MMIO_READ",
+      "ISR_MMIO_READ",
+      "DMA_BACKED_BUFFER"
+    ],
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "STORE_SINK",
+      "LOOP_WRITE_SINK"
+    ],
+    "current_support_status": "target_for_artifact_gt"
+  },
+  "sources": [
+    {
+      "source_id": "SRC_tcp_echo_eth_dma",
+      "label": "DMA_BACKED_BUFFER",
+      "function_name": "low_level_input",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "ethernet_dma_rx",
+      "status": "complete",
+      "notes": "HAL_ETH_ReadData returns an RX pbuf that is later consumed by ethernetif_input and higher-level TCP handlers."
+    },
+    {
+      "source_id": "R_AUTO_001",
+      "label": "MMIO_READ",
+      "function_name": "I2C_IsAcknowledgeFailed",
+      "address": 1073763348,
+      "address_hex": "0x40005414",
+      "site_kind": "mmio_read",
+      "context": "MAIN",
+      "role": "control",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain in /tmp/eval_gt_backed_suite_v1_20260308_150048."
+    },
+    {
+      "source_id": "R_AUTO_002",
+      "label": "MMIO_READ",
+      "function_name": "I2C_WaitOnRXNEFlagUntilTimeout",
+      "address": 1073763348,
+      "address_hex": "0x40005414",
+      "site_kind": "mmio_read",
+      "context": "MAIN",
+      "role": "control",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain in /tmp/eval_gt_backed_suite_v1_20260308_150048."
+    },
+    {
+      "source_id": "R_AUTO_003",
+      "label": "MMIO_READ",
+      "function_name": "I2C_WaitOnMasterAddressFlagUntilTimeout",
+      "address": 1073763328,
+      "address_hex": "0x40005400",
+      "site_kind": "mmio_read",
+      "context": "MAIN",
+      "role": "control",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain in /tmp/eval_gt_backed_suite_v1_20260308_150048."
+    }
+  ],
+  "objects": [
+    {
+      "object_id": "obj_sram_20003d00_20003dff",
+      "region_kind": "DMA_BUFFER",
+      "addr_range": [
+        "0x20003d00",
+        "0x20003dff"
+      ],
+      "members": [
+        "LCD_CacheBuffer",
+        "LCD_CacheBuffer_xptr",
+        "LCD_CacheBuffer_yptr_bottom"
+      ],
+      "producer_contexts": [
+        "DMA",
+        "MAIN"
+      ],
+      "consumer_contexts": [
+        "MAIN"
+      ],
+      "writer_sites": [
+        "SysTick_Config",
+        "HAL_RCC_OscConfig"
+      ],
+      "reader_sites": [
+        "LCD_LOG_UpdateDisplay"
+      ],
+      "evidence_refs": [
+        "E1",
+        "E2"
+      ],
+      "confidence": 1.0,
+      "notes": "Current pipeline-stable DMA-backed proxy object for this sample; used as the representative ingress object for chain matching."
+    }
+  ],
+  "channels": [
+    {
+      "channel_id": "CH_tcp_echo_dma_main",
+      "src_context": "DMA",
+      "object_id": "obj_sram_20003d00_20003dff",
+      "dst_context": "MAIN",
+      "edge_kind": "DATA",
+      "constraints": [],
+      "evidence_refs": [
+        "E1",
+        "E2"
+      ],
+      "score": 0.9,
+      "notes": "Pipeline-observed DMA->MAIN handoff in the current TCP echo server binary."
+    }
+  ],
+  "sinks": [
+    {
+      "sink_id": "S_tcp_echo_low_level_input",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "low_level_input",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Representative packet ingress copy inside low_level_input."
+    },
+    {
+      "sink_id": "S_tcp_echo_tcp_write",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "tcp_write",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Representative echo/writeback copy path."
+    },
+    {
+      "sink_id": "SINK_stm32_tcp_echo_server_0021",
+      "label": "STORE_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "I2C_WaitOnTXEFlagUntilTimeout",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_stm32_tcp_echo_server_0022",
+      "label": "STORE_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "I2C_WaitOnBTFFlagUntilTimeout",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_stm32_tcp_echo_server_0023",
+      "label": "STORE_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "I2C_WaitOnRXNEFlagUntilTimeout",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_stm32_tcp_echo_server_0024",
+      "label": "STORE_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "I2C_WaitOnMasterAddressFlagUntilTimeout",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_stm32_tcp_echo_server_0025",
+      "label": "STORE_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "I2C_IsAcknowledgeFailed",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    }
+  ],
+  "sink_roots": [
+    {
+      "root_id": "R_tcp_echo_low_level_input_len",
+      "sink_id": "S_tcp_echo_low_level_input",
+      "root_role": "len",
+      "expr": "0x5f4 - local_1c",
+      "status": "complete",
+      "notes": "Pipeline-recovered length root for low_level_input."
+    },
+    {
+      "root_id": "R_tcp_echo_tcp_write_len",
+      "sink_id": "S_tcp_echo_tcp_write",
+      "root_role": "len",
+      "expr": "(uint)local_4a",
+      "status": "complete",
+      "notes": "Pipeline-recovered length root for tcp_write."
+    },
+    {
+      "root_id": "SR_AUTO_001_SINK_stm32_tcp_echo_server_0021_primary",
+      "sink_id": "SINK_stm32_tcp_echo_server_0021",
+      "root_role": "primary",
+      "expr": "hi2c",
+      "root_kind": "dst_ptr",
+      "root_source": "param_name",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_002_SINK_stm32_tcp_echo_server_0022_primary",
+      "sink_id": "SINK_stm32_tcp_echo_server_0022",
+      "root_role": "primary",
+      "expr": "hi2c",
+      "root_kind": "dst_ptr",
+      "root_source": "param_name",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_003_SINK_stm32_tcp_echo_server_0023_primary",
+      "sink_id": "SINK_stm32_tcp_echo_server_0023",
+      "root_role": "primary",
+      "expr": "hi2c",
+      "root_kind": "dst_ptr",
+      "root_source": "param_name",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_004_SINK_stm32_tcp_echo_server_0024_primary",
+      "sink_id": "SINK_stm32_tcp_echo_server_0024",
+      "root_role": "primary",
+      "expr": "hi2c",
+      "root_kind": "dst_ptr",
+      "root_source": "param_name",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_005_SINK_stm32_tcp_echo_server_0025_primary",
+      "sink_id": "SINK_stm32_tcp_echo_server_0025",
+      "root_role": "primary",
+      "expr": "hi2c",
+      "root_kind": "dst_ptr",
+      "root_source": "param_name",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    }
+  ],
+  "derive_checks": [
+    {
+      "derive_check_id": "D_tcp_echo_low_level_input_len",
+      "sink_id": "S_tcp_echo_low_level_input",
+      "root_id": "R_tcp_echo_low_level_input_len",
+      "derive_facts": [
+        {
+          "expr": "0x5f4 - local_1c",
+          "kind": "root_expr",
+          "site": "low_level_input"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "absent",
+          "site": "low_level_input"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_tcp_echo_tcp_write_len",
+      "sink_id": "S_tcp_echo_tcp_write",
+      "root_id": "R_tcp_echo_tcp_write_len",
+      "derive_facts": [
+        {
+          "expr": "(uint)local_4a",
+          "kind": "root_expr",
+          "site": "tcp_write"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "absent",
+          "site": "tcp_write"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_001_SINK_stm32_tcp_echo_server_0021",
+      "sink_id": "SINK_stm32_tcp_echo_server_0021",
+      "root_id": "SR_AUTO_001_SINK_stm32_tcp_echo_server_0021_primary",
+      "derive_facts": [
+        {
+          "expr": "hi2c",
+          "kind": "root_expr",
+          "site": "I2C_WaitOnTXEFlagUntilTimeout"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "param_store_without_explicit_guard",
+          "strength": "weak",
+          "site": "I2C_WaitOnTXEFlagUntilTimeout"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_002_SINK_stm32_tcp_echo_server_0022",
+      "sink_id": "SINK_stm32_tcp_echo_server_0022",
+      "root_id": "SR_AUTO_002_SINK_stm32_tcp_echo_server_0022_primary",
+      "derive_facts": [
+        {
+          "expr": "hi2c",
+          "kind": "root_expr",
+          "site": "I2C_WaitOnBTFFlagUntilTimeout"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "param_store_without_explicit_guard",
+          "strength": "weak",
+          "site": "I2C_WaitOnBTFFlagUntilTimeout"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_003_SINK_stm32_tcp_echo_server_0023",
+      "sink_id": "SINK_stm32_tcp_echo_server_0023",
+      "root_id": "SR_AUTO_003_SINK_stm32_tcp_echo_server_0023_primary",
+      "derive_facts": [
+        {
+          "expr": "hi2c",
+          "kind": "root_expr",
+          "site": "I2C_WaitOnRXNEFlagUntilTimeout"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "param_store_without_explicit_guard",
+          "strength": "weak",
+          "site": "I2C_WaitOnRXNEFlagUntilTimeout"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_004_SINK_stm32_tcp_echo_server_0024",
+      "sink_id": "SINK_stm32_tcp_echo_server_0024",
+      "root_id": "SR_AUTO_004_SINK_stm32_tcp_echo_server_0024_primary",
+      "derive_facts": [
+        {
+          "expr": "hi2c",
+          "kind": "root_expr",
+          "site": "I2C_WaitOnMasterAddressFlagUntilTimeout"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "param_store_without_explicit_guard",
+          "strength": "weak",
+          "site": "I2C_WaitOnMasterAddressFlagUntilTimeout"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_005_SINK_stm32_tcp_echo_server_0025",
+      "sink_id": "SINK_stm32_tcp_echo_server_0025",
+      "root_id": "SR_AUTO_005_SINK_stm32_tcp_echo_server_0025_primary",
+      "derive_facts": [
+        {
+          "expr": "hi2c",
+          "kind": "root_expr",
+          "site": "I2C_IsAcknowledgeFailed"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "param_store_without_explicit_guard",
+          "strength": "weak",
+          "site": "I2C_IsAcknowledgeFailed"
+        }
+      ],
+      "status": "complete"
+    }
+  ],
+  "chains": [
+    {
+      "chain_id": "C_tcp_echo_low_level_input",
+      "sink_id": "S_tcp_echo_low_level_input",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20003d00_20003dff"
+      ],
+      "required_channel_ids": [
+        "CH_tcp_echo_dma_main"
+      ],
+      "required_root_ids": [
+        "R_tcp_echo_low_level_input_len"
+      ],
+      "required_derive_check_ids": [
+        "D_tcp_echo_low_level_input_len"
+      ],
+      "must_use_channel": true,
+      "notes": "Benign but structurally rich ingress copy chain."
+    },
+    {
+      "chain_id": "C_tcp_echo_tcp_write",
+      "sink_id": "S_tcp_echo_tcp_write",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20003d00_20003dff"
+      ],
+      "required_channel_ids": [
+        "CH_tcp_echo_dma_main"
+      ],
+      "required_root_ids": [
+        "R_tcp_echo_tcp_write_len"
+      ],
+      "required_derive_check_ids": [
+        "D_tcp_echo_tcp_write_len"
+      ],
+      "must_use_channel": true,
+      "notes": "Benign echo/writeback chain anchored on tcp_write."
+    },
+    {
+      "chain_id": "chain_stm32_tcp_echo_server_SINK_stm32_tcp_echo_server_0021_6d342cd9",
+      "sink_id": "SINK_stm32_tcp_echo_server_0021",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [
+        "R_AUTO_001"
+      ],
+      "required_object_ids": [],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR_AUTO_001_SINK_stm32_tcp_echo_server_0021_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_001_SINK_stm32_tcp_echo_server_0021"
+      ],
+      "must_use_channel": false,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: I2C_WaitOnTXEFlagUntilTimeout"
+    },
+    {
+      "chain_id": "chain_stm32_tcp_echo_server_SINK_stm32_tcp_echo_server_0022_4305ab72",
+      "sink_id": "SINK_stm32_tcp_echo_server_0022",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [
+        "R_AUTO_001"
+      ],
+      "required_object_ids": [],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR_AUTO_002_SINK_stm32_tcp_echo_server_0022_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_002_SINK_stm32_tcp_echo_server_0022"
+      ],
+      "must_use_channel": false,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: I2C_WaitOnBTFFlagUntilTimeout"
+    },
+    {
+      "chain_id": "chain_stm32_tcp_echo_server_SINK_stm32_tcp_echo_server_0023_42ed97b5",
+      "sink_id": "SINK_stm32_tcp_echo_server_0023",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [
+        "R_AUTO_002"
+      ],
+      "required_object_ids": [],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR_AUTO_003_SINK_stm32_tcp_echo_server_0023_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_003_SINK_stm32_tcp_echo_server_0023"
+      ],
+      "must_use_channel": false,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: I2C_WaitOnRXNEFlagUntilTimeout"
+    },
+    {
+      "chain_id": "chain_stm32_tcp_echo_server_SINK_stm32_tcp_echo_server_0024_0adfca4f",
+      "sink_id": "SINK_stm32_tcp_echo_server_0024",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [
+        "R_AUTO_003"
+      ],
+      "required_object_ids": [],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR_AUTO_004_SINK_stm32_tcp_echo_server_0024_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_004_SINK_stm32_tcp_echo_server_0024"
+      ],
+      "must_use_channel": false,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: I2C_WaitOnMasterAddressFlagUntilTimeout"
+    },
+    {
+      "chain_id": "chain_stm32_tcp_echo_server_SINK_stm32_tcp_echo_server_0025_c4d135f8",
+      "sink_id": "SINK_stm32_tcp_echo_server_0025",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [
+        "R_AUTO_001"
+      ],
+      "required_object_ids": [],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR_AUTO_005_SINK_stm32_tcp_echo_server_0025_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_005_SINK_stm32_tcp_echo_server_0025"
+      ],
+      "must_use_channel": false,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: I2C_IsAcknowledgeFailed"
+    }
+  ],
+  "negative_expectations": [],
+  "todo_items": [],
+  "notes": [
+    "Targeted GT uses the currently stable pipeline proxy object/channel so the sample participates in chain regression immediately.",
+    "Auto-promoted to full_gt from current pipeline eval outputs; exhaustive within declared pipeline_scope."
+  ],
+  "gt_provenance": {
+    "mode": "auto_promoted_from_eval",
+    "eval_dir": "/tmp/eval_gt_backed_suite_v1_20260308_150048",
+    "scope": "pipeline_scope",
+    "warning": "This full GT is exhaustive within the current SourceAgent pipeline scope and source-backed focus region; manual semantic refinement may still improve subtype fidelity."
+  }
+}

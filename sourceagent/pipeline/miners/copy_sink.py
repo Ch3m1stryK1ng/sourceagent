@@ -109,12 +109,15 @@ async def mine_copy_sinks(
             mcp_manager, ghidra_binary_name, callee_addr,
         )
 
-        # Fallback: if MCP xrefs are empty, scan decompiled code cache
-        if not xrefs and mai and mai.decompiled_cache:
-            xrefs = _find_callers_from_decompile_cache(
+        # Always augment MCP xrefs with a decompile-cache scan. In practice the
+        # MCP xref list can be incomplete for some statically linked firmware
+        # functions even when it is non-empty.
+        if mai and mai.decompiled_cache:
+            fallback_xrefs = _find_callers_from_decompile_cache(
                 mai.decompiled_cache, callee_name, callee_addr,
                 callee_aliases=callee_aliases,
             )
+            xrefs = _merge_xrefs(xrefs, fallback_xrefs)
 
         for xref in xrefs:
             caller_func = xref.get("function_name") or ""
@@ -427,6 +430,24 @@ def _find_callers_from_decompile_cache(
             })
             break  # one xref per calling function
     return xrefs
+
+
+def _merge_xrefs(
+    primary: List[Dict[str, Any]],
+    secondary: List[Dict[str, Any]],
+) -> List[Dict[str, Any]]:
+    merged: List[Dict[str, Any]] = []
+    seen = set()
+    for row in list(primary or []) + list(secondary or []):
+        fn = str(row.get("function_name", "") or "")
+        addr = str(row.get("from_address", "") or "")
+        typ = str(row.get("type", "") or "")
+        key = (fn, addr, typ)
+        if key in seen:
+            continue
+        seen.add(key)
+        merged.append(dict(row))
+    return merged
 
 
 # ── Call context extraction ──────────────────────────────────────────────────

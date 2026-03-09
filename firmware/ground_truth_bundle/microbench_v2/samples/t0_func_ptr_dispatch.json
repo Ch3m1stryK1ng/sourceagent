@@ -1,0 +1,205 @@
+{
+  "schema_version": "2.0-seed",
+  "binary_stem": "t0_func_ptr_dispatch",
+  "binary_paths": {
+    "source_file": "firmware/microbench/t0_func_ptr_dispatch.c",
+    "map_file": "firmware/microbench/t0_func_ptr_dispatch.map",
+    "elf_file": "firmware/microbench/t0_func_ptr_dispatch.elf",
+    "bin_file": "firmware/microbench/t0_func_ptr_dispatch.bin"
+  },
+  "sample_meta": {
+    "title": "Function-pointer dispatch sink archetype",
+    "mechanism_group": "sink_archetype",
+    "runtime_style": "baremetal_polling",
+    "inspiration": "toy_func_ptr_dispatch",
+    "arch": "ARM_CORTEX_M",
+    "expected_channel_mode": "none",
+    "chain_shape": "same_context_indirect_call"
+  },
+  "annotation_status": {
+    "sources": "complete",
+    "objects": "complete",
+    "channels": "n/a",
+    "sinks": "complete",
+    "sink_roots": "complete",
+    "derive_checks": "complete",
+    "chains": "complete",
+    "negative_expectations": "complete",
+    "overall": "complete"
+  },
+  "todo_items": [
+    "Annotate dispatch table object and index root.",
+    "Record any bounds checks on the dispatch index."
+  ],
+  "sources": [
+    {
+      "source_id": "R1",
+      "label": "MMIO_READ",
+      "function_name": "uart_read_byte",
+      "address": 1073811456,
+      "address_hex": "0x40011000",
+      "site_kind": "mmio_read",
+      "context": "MAIN",
+      "role": "control",
+      "notes": "USART SR polling gate.",
+      "status": "complete",
+      "source_file": "t0_func_ptr_dispatch.c",
+      "map_file": "t0_func_ptr_dispatch.map"
+    },
+    {
+      "source_id": "R2",
+      "label": "MMIO_READ",
+      "function_name": "uart_read_byte",
+      "address": 1073811460,
+      "address_hex": "0x40011004",
+      "site_kind": "mmio_read",
+      "context": "MAIN",
+      "role": "data",
+      "notes": "USART DR provides unchecked dispatch index.",
+      "status": "complete",
+      "source_file": "t0_func_ptr_dispatch.c",
+      "map_file": "t0_func_ptr_dispatch.map"
+    }
+  ],
+  "objects": [
+    {
+      "object_id": "O1_cmd_table",
+      "region_kind": "RODATA_TABLE",
+      "addr_range": [
+        "0x080000b0",
+        "0x080000bf"
+      ],
+      "members": [
+        "cmd_table"
+      ],
+      "producer_contexts": [
+        "MAIN"
+      ],
+      "consumer_contexts": [
+        "MAIN"
+      ],
+      "writer_sites": [],
+      "reader_sites": [
+        {
+          "function_name": "dispatch_command",
+          "address_hex": "0x0800008c",
+          "kind": "table_lookup"
+        }
+      ],
+      "evidence_refs": [
+        "c:t0_func_ptr_dispatch:61",
+        "m:t0_func_ptr_dispatch:73"
+      ],
+      "confidence": 1.0,
+      "notes": "Function pointer dispatch table with 4 valid entries."
+    }
+  ],
+  "channels": [],
+  "sinks": [
+    {
+      "sink_id": "S1",
+      "label": "FUNC_PTR_SINK",
+      "pipeline_label_hint": null,
+      "function_name": "dispatch_command",
+      "address": 134217868,
+      "address_hex": "0x0800008c",
+      "site_kind": "indirect_call",
+      "notes": "unchecked function-pointer dispatch",
+      "status": "complete",
+      "source_file": "t0_func_ptr_dispatch.c",
+      "map_file": "t0_func_ptr_dispatch.map"
+    }
+  ],
+  "sink_roots": [
+    {
+      "root_id": "SR1_cmd_id",
+      "sink_id": "S1",
+      "root_role": "dispatch_index",
+      "expr": "cmd_id",
+      "status": "complete",
+      "controllability": "source_derived_via_caller",
+      "evidence_refs": [
+        "c:t0_func_ptr_dispatch:69",
+        "c:t0_func_ptr_dispatch:82"
+      ]
+    }
+  ],
+  "derive_checks": [
+    {
+      "derive_check_id": "D1_dispatch",
+      "sink_id": "S1",
+      "root_id": "SR1_cmd_id",
+      "status": "complete",
+      "derive_facts": [
+        {
+          "expr": "cmd = uart_read_byte()",
+          "site": "main",
+          "evidence_refs": [
+            "c:t0_func_ptr_dispatch:81"
+          ]
+        },
+        {
+          "expr": "dispatch_command(cmd)",
+          "site": "main",
+          "evidence_refs": [
+            "c:t0_func_ptr_dispatch:82"
+          ]
+        },
+        {
+          "expr": "handler = cmd_table[cmd_id]; handler()",
+          "site": "dispatch_command",
+          "evidence_refs": [
+            "c:t0_func_ptr_dispatch:72"
+          ]
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "No bounds check cmd_id < 4 before table lookup and indirect call",
+          "strength": "absent",
+          "site": "dispatch_command",
+          "evidence_refs": [
+            "c:t0_func_ptr_dispatch:72"
+          ]
+        }
+      ]
+    }
+  ],
+  "chains": [
+    {
+      "chain_id": "C1_unchecked_dispatch",
+      "sink_id": "S1",
+      "expected_verdict": "CONFIRMED",
+      "required_source_ids": [
+        "R2"
+      ],
+      "required_object_ids": [
+        "O1_cmd_table"
+      ],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR1_cmd_id"
+      ],
+      "required_derive_check_ids": [
+        "D1_dispatch"
+      ],
+      "must_use_channel": false,
+      "notes": "UART-controlled cmd_id indexes cmd_table without bounds check before indirect call.",
+      "optional_object_ids": [
+        "O1_cmd_table"
+      ]
+    }
+  ],
+  "negative_expectations": [
+    {
+      "negative_id": "N1_status_not_payload",
+      "target_kind": "source",
+      "target_id": "R1",
+      "expected_verdict": "DROP",
+      "reason": "Status read should not anchor the dispatch chain."
+    }
+  ],
+  "notes": [
+    "Annotated unchecked function-pointer dispatch chain."
+  ]
+}

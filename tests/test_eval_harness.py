@@ -221,6 +221,29 @@ def test_match_entries_false_negative():
     assert fn == 1
 
 
+def test_compare_labels_detailed_counts_pipeline_label_hint_partial():
+    result = _make_result(
+        verified_labels=[
+            _make_verified("STORE_SINK", 0x080000b8, "USBH_ParseCfgDesc"),
+        ],
+    )
+    gt = [
+        GroundTruthEntry(
+            binary_stem="test_fw",
+            label="PARSING_OVERFLOW_SINK",
+            address=0x080000b8,
+            function_name="USBH_ParseCfgDesc",
+            pipeline_label_hint="STORE_SINK",
+        ),
+    ]
+
+    detailed = compare_labels_detailed(result, gt, eval_scope="sinks")
+
+    assert detailed["strict"]["tp"] == 0.0
+    assert detailed["weighted"]["tp"] == 0.5
+    assert detailed["partial_breakdown"]["sink_family"] == 1
+
+
 def test_match_entries_empty_both():
     """Empty predictions and GT should give all zeros."""
     tp, fp, fn = _match_entries([], [])

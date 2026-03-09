@@ -1,0 +1,161 @@
+{
+  "schema_version": "2.0-seed",
+  "binary_stem": "t0_uart_rx_overflow",
+  "binary_paths": {
+    "source_file": "firmware/microbench/t0_uart_rx_overflow.c",
+    "map_file": "firmware/microbench/t0_uart_rx_overflow.map",
+    "elf_file": "firmware/microbench/t0_uart_rx_overflow.elf",
+    "bin_file": "firmware/microbench/t0_uart_rx_overflow.bin"
+  },
+  "sample_meta": {
+    "title": "Manual UART loop-copy overflow",
+    "mechanism_group": "same_context_direct",
+    "runtime_style": "baremetal_polling",
+    "inspiration": "toy_loop_copy",
+    "arch": "ARM_CORTEX_M",
+    "expected_channel_mode": "none",
+    "chain_shape": "same_context_loop_copy"
+  },
+  "annotation_status": {
+    "sources": "complete",
+    "objects": "complete",
+    "channels": "n/a",
+    "sinks": "complete",
+    "sink_roots": "complete",
+    "derive_checks": "complete",
+    "chains": "complete",
+    "negative_expectations": "complete",
+    "overall": "complete"
+  },
+  "todo_items": [
+    "Annotate manual loop-write sink as copy-equivalent.",
+    "Record that the sink root is the loop bound/count rather than API length."
+  ],
+  "sources": [
+    {
+      "source_id": "R1",
+      "label": "MMIO_READ",
+      "function_name": "uart_read_byte",
+      "address": 1073811456,
+      "address_hex": "0x40011000",
+      "site_kind": "mmio_read",
+      "context": "MAIN",
+      "role": "control",
+      "notes": "USART SR polling gate.",
+      "status": "complete",
+      "source_file": "t0_uart_rx_overflow.c",
+      "map_file": "t0_uart_rx_overflow.map"
+    },
+    {
+      "source_id": "R2",
+      "label": "MMIO_READ",
+      "function_name": "uart_read_byte",
+      "address": 1073811460,
+      "address_hex": "0x40011004",
+      "site_kind": "mmio_read",
+      "context": "MAIN",
+      "role": "data",
+      "notes": "USART DR supplies both length byte and payload bytes.",
+      "status": "complete",
+      "source_file": "t0_uart_rx_overflow.c",
+      "map_file": "t0_uart_rx_overflow.map"
+    }
+  ],
+  "objects": [],
+  "channels": [],
+  "sinks": [
+    {
+      "sink_id": "S1",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "uart_receive",
+      "address": 134217820,
+      "address_hex": "0x0800005c",
+      "site_kind": "copy_call_or_copy_idiom",
+      "notes": "DR-controlled loop writes to fixed buffer",
+      "status": "complete",
+      "source_file": "t0_uart_rx_overflow.c",
+      "map_file": "t0_uart_rx_overflow.map"
+    }
+  ],
+  "sink_roots": [
+    {
+      "root_id": "SR1_len",
+      "sink_id": "S1",
+      "root_role": "len",
+      "expr": "len",
+      "status": "complete",
+      "controllability": "source_derived_via_caller",
+      "evidence_refs": [
+        "c:t0_uart_rx_overflow:51",
+        "c:t0_uart_rx_overflow:61"
+      ]
+    }
+  ],
+  "derive_checks": [
+    {
+      "derive_check_id": "D1_uart_len",
+      "sink_id": "S1",
+      "root_id": "SR1_len",
+      "status": "complete",
+      "derive_facts": [
+        {
+          "expr": "length = uart_read_byte()",
+          "site": "protocol_handler",
+          "evidence_refs": [
+            "c:t0_uart_rx_overflow:61"
+          ]
+        },
+        {
+          "expr": "uart_receive(frame, length)",
+          "site": "protocol_handler",
+          "evidence_refs": [
+            "c:t0_uart_rx_overflow:62"
+          ]
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "No bound check against frame[32] before loop write in uart_receive",
+          "strength": "absent",
+          "site": "uart_receive",
+          "evidence_refs": [
+            "c:t0_uart_rx_overflow:53"
+          ]
+        }
+      ]
+    }
+  ],
+  "chains": [
+    {
+      "chain_id": "C1_uart_len_overflow",
+      "sink_id": "S1",
+      "expected_verdict": "CONFIRMED",
+      "required_source_ids": [
+        "R2"
+      ],
+      "required_object_ids": [],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR1_len"
+      ],
+      "required_derive_check_ids": [
+        "D1_uart_len"
+      ],
+      "must_use_channel": false,
+      "notes": "UART DR controls length byte that drives unchecked writes into frame[32]."
+    }
+  ],
+  "negative_expectations": [
+    {
+      "negative_id": "N1_status_not_payload",
+      "target_kind": "source",
+      "target_id": "R1",
+      "expected_verdict": "DROP",
+      "reason": "Status read should not serve as payload source for the overflow chain."
+    }
+  ],
+  "notes": [
+    "Annotated same-context loop-copy overflow with caller-derived length root."
+  ]
+}

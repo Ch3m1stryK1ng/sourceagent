@@ -12,9 +12,11 @@ import asyncio
 import csv
 import json
 import logging
+import os
 import re
 import sys
 import time
+import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
@@ -39,7 +41,7 @@ def main():
     mine_parser.add_argument("binary", help="Path to firmware .bin or .elf")
     mine_parser.add_argument(
         "--stage", type=int, default=7,
-        help="Run pipeline up to this stage (1-7, default: 7)",
+        help="Run pipeline up to this stage (1-10, default: 7)",
     )
     mine_parser.add_argument("--model", "-m", default=None, help="LLM model for Stage 6 (enables LLM mode)")
     mine_parser.add_argument("--run-id", default=None, help="Custom run ID")
@@ -50,6 +52,10 @@ def main():
     mine_parser.add_argument(
         "--analysis-wait-sec", type=int, default=60,
         help="Max seconds to wait for Ghidra analysis completion before proceeding (default: 60)",
+    )
+    mine_parser.add_argument(
+        "--mcp-connect-timeout-sec", type=int, default=30,
+        help="Max seconds to wait for MCP server connection (default: 30)",
     )
     mine_parser.add_argument(
         "--output", "-o", default=None,
@@ -91,7 +97,7 @@ def main():
     )
     eval_parser.add_argument(
         "--stage", type=int, default=7,
-        help="Run pipeline up to this stage when evaluation needs a fresh run (default: 7)",
+        help="Run pipeline up to this stage when evaluation needs a fresh run (1-10, default: 7)",
     )
     eval_parser.add_argument(
         "--online", action="store_true",
@@ -129,6 +135,10 @@ def main():
         "--analysis-wait-sec", type=int, default=60,
         help="Max seconds to wait for Ghidra analysis completion per sample (default: 60)",
     )
+    eval_parser.add_argument(
+        "--mcp-connect-timeout-sec", type=int, default=30,
+        help="Max seconds to wait for MCP server connection per sample (default: 30)",
+    )
 
     # gt-sinks subcommand
     gt_sinks_parser = subparsers.add_parser(
@@ -149,6 +159,43 @@ def main():
         "--output-csv",
         default="firmware/ground_truth_bundle/normalized_gt_sinks.csv",
         help="Output CSV path (default: firmware/ground_truth_bundle/normalized_gt_sinks.csv)",
+    )
+
+    # gt-sources subcommand
+    gt_sources_parser = subparsers.add_parser(
+        "gt-sources",
+        help="Generate normalized machine-readable GT source list for microbench/CVE set",
+    )
+    gt_sources_parser.add_argument(
+        "--output-json",
+        default="firmware/ground_truth_bundle/normalized_gt_sources.json",
+        help="Output JSON path (default: firmware/ground_truth_bundle/normalized_gt_sources.json)",
+    )
+    gt_sources_parser.add_argument(
+        "--output-csv",
+        default="firmware/ground_truth_bundle/normalized_gt_sources.csv",
+        help="Output CSV path (default: firmware/ground_truth_bundle/normalized_gt_sources.csv)",
+    )
+
+    # gt-bundle subcommand
+    gt_bundle_parser = subparsers.add_parser(
+        "gt-bundle",
+        help="Generate combined normalized GT bundle (sources + sinks)",
+    )
+    gt_bundle_parser.add_argument(
+        "--microbench-dir",
+        default="firmware/microbench",
+        help="Microbench directory containing .map files (default: firmware/microbench)",
+    )
+    gt_bundle_parser.add_argument(
+        "--output-json",
+        default="firmware/ground_truth_bundle/normalized_gt_bundle.json",
+        help="Output JSON path (default: firmware/ground_truth_bundle/normalized_gt_bundle.json)",
+    )
+    gt_bundle_parser.add_argument(
+        "--output-csv",
+        default="firmware/ground_truth_bundle/normalized_gt_bundle.csv",
+        help="Output CSV path (default: firmware/ground_truth_bundle/normalized_gt_bundle.csv)",
     )
 
     args = parser.parse_args()
@@ -175,6 +222,10 @@ async def _dispatch(args):
         await _cmd_eval(args)
     elif args.command == "gt-sinks":
         await _cmd_gt_sinks(args)
+    elif args.command == "gt-sources":
+        await _cmd_gt_sources(args)
+    elif args.command == "gt-bundle":
+        await _cmd_gt_bundle(args)
 
 
 # ── Pipeline Orchestrator ──────────────────────────────────────────────────
@@ -193,6 +244,9 @@ async def _cmd_mine(args):
       5  M5  — Pack evidence
       6  M6  — Propose labels (heuristic or LLM)
       7  M7  — Verify proposals
+      8  M8  — Build channel graph + refined objects
+      9  M9  — Extract sink roots + link chains + chain eval
+      10 M10 — Build low-conf sink list + triage queue
     """
     from sourceagent.pipeline.models import PipelineResult
 
@@ -203,9 +257,13 @@ async def _cmd_mine(args):
 
     run_id = args.run_id or f"run-{binary_path.stem}-{int(time.time())}"
     max_stage = args.stage
+    if max_stage < 1 or max_stage > 10:
+        print("Error: --stage must be in [1, 10]")
+        sys.exit(1)
     offline = args.offline
 
     result = PipelineResult(binary_path=str(binary_path), run_id=run_id)
+    setattr(result, "_max_stage", max_stage)
 
     print(f"[SourceAgent] Mining sources/sinks from: {binary_path}")
     print(f"[SourceAgent] Pipeline stages: 1-{max_stage}, run_id={run_id}")
@@ -235,6 +293,7 @@ async def _cmd_mine(args):
             result,
             memory_map,
             analysis_wait_sec=int(getattr(args, "analysis_wait_sec", 60) or 60),
+            mcp_connect_timeout_sec=int(getattr(args, "mcp_connect_timeout_sec", 30) or 30),
         )
         if mcp_manager is None:
             _print_result(result, args)
@@ -263,6 +322,9 @@ async def _cmd_mine(args):
 
     if mai is not None and mcp_manager is not None:
         mai = await _run_stage_2_5(mai, mcp_manager, ghidra_binary_name)
+
+    # Keep MAI in-memory for downstream artifact builders.
+    setattr(result, "_mai", mai)
 
     # ── Populate all_mmio_addrs from MAI ──────────────────────────────────
     if mai is not None:
@@ -309,6 +371,9 @@ async def _cmd_mine(args):
     # ── Stage 7: Verification (M7) ───────────────────────────────────────
 
     await _run_stage_7(proposals, mcp_manager, ghidra_binary_name, result)
+
+    # ── Stage 8-10: Chain artifacts / linking / triage ───────────────────
+    _run_stage_8_10(result, max_stage=max_stage)
 
     # ── Cleanup ──────────────────────────────────────────────────────────
 
@@ -362,6 +427,7 @@ async def _connect_ghidra(
     result,
     memory_map=None,
     analysis_wait_sec: int = 60,
+    mcp_connect_timeout_sec: int = 30,
 ):
     """Connect to Ghidra MCP, import binary, wait for analysis.
 
@@ -370,54 +436,233 @@ async def _connect_ghidra(
     """
     from sourceagent.mcp.manager import MCPManager
 
-    mcp_manager = MCPManager()
-    print("[Ghidra] Connecting to MCP server...")
-    try:
-        await mcp_manager.connect_all()
-    except Exception as e:
-        print(f"[Ghidra] ERROR connecting: {e}")
-        result.stage_errors["MCP"] = str(e)
-        return None, ""
-
-    # Find the ghidra server name from connected servers
-    ghidra_server = _find_ghidra_server(mcp_manager)
-    if not ghidra_server:
-        print("[Ghidra] ERROR: No Ghidra MCP server connected")
-        result.stage_errors["MCP"] = "No Ghidra server found"
-        return None, ""
-
-    print(f"[Ghidra] Connected to server: {ghidra_server}")
-
-    # Import binary
-    ghidra_binary_name = await _import_and_analyze(
-        mcp_manager, ghidra_server, binary_path,
-        memory_map=memory_map,
-        max_wait=float(analysis_wait_sec),
-    )
-    if not ghidra_binary_name:
-        print("[Ghidra] ERROR: Could not import/analyze binary")
-        result.stage_errors["MCP"] = "Ghidra import failed"
+    # Project selection policy:
+    # - default: shared project from mcp_servers.json
+    # - optional override: SOURCEAGENT_GHIDRA_PROJECT_PATH
+    # - optional mode: SOURCEAGENT_GHIDRA_PROJECT_MODE=isolated
+    # - fallback: recently used healthy projects under /tmp/sourceagent_ghidra_projects
+    old_project_env = os.environ.get("SOURCEAGENT_GHIDRA_PROJECT_PATH")
+    project_mode = str(
+        os.environ.get("SOURCEAGENT_GHIDRA_PROJECT_MODE", "shared") or "shared"
+    ).strip().lower()
+    candidate_overrides: List[Optional[str]] = []
+    if old_project_env:
+        candidate_overrides.append(old_project_env)
+    elif project_mode == "isolated":
+        project_root = Path("/tmp/sourceagent_ghidra_projects")
+        isolated_project = project_root / f"{binary_path.stem}_{int(time.time())}"
         try:
-            await mcp_manager.disconnect_all()
+            isolated_project.mkdir(parents=True, exist_ok=True)
+            candidate_overrides.append(str(isolated_project))
         except Exception:
             pass
-        return None, ""
+    else:
+        # Primary: use configured shared project (no override).
+        candidate_overrides.append(None)
+        # Optional fallback: try recently used projects with local chroma DB.
+        # Default OFF: stale/broken historical projects can cause long retry loops.
+        use_fallback = str(
+            os.environ.get("SOURCEAGENT_GHIDRA_ENABLE_FALLBACK_PROJECTS", "0")
+        ).strip().lower() in {"1", "true", "yes", "y"}
+        if use_fallback:
+            candidate_overrides.extend(_discover_ghidra_project_overrides(limit=8))
 
-    print(f"[Ghidra] Binary loaded: {ghidra_binary_name}")
+    # De-duplicate while preserving order.
+    seen: Set[str] = set()
+    unique_overrides: List[Optional[str]] = []
+    for item in candidate_overrides:
+        key = "<default>" if item is None else str(item)
+        if key in seen:
+            continue
+        seen.add(key)
+        unique_overrides.append(item)
 
-    # Set up firmware memory context in Ghidra (ISR entry points, memory regions)
-    # For .bin files: create memory regions + ISR entry points
-    # For .elf files: only add ISR entry points (regions already set by ELF loader)
-    if memory_map is not None and ghidra_server:
-        has_isr = bool(memory_map.isr_handler_addrs)
-        is_bin = binary_path.suffix.lower() == ".bin"
-        if is_bin or has_isr:
-            await _setup_firmware_context(
-                mcp_manager, ghidra_server, ghidra_binary_name, memory_map,
-                skip_regions=(not is_bin),
+    try:
+        last_error = ""
+        for idx, override in enumerate(unique_overrides, start=1):
+            if override:
+                os.environ["SOURCEAGENT_GHIDRA_PROJECT_PATH"] = str(override)
+                print(
+                    "[Ghidra] Connecting to MCP server... "
+                    f"(project override {idx}/{len(unique_overrides)})"
+                )
+            else:
+                os.environ.pop("SOURCEAGENT_GHIDRA_PROJECT_PATH", None)
+                print(
+                    "[Ghidra] Connecting to MCP server... "
+                    f"(default project {idx}/{len(unique_overrides)})"
+                )
+
+            mcp_manager = MCPManager()
+            try:
+                ghidra_server = await _connect_ghidra_server_only(
+                    mcp_manager,
+                    timeout_sec=max(1, int(mcp_connect_timeout_sec)),
+                )
+            except asyncio.TimeoutError:
+                last_error = (
+                    "MCP connect timeout after "
+                    f"{max(1, int(mcp_connect_timeout_sec))}s"
+                )
+                try:
+                    await mcp_manager.disconnect_all()
+                except Exception:
+                    pass
+                continue
+            except Exception as e:
+                last_error = str(e)
+                try:
+                    await mcp_manager.disconnect_all()
+                except Exception:
+                    pass
+                continue
+
+            if not ghidra_server:
+                last_error = (
+                    "MCP connect timeout after "
+                    f"{max(1, int(mcp_connect_timeout_sec))}s"
+                )
+                try:
+                    await mcp_manager.disconnect_all()
+                except Exception:
+                    pass
+                continue
+
+            print(f"[Ghidra] Connected to server: {ghidra_server}")
+
+            # Import binary
+            ghidra_binary_name = await _import_and_analyze(
+                mcp_manager, ghidra_server, binary_path,
+                memory_map=memory_map,
+                max_wait=float(analysis_wait_sec),
             )
+            if not ghidra_binary_name:
+                last_error = "Ghidra import failed"
+                try:
+                    await mcp_manager.disconnect_all()
+                except Exception:
+                    pass
+                continue
 
-    return mcp_manager, ghidra_binary_name
+            print(f"[Ghidra] Binary loaded: {ghidra_binary_name}")
+
+            # Set up firmware memory context in Ghidra (ISR entry points, memory regions)
+            # For .bin files: create memory regions + ISR entry points
+            # For .elf files: only add ISR entry points (regions already set by ELF loader)
+            if memory_map is not None and ghidra_server:
+                has_isr = bool(memory_map.isr_handler_addrs)
+                is_bin = binary_path.suffix.lower() == ".bin"
+                if is_bin or has_isr:
+                    await _setup_firmware_context(
+                        mcp_manager, ghidra_server, ghidra_binary_name, memory_map,
+                        skip_regions=(not is_bin),
+                    )
+
+            return mcp_manager, ghidra_binary_name
+
+        if not last_error:
+            last_error = (
+                "MCP connect timeout after "
+                f"{max(1, int(mcp_connect_timeout_sec))}s"
+            )
+        print(f"[Ghidra] ERROR connecting: {last_error}")
+        result.stage_errors["MCP"] = last_error
+        return None, ""
+    finally:
+        if old_project_env is None:
+            os.environ.pop("SOURCEAGENT_GHIDRA_PROJECT_PATH", None)
+        else:
+            os.environ["SOURCEAGENT_GHIDRA_PROJECT_PATH"] = old_project_env
+
+
+def _discover_ghidra_project_overrides(limit: int = 8) -> List[str]:
+    """Discover likely-healthy Ghidra project paths for fallback connection."""
+    root = Path("/tmp/sourceagent_ghidra_projects")
+    if not root.exists():
+        return []
+    candidates: List[tuple[float, str]] = []
+    try:
+        for p in root.iterdir():
+            if not p.is_dir():
+                continue
+            stem = p.name
+            if not (p / f"{stem}.gpr").exists():
+                continue
+            if not (p / f"{stem}.rep").exists():
+                continue
+            if not (p / "chromadb" / "chroma.sqlite3").exists():
+                continue
+            try:
+                mtime = p.stat().st_mtime
+            except Exception:
+                mtime = 0.0
+            candidates.append((mtime, str(p)))
+    except Exception:
+        return []
+
+    candidates.sort(key=lambda x: x[0], reverse=True)
+    return [path for _, path in candidates[:max(1, int(limit))]]
+
+
+async def _connect_ghidra_server_only(mcp_manager, timeout_sec: int = 30) -> Optional[str]:
+    """Connect only ghidra-like MCP servers to avoid unrelated server stalls."""
+    timeout_cap = str(max(1, int(timeout_sec)))
+    old_timeout_cap = os.environ.get("SOURCEAGENT_MCP_CONNECT_TIMEOUT_SEC")
+    os.environ["SOURCEAGENT_MCP_CONNECT_TIMEOUT_SEC"] = timeout_cap
+
+    try:
+        candidates: List[str] = []
+        try:
+            for item in mcp_manager.list_configured_servers():
+                name = str(item.get("name", "") or "")
+                command = str(item.get("command", "") or "")
+                args = " ".join(item.get("args", []) or [])
+                enabled = bool(item.get("enabled", True))
+                if not enabled:
+                    continue
+                if (
+                    "ghidra" in name.lower()
+                    or "pyghidra-mcp" in command
+                    or "pyghidra-mcp" in args
+                ):
+                    candidates.append(name)
+        except Exception:
+            candidates = []
+
+        # Fallback to legacy connect_all path if config inspection fails.
+        if not candidates:
+            await asyncio.wait_for(
+                mcp_manager.connect_all(),
+                timeout=max(1, int(timeout_sec)),
+            )
+            return _find_ghidra_server(mcp_manager)
+
+        attempts = 3
+        for attempt in range(1, attempts + 1):
+            for name in candidates:
+                try:
+                    server = await asyncio.wait_for(
+                        mcp_manager.connect_server(name),
+                        timeout=max(1, int(timeout_sec)),
+                    )
+                except Exception:
+                    continue
+                if server and getattr(server, "connected", False):
+                    return name
+
+            if attempt < attempts:
+                try:
+                    await mcp_manager.disconnect_all()
+                except Exception:
+                    pass
+                await asyncio.sleep(2.0 * attempt)
+
+        return None
+    finally:
+        if old_timeout_cap is None:
+            os.environ.pop("SOURCEAGENT_MCP_CONNECT_TIMEOUT_SEC", None)
+        else:
+            os.environ["SOURCEAGENT_MCP_CONNECT_TIMEOUT_SEC"] = old_timeout_cap
 
 
 def _find_ghidra_server(mcp_manager) -> Optional[str]:
@@ -837,6 +1082,47 @@ async def _run_stage_7(proposals, mcp_manager, ghidra_binary_name, result):
         result.stage_errors["M7"] = str(e)
 
 
+def _run_stage_8_10(result, *, max_stage: int):
+    """Stage 8-10: build chain artifacts with staged contracts."""
+    if max_stage < 8:
+        return
+
+    from sourceagent.pipeline.chain_artifacts import build_phase_a_artifacts
+
+    print("[Stage 8] Building ChannelGraph + refined objects...")
+    try:
+        artifacts = build_phase_a_artifacts(result, max_stage=max_stage)
+    except Exception as e:
+        print(f"[Stage 8] ERROR: {e}")
+        result.stage_errors["M8"] = str(e)
+        return
+
+    # Cache staged artifacts so output serialization does not rebuild.
+    setattr(result, "_phase_a_artifacts", artifacts)
+
+    channel_graph = artifacts.get("channel_graph", {}) or {}
+    refined = artifacts.get("refined_objects", {}) or {}
+    obj_count = len(channel_graph.get("object_nodes", []) or [])
+    edge_count = len(channel_graph.get("channel_edges", []) or [])
+    ref_count = len(refined.get("objects", []) or [])
+    print(f"[Stage 8] object_nodes={obj_count}, channel_edges={edge_count}, refined_objects={ref_count}")
+
+    if max_stage >= 9:
+        chains = (artifacts.get("chains", {}) or {}).get("chains", []) or []
+        chain_eval = (artifacts.get("chain_eval", {}) or {}).get("stats", {}) or {}
+        print(
+            "[Stage 9] "
+            f"sink_roots={len((artifacts.get('sink_roots', {}) or {}).get('sink_roots', []) or [])}, "
+            f"chains={len(chains)}, confirmed={chain_eval.get('confirmed', 0)}, "
+            f"suspicious={chain_eval.get('suspicious', 0)}"
+        )
+
+    if max_stage >= 10:
+        low_conf = (artifacts.get("low_conf_sinks", {}) or {}).get("items", []) or []
+        triage = (artifacts.get("triage_queue", {}) or {}).get("items", []) or []
+        print(f"[Stage 10] low_conf={len(low_conf)}, triage_topk={len(triage)}")
+
+
 # ── Output ─────────────────────────────────────────────────────────────────
 
 
@@ -896,6 +1182,27 @@ def _pipeline_result_to_dict(result) -> Dict[str, Any]:
     from dataclasses import asdict
 
     data = asdict(result)
+    artifacts = getattr(result, "_phase_a_artifacts", None)
+    if artifacts is None:
+        try:
+            from sourceagent.pipeline.chain_artifacts import build_phase_a_artifacts
+
+            artifacts = build_phase_a_artifacts(result)
+        except Exception as e:
+            logger.warning("phase-A artifact build failed (non-fatal): %s", e)
+            artifacts = {
+                "channel_graph": {},
+                "refined_objects": {},
+                "sink_roots": {},
+                "chains": {},
+                "chain_eval": {},
+                "low_conf_sinks": {},
+                "triage_queue": {},
+                "status": "failed",
+                "failure_code": "ARTIFACT_BUILD_ERROR",
+                "failure_detail": str(e),
+            }
+    data["phase_a_artifacts"] = artifacts
 
     # Convert enum values to strings
     def _fix_enums(obj):
@@ -1061,7 +1368,7 @@ def _load_eval_manifest(manifest_path: Path) -> List[Dict[str, Any]]:
     Required sample key:
       - binary_path
     Optional keys:
-      - dataset, sample_id, gt_stem, eval_scope, notes
+      - dataset, sample_id, gt_stem, eval_scope, notes, output_stem
     """
     if not manifest_path.exists():
         raise FileNotFoundError(f"manifest not found: {manifest_path}")
@@ -1092,6 +1399,7 @@ def _load_eval_manifest(manifest_path: Path) -> List[Dict[str, Any]]:
             "dataset": item.get("dataset", "") or _infer_dataset_from_path(p),
             "sample_id": item.get("sample_id", "") or p.stem,
             "gt_stem": item.get("gt_stem", "") or p.stem,
+            "output_stem": item.get("output_stem", "") or item.get("sample_id", "") or p.stem,
             "eval_scope": item.get("eval_scope", "") or "",
             "notes": item.get("notes", "") or "",
             "_manifest_index": idx,
@@ -1122,6 +1430,7 @@ def _collect_eval_items(args) -> List[Dict[str, Any]]:
                 "dataset": _infer_dataset_from_path(p),
                 "sample_id": p.stem,
                 "gt_stem": p.stem,
+                "output_stem": p.stem,
                 "eval_scope": "",
                 "notes": "",
             })
@@ -1134,6 +1443,7 @@ def _collect_eval_items(args) -> List[Dict[str, Any]]:
             "dataset": _infer_dataset_from_path(p),
             "sample_id": p.stem,
             "gt_stem": p.stem,
+            "output_stem": p.stem,
             "eval_scope": "",
             "notes": "",
         })
@@ -1169,6 +1479,25 @@ def _collect_detected_labels(
             "pack_id": vl.pack_id,
         })
     return records
+
+
+def _extract_chain_stats_from_result_dict(data: Dict[str, Any]) -> Dict[str, int]:
+    """Extract chain_eval stats from serialized pipeline result dict."""
+    stats = (
+        (data.get("phase_a_artifacts", {}) or {})
+        .get("chain_eval", {})
+        .get("stats", {})
+        or {}
+    )
+    return {
+        "chain_count": int(stats.get("chain_count", 0) or 0),
+        "chain_with_source": int(stats.get("with_source", 0) or 0),
+        "chain_with_channel": int(stats.get("with_channel", 0) or 0),
+        "chain_confirmed": int(stats.get("confirmed", 0) or 0),
+        "chain_suspicious": int(stats.get("suspicious", 0) or 0),
+        "chain_safe_or_low_risk": int(stats.get("safe_or_low_risk", 0) or 0),
+        "chain_dropped": int(stats.get("dropped", 0) or 0),
+    }
 
 
 def _write_csv(path: Path, rows: List[Dict[str, Any]], fieldnames: List[str]):
@@ -1268,6 +1597,44 @@ def _binary_meta(binary_path: Path) -> Dict[str, Any]:
             "stripped" in binary_path.stem.lower() and suffix == "elf"
         ),
     }
+
+
+def _stem_counts(items: List[Dict[str, Any]]) -> Dict[str, int]:
+    counts: Dict[str, int] = {}
+    for item in items:
+        binary_path = item.get("binary_path")
+        if not isinstance(binary_path, Path):
+            continue
+        stem = binary_path.stem
+        counts[stem] = counts.get(stem, 0) + 1
+    return counts
+
+
+def _make_eval_project_override(output_stem: str) -> str:
+    root = Path("/tmp/sourceagent_ghidra_projects")
+    root.mkdir(parents=True, exist_ok=True)
+    ts = int(time.time() * 1000)
+    suffix = uuid.uuid4().hex[:8]
+    project = root / f"eval_{output_stem}_{ts}_{suffix}"
+    project.mkdir(parents=True, exist_ok=True)
+    return str(project)
+
+
+def _needs_isolated_eval_project(
+    binary_path: Path,
+    output_stem: str,
+    stem_counts: Dict[str, int],
+) -> bool:
+    stem = binary_path.stem
+    if stem_counts.get(stem, 0) > 1:
+        return True
+    # Manifest-driven variants (e.g. uSBS) may share the same ELF stem while
+    # representing different benchmark cases. If the desired output stem differs
+    # from the binary stem, isolate the Ghidra project to avoid reusing a stale
+    # import from an earlier run of a sibling sample.
+    if output_stem and output_stem != stem:
+        return True
+    return False
 
 
 def _format_counts(binary_meta: List[Dict[str, Any]]) -> Dict[str, int]:
@@ -1410,12 +1777,14 @@ async def _cmd_eval(args):
     detection_by_label_total: Dict[str, int] = {}
     detection_by_label_gt: Dict[str, int] = {}
     detection_by_label_no_gt: Dict[str, int] = {}
+    stem_counts = _stem_counts(items)
 
     for item in items:
         binary_path: Path = item["binary_path"]
         dataset = item.get("dataset", "") or _infer_dataset_from_path(binary_path)
         sample_id = item.get("sample_id", "") or binary_path.stem
         gt_stem = item.get("gt_stem", "") or binary_path.stem
+        output_stem = item.get("output_stem", "") or sample_id or binary_path.stem
         item_eval_scope = item.get("eval_scope", "") or ""
 
         meta = _binary_meta(binary_path)
@@ -1429,6 +1798,7 @@ async def _cmd_eval(args):
             sample_summaries.append({
                 "binary": str(binary_path),
                 "stem": binary_path.stem,
+                "output_stem": output_stem,
                 "dataset": dataset,
                 "sample_id": sample_id,
                 "status": "missing_binary",
@@ -1437,6 +1807,7 @@ async def _cmd_eval(args):
                 "dataset": dataset,
                 "sample_id": sample_id,
                 "binary_stem": binary_path.stem,
+                "output_stem": output_stem,
                 "binary_path": str(binary_path),
                 "has_gt": False,
                 "status": "missing_binary",
@@ -1452,6 +1823,13 @@ async def _cmd_eval(args):
                 "detected_sink": 0,
                 "detected_other": 0,
                 "detected_labels": "",
+                "chain_count": 0,
+                "chain_with_source": 0,
+                "chain_with_channel": 0,
+                "chain_confirmed": 0,
+                "chain_suspicious": 0,
+                "chain_safe_or_low_risk": 0,
+                "chain_dropped": 0,
             })
             continue
 
@@ -1460,36 +1838,61 @@ async def _cmd_eval(args):
         has_gt = bool(gt)
         if has_gt:
             print(
-                f"[SourceAgent] Eval: {stem} ({dataset}) — "
+                f"[SourceAgent] Eval: {stem} [{output_stem}] ({dataset}) — "
                 f"{len(gt)} ground truth entries (stem={gt_stem})"
             )
         else:
-            print(f"[SourceAgent] Eval: {stem} ({dataset}) — no ground truth, mining-only mode")
+            print(f"[SourceAgent] Eval: {stem} [{output_stem}] ({dataset}) — no ground truth, mining-only mode")
 
         try:
-            run_id = f"eval-{stem}-{int(time.time())}"
+            run_id = f"eval-{output_stem}-{int(time.time())}"
             raw_json_path = (
-                output_dir / "raw_results" / f"{stem}.pipeline.json"
+                output_dir / "raw_results" / f"{output_stem}.pipeline.json"
                 if output_dir else None
             )
-            run_eval_coro = run_eval(
-                str(binary_path),
-                gt if has_gt else [],
-                stage=args.stage,
-                offline=offline,
-                model=model,
-                analysis_wait_sec=int(getattr(args, "analysis_wait_sec", 60) or 60),
-                accepted_verdicts=accepted_verdicts,
-                output_path=str(raw_json_path) if raw_json_path else None,
-                run_id=run_id,
-                return_pipeline_result=True,
+            needs_isolated_project = _needs_isolated_eval_project(
+                binary_path,
+                output_stem,
+                stem_counts,
             )
-            if sample_timeout > 0:
-                results, pipeline_result = await asyncio.wait_for(
-                    run_eval_coro, timeout=sample_timeout,
+            old_project_env = os.environ.get("SOURCEAGENT_GHIDRA_PROJECT_PATH")
+            old_project_mode = os.environ.get("SOURCEAGENT_GHIDRA_PROJECT_MODE")
+            if needs_isolated_project and not offline:
+                project_override = _make_eval_project_override(output_stem)
+                os.environ["SOURCEAGENT_GHIDRA_PROJECT_PATH"] = project_override
+                print(
+                    "[SourceAgent] Eval: "
+                    f"{output_stem} uses isolated Ghidra project {project_override}"
                 )
-            else:
-                results, pipeline_result = await run_eval_coro
+            try:
+                run_eval_coro = run_eval(
+                    str(binary_path),
+                    gt if has_gt else [],
+                    stage=args.stage,
+                    offline=offline,
+                    model=model,
+                    analysis_wait_sec=int(getattr(args, "analysis_wait_sec", 60) or 60),
+                    mcp_connect_timeout_sec=int(getattr(args, "mcp_connect_timeout_sec", 30) or 30),
+                    accepted_verdicts=accepted_verdicts,
+                    output_path=str(raw_json_path) if raw_json_path else None,
+                    run_id=run_id,
+                    return_pipeline_result=True,
+                )
+                if sample_timeout > 0:
+                    results, pipeline_result = await asyncio.wait_for(
+                        run_eval_coro, timeout=sample_timeout,
+                    )
+                else:
+                    results, pipeline_result = await run_eval_coro
+            finally:
+                if old_project_env is None:
+                    os.environ.pop("SOURCEAGENT_GHIDRA_PROJECT_PATH", None)
+                else:
+                    os.environ["SOURCEAGENT_GHIDRA_PROJECT_PATH"] = old_project_env
+                if old_project_mode is None:
+                    os.environ.pop("SOURCEAGENT_GHIDRA_PROJECT_MODE", None)
+                else:
+                    os.environ["SOURCEAGENT_GHIDRA_PROJECT_MODE"] = old_project_mode
             detected = _collect_detected_labels(pipeline_result, accepted_verdicts)
             detected_by_label: Dict[str, int] = {}
             detected_source = 0
@@ -1538,6 +1941,7 @@ async def _cmd_eval(args):
                 sample_summaries.append({
                     "binary": str(binary_path),
                     "stem": stem,
+                    "output_stem": output_stem,
                     "dataset": dataset,
                     "sample_id": sample_id,
                     "gt_stem": gt_stem,
@@ -1573,6 +1977,7 @@ async def _cmd_eval(args):
                     "dataset": dataset,
                     "sample_id": sample_id,
                     "binary_stem": stem,
+                    "output_stem": output_stem,
                     "binary_path": str(binary_path),
                     "has_gt": True,
                     "status": "ok",
@@ -1588,6 +1993,13 @@ async def _cmd_eval(args):
                     "detected_sink": detected_sink,
                     "detected_other": detected_other,
                     "detected_labels": json.dumps(dict(sorted(detected_by_label.items())), ensure_ascii=True),
+                    "chain_count": 0,
+                    "chain_with_source": 0,
+                    "chain_with_channel": 0,
+                    "chain_confirmed": 0,
+                    "chain_suspicious": 0,
+                    "chain_safe_or_low_risk": 0,
+                    "chain_dropped": 0,
                 })
             else:
                 print(
@@ -1597,6 +2009,7 @@ async def _cmd_eval(args):
                 sample_summaries.append({
                     "binary": str(binary_path),
                     "stem": stem,
+                    "output_stem": output_stem,
                     "dataset": dataset,
                     "sample_id": sample_id,
                     "gt_stem": gt_stem,
@@ -1614,6 +2027,7 @@ async def _cmd_eval(args):
                     "dataset": dataset,
                     "sample_id": sample_id,
                     "binary_stem": stem,
+                    "output_stem": output_stem,
                     "binary_path": str(binary_path),
                     "has_gt": False,
                     "status": "ok_no_ground_truth",
@@ -1629,13 +2043,25 @@ async def _cmd_eval(args):
                     "detected_sink": detected_sink,
                     "detected_other": detected_other,
                     "detected_labels": json.dumps(dict(sorted(detected_by_label.items())), ensure_ascii=True),
+                    "chain_count": 0,
+                    "chain_with_source": 0,
+                    "chain_with_channel": 0,
+                    "chain_confirmed": 0,
+                    "chain_suspicious": 0,
+                    "chain_safe_or_low_risk": 0,
+                    "chain_dropped": 0,
                 })
 
             if output_dir:
                 data = _pipeline_result_to_dict(pipeline_result)
+                chain_stats = _extract_chain_stats_from_result_dict(data)
+                if sample_summaries:
+                    sample_summaries[-1]["chain"] = dict(chain_stats)
+                if per_file_rows:
+                    per_file_rows[-1].update(chain_stats)
 
                 # Split views for optimization loop tooling.
-                (output_dir / "raw_views" / f"{stem}.candidate.json").write_text(
+                (output_dir / "raw_views" / f"{output_stem}.candidate.json").write_text(
                     json.dumps({
                         "binary_path": data.get("binary_path"),
                         "run_id": data.get("run_id"),
@@ -1644,7 +2070,7 @@ async def _cmd_eval(args):
                     }, indent=2),
                     encoding="utf-8",
                 )
-                (output_dir / "raw_views" / f"{stem}.proposal.json").write_text(
+                (output_dir / "raw_views" / f"{output_stem}.proposal.json").write_text(
                     json.dumps({
                         "binary_path": data.get("binary_path"),
                         "run_id": data.get("run_id"),
@@ -1652,7 +2078,7 @@ async def _cmd_eval(args):
                     }, indent=2),
                     encoding="utf-8",
                 )
-                (output_dir / "raw_views" / f"{stem}.verified.json").write_text(
+                (output_dir / "raw_views" / f"{output_stem}.verified.json").write_text(
                     json.dumps({
                         "binary_path": data.get("binary_path"),
                         "run_id": data.get("run_id"),
@@ -1660,12 +2086,35 @@ async def _cmd_eval(args):
                     }, indent=2),
                     encoding="utf-8",
                 )
+                (output_dir / "raw_views" / f"{output_stem}.phase_a_artifacts.json").write_text(
+                    json.dumps({
+                        "binary_path": data.get("binary_path"),
+                        "run_id": data.get("run_id"),
+                        "phase_a_artifacts": data.get("phase_a_artifacts", {}),
+                    }, indent=2),
+                    encoding="utf-8",
+                )
+                phase_a = data.get("phase_a_artifacts", {}) or {}
+                for artifact_name in (
+                    "channel_graph",
+                    "refined_objects",
+                    "sink_roots",
+                    "chains",
+                    "chain_eval",
+                    "low_conf_sinks",
+                    "triage_queue",
+                ):
+                    (output_dir / "raw_views" / f"{output_stem}.{artifact_name}.json").write_text(
+                        json.dumps(phase_a.get(artifact_name, {}), indent=2),
+                        encoding="utf-8",
+                    )
 
-                (output_dir / "detailed" / f"{stem}.matching.json").write_text(
+                (output_dir / "detailed" / f"{output_stem}.matching.json").write_text(
                     json.dumps({
                         "binary_meta": _binary_meta(binary_path),
                         "dataset": dataset,
                         "sample_id": sample_id,
+                        "output_stem": output_stem,
                         "gt_stem": gt_stem,
                         "gt_entries": [
                             {
@@ -1684,6 +2133,7 @@ async def _cmd_eval(args):
                             detailed if has_gt else {
                                 "binary_path": str(binary_path),
                                 "binary_stem": stem,
+                                "output_stem": output_stem,
                                 "gt_count": 0,
                                 "prediction_count": len(detected),
                                 "matches": [],
@@ -1702,6 +2152,7 @@ async def _cmd_eval(args):
             sample_summaries.append({
                 "binary": str(binary_path),
                 "stem": stem,
+                "output_stem": output_stem,
                 "dataset": dataset,
                 "sample_id": sample_id,
                 "gt_stem": gt_stem,
@@ -1712,6 +2163,7 @@ async def _cmd_eval(args):
                 "dataset": dataset,
                 "sample_id": sample_id,
                 "binary_stem": stem,
+                "output_stem": output_stem,
                 "binary_path": str(binary_path),
                 "has_gt": bool(gt),
                 "status": "eval_timeout",
@@ -1727,12 +2179,20 @@ async def _cmd_eval(args):
                 "detected_sink": 0,
                 "detected_other": 0,
                 "detected_labels": "",
+                "chain_count": 0,
+                "chain_with_source": 0,
+                "chain_with_channel": 0,
+                "chain_confirmed": 0,
+                "chain_suspicious": 0,
+                "chain_safe_or_low_risk": 0,
+                "chain_dropped": 0,
             })
         except Exception as e:
             print(f"[SourceAgent] Eval ERROR for {stem}: {e}")
             sample_summaries.append({
                 "binary": str(binary_path),
                 "stem": stem,
+                "output_stem": output_stem,
                 "dataset": dataset,
                 "sample_id": sample_id,
                 "gt_stem": gt_stem,
@@ -1743,6 +2203,7 @@ async def _cmd_eval(args):
                 "dataset": dataset,
                 "sample_id": sample_id,
                 "binary_stem": stem,
+                "output_stem": output_stem,
                 "binary_path": str(binary_path),
                 "has_gt": bool(gt),
                 "status": "eval_error",
@@ -1758,6 +2219,13 @@ async def _cmd_eval(args):
                 "detected_sink": 0,
                 "detected_other": 0,
                 "detected_labels": "",
+                "chain_count": 0,
+                "chain_with_source": 0,
+                "chain_with_channel": 0,
+                "chain_confirmed": 0,
+                "chain_suspicious": 0,
+                "chain_safe_or_low_risk": 0,
+                "chain_dropped": 0,
             })
 
     if len(items) > 1:
@@ -1867,6 +2335,13 @@ async def _cmd_eval(args):
                 "detected_source": 0,
                 "detected_sink": 0,
                 "detected_other": 0,
+                "chain_count": 0,
+                "chain_with_source": 0,
+                "chain_with_channel": 0,
+                "chain_confirmed": 0,
+                "chain_suspicious": 0,
+                "chain_safe_or_low_risk": 0,
+                "chain_dropped": 0,
             })
             acc["sample_count"] += 1
             status = str(row.get("status", ""))
@@ -1886,6 +2361,13 @@ async def _cmd_eval(args):
             acc["detected_source"] += int(row.get("detected_source") or 0)
             acc["detected_sink"] += int(row.get("detected_sink") or 0)
             acc["detected_other"] += int(row.get("detected_other") or 0)
+            acc["chain_count"] += int(row.get("chain_count") or 0)
+            acc["chain_with_source"] += int(row.get("chain_with_source") or 0)
+            acc["chain_with_channel"] += int(row.get("chain_with_channel") or 0)
+            acc["chain_confirmed"] += int(row.get("chain_confirmed") or 0)
+            acc["chain_suspicious"] += int(row.get("chain_suspicious") or 0)
+            acc["chain_safe_or_low_risk"] += int(row.get("chain_safe_or_low_risk") or 0)
+            acc["chain_dropped"] += int(row.get("chain_dropped") or 0)
 
         by_dataset_rows = []
         for _, acc in sorted(by_dataset.items(), key=lambda x: x[0]):
@@ -1945,9 +2427,41 @@ async def _cmd_eval(args):
                 "detected_in_no_gt_samples": int(detection_by_label_no_gt.get(label, 0)),
             })
 
+        by_kind_rows: List[Dict[str, Any]] = []
+        for kind in ("source", "sink", "other"):
+            rows = [r for r in by_label_rows if str(r.get("kind", "")) == kind]
+            tp = sum(float(r.get("gt_tp", 0.0) or 0.0) for r in rows)
+            fp = sum(float(r.get("gt_fp", 0.0) or 0.0) for r in rows)
+            fn = sum(float(r.get("gt_fn", 0.0) or 0.0) for r in rows)
+            p = (tp / (tp + fp)) if (tp + fp) > 0 else 0.0
+            r = (tp / (tp + fn)) if (tp + fn) > 0 else 0.0
+            f1 = (2 * p * r / (p + r)) if (p + r) > 0 else 0.0
+            by_kind_rows.append({
+                "kind": kind,
+                "gt_tp": tp,
+                "gt_fp": fp,
+                "gt_fn": fn,
+                "gt_precision": p,
+                "gt_recall": r,
+                "gt_f1": f1,
+                "detected_total": sum(int(rw.get("detected_total", 0) or 0) for rw in rows),
+                "detected_in_gt_samples": sum(int(rw.get("detected_in_gt_samples", 0) or 0) for rw in rows),
+                "detected_in_no_gt_samples": sum(int(rw.get("detected_in_no_gt_samples", 0) or 0) for rw in rows),
+            })
+
         summary["by_dataset"] = by_dataset_rows
         summary["by_label_type"] = by_label_rows
+        summary["by_kind"] = by_kind_rows
         summary["by_file"] = per_file_rows
+        summary["chain_overall"] = {
+            "chain_count": sum(int(r.get("chain_count") or 0) for r in per_file_rows),
+            "chain_with_source": sum(int(r.get("chain_with_source") or 0) for r in per_file_rows),
+            "chain_with_channel": sum(int(r.get("chain_with_channel") or 0) for r in per_file_rows),
+            "chain_confirmed": sum(int(r.get("chain_confirmed") or 0) for r in per_file_rows),
+            "chain_suspicious": sum(int(r.get("chain_suspicious") or 0) for r in per_file_rows),
+            "chain_safe_or_low_risk": sum(int(r.get("chain_safe_or_low_risk") or 0) for r in per_file_rows),
+            "chain_dropped": sum(int(r.get("chain_dropped") or 0) for r in per_file_rows),
+        }
         (output_dir / "summary" / "eval_summary.json").write_text(
             json.dumps(summary, indent=2), encoding="utf-8",
         )
@@ -1956,12 +2470,14 @@ async def _cmd_eval(args):
             output_dir / "tables" / "by_file.csv",
             per_file_rows,
             [
-                "dataset", "sample_id", "binary_stem", "binary_path",
+                "dataset", "sample_id", "binary_stem", "output_stem", "binary_path",
                 "has_gt", "status", "eval_scope",
                 "strict_tp", "strict_fp", "strict_fn",
                 "strict_precision", "strict_recall", "strict_f1",
                 "detected_total", "detected_source", "detected_sink", "detected_other",
                 "detected_labels",
+                "chain_count", "chain_with_source", "chain_with_channel",
+                "chain_confirmed", "chain_suspicious", "chain_safe_or_low_risk", "chain_dropped",
             ],
         )
         _write_csv(
@@ -1973,6 +2489,8 @@ async def _cmd_eval(args):
                 "strict_tp", "strict_fp", "strict_fn",
                 "strict_precision", "strict_recall", "strict_f1",
                 "detected_total", "detected_source", "detected_sink", "detected_other",
+                "chain_count", "chain_with_source", "chain_with_channel",
+                "chain_confirmed", "chain_suspicious", "chain_safe_or_low_risk", "chain_dropped",
             ],
         )
         _write_csv(
@@ -1980,6 +2498,16 @@ async def _cmd_eval(args):
             by_label_rows,
             [
                 "label", "kind",
+                "gt_tp", "gt_fp", "gt_fn",
+                "gt_precision", "gt_recall", "gt_f1",
+                "detected_total", "detected_in_gt_samples", "detected_in_no_gt_samples",
+            ],
+        )
+        _write_csv(
+            output_dir / "tables" / "by_kind.csv",
+            by_kind_rows,
+            [
+                "kind",
                 "gt_tp", "gt_fp", "gt_fn",
                 "gt_precision", "gt_recall", "gt_f1",
                 "detected_total", "detected_in_gt_samples", "detected_in_no_gt_samples",
@@ -2002,17 +2530,45 @@ async def _cmd_eval(args):
                 f"{summary['strict_overall']['f1']:.3f} |"
             ),
             "",
+            "## Strict by Kind",
+            "",
+            "| Kind | TP | FP | FN | Precision | Recall | F1 |",
+            "|---|---:|---:|---:|---:|---:|---:|",
+        ]
+        for row in by_kind_rows:
+            md_lines.append(
+                f"| {row['kind']} | {row['gt_tp']:.0f} | {row['gt_fp']:.0f} | {row['gt_fn']:.0f} | "
+                f"{row['gt_precision']:.3f} | {row['gt_recall']:.3f} | {row['gt_f1']:.3f} |"
+            )
+
+        md_lines.extend([
+            "",
+            "## Chain Overall",
+            "",
+            "| Chains | With Source | With Channel | Confirmed | Suspicious | Safe/Low-Risk | Dropped |",
+            "|---:|---:|---:|---:|---:|---:|---:|",
+            (
+                f"| {summary['chain_overall']['chain_count']} | "
+                f"{summary['chain_overall']['chain_with_source']} | "
+                f"{summary['chain_overall']['chain_with_channel']} | "
+                f"{summary['chain_overall']['chain_confirmed']} | "
+                f"{summary['chain_overall']['chain_suspicious']} | "
+                f"{summary['chain_overall']['chain_safe_or_low_risk']} | "
+                f"{summary['chain_overall']['chain_dropped']} |"
+            ),
+            "",
             "## By Dataset",
             "",
-            "| Dataset | Samples | GT | No-GT | TP | FP | FN | Detected Sources | Detected Sinks |",
-            "|---|---:|---:|---:|---:|---:|---:|---:|---:|",
-        ]
+            "| Dataset | Samples | GT | No-GT | TP | FP | FN | Detected Sources | Detected Sinks | Chains | Confirmed |",
+            "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+        ])
         for row in by_dataset_rows:
             md_lines.append(
                 f"| {row['dataset']} | {row['sample_count']} | {row['gt_sample_count']} | "
                 f"{row['no_gt_sample_count']} | {row['strict_tp']:.0f} | "
                 f"{row['strict_fp']:.0f} | {row['strict_fn']:.0f} | "
-                f"{row['detected_source']} | {row['detected_sink']} |"
+                f"{row['detected_source']} | {row['detected_sink']} | "
+                f"{row['chain_count']} | {row['chain_confirmed']} |"
             )
         (output_dir / "summary" / "eval_summary.md").write_text(
             "\n".join(md_lines) + "\n",
@@ -2033,6 +2589,7 @@ async def _cmd_eval(args):
                 "only_unstripped_elf": bool(args.only_unstripped_elf),
                 "sample_timeout_sec": sample_timeout,
                 "analysis_wait_sec": int(getattr(args, "analysis_wait_sec", 60) or 60),
+                "mcp_connect_timeout_sec": int(getattr(args, "mcp_connect_timeout_sec", 30) or 30),
             },
             "binary_selection": {
                 "single_binary": str(Path(args.binary).resolve()) if args.binary else None,
@@ -2080,6 +2637,91 @@ async def _cmd_gt_sinks(args):
     print(
         "[SourceAgent] GT sink inventory generated: "
         f"{summary['entry_count']} entries across {summary['sample_count']} samples"
+    )
+    print(f"  JSON: {output_json}")
+    print(f"  CSV:  {output_csv}")
+
+
+async def _cmd_gt_sources(args):
+    """Generate normalized GT source list (machine-readable)."""
+    from sourceagent.pipeline.gt_source_catalog import write_normalized_source_gt
+
+    output_json = Path(args.output_json).resolve()
+    output_csv = Path(args.output_csv).resolve()
+    summary = write_normalized_source_gt(
+        output_json=output_json,
+        output_csv=output_csv,
+    )
+    print(
+        "[SourceAgent] GT source inventory generated: "
+        f"{summary['entry_count']} entries across {summary['sample_count']} samples"
+    )
+    print(f"  JSON: {output_json}")
+    print(f"  CSV:  {output_csv}")
+
+
+async def _cmd_gt_bundle(args):
+    """Generate combined normalized GT bundle (sources + sinks)."""
+    from sourceagent.pipeline.gt_sink_catalog import build_normalized_sink_gt
+    from sourceagent.pipeline.gt_source_catalog import build_normalized_source_gt
+
+    microbench_dir = Path(args.microbench_dir).resolve()
+    output_json = Path(args.output_json).resolve()
+    output_csv = Path(args.output_csv).resolve()
+
+    if not microbench_dir.exists():
+        print(f"Error: microbench dir not found: {microbench_dir}")
+        sys.exit(1)
+
+    source_rows = build_normalized_source_gt()
+    sink_rows = build_normalized_sink_gt(microbench_dir)
+
+    rows: List[Dict[str, Any]] = []
+    for row in source_rows:
+        rows.append({**row, "gt_kind": "source"})
+    for row in sink_rows:
+        rows.append({**row, "gt_kind": "sink"})
+    rows.sort(
+        key=lambda x: (
+            str(x.get("binary_stem", "")),
+            str(x.get("gt_kind", "")),
+            str(x.get("gt_source_id", x.get("gt_sink_id", ""))),
+        )
+    )
+
+    output_json.parent.mkdir(parents=True, exist_ok=True)
+    output_csv.parent.mkdir(parents=True, exist_ok=True)
+    output_json.write_text(json.dumps(rows, indent=2), encoding="utf-8")
+
+    fieldnames = [
+        "gt_kind",
+        "binary_stem",
+        "gt_source_id",
+        "gt_sink_id",
+        "label",
+        "pipeline_label_hint",
+        "function_name",
+        "address",
+        "address_hex",
+        "address_status",
+        "notes",
+        "source_file",
+        "map_file",
+    ]
+    with output_csv.open("w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        for row in rows:
+            writer.writerow(row)
+
+    sample_count = len({str(r.get("binary_stem", "")) for r in rows})
+    source_count = sum(1 for r in rows if r.get("gt_kind") == "source")
+    sink_count = sum(1 for r in rows if r.get("gt_kind") == "sink")
+    unresolved = sum(1 for r in rows if str(r.get("address_status", "")) != "resolved")
+    print(
+        "[SourceAgent] GT bundle generated: "
+        f"{len(rows)} entries (source={source_count}, sink={sink_count}) "
+        f"across {sample_count} samples, unresolved={unresolved}"
     )
     print(f"  JSON: {output_json}")
     print(f"  CSV:  {output_csv}")

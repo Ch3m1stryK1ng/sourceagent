@@ -1,0 +1,343 @@
+{
+  "schema_version": "2.0-seed",
+  "binary_stem": "cve_2020_10065_hci_spi",
+  "binary_paths": {
+    "source_file": "firmware/microbench/cve_2020_10065_hci_spi.c",
+    "map_file": "firmware/microbench/cve_2020_10065_hci_spi.map",
+    "elf_file": "firmware/microbench/cve_2020_10065_hci_spi.elf",
+    "bin_file": "firmware/microbench/cve_2020_10065_hci_spi.bin"
+  },
+  "sample_meta": {
+    "title": "Zephyr HCI-over-SPI overflow reproduction",
+    "mechanism_group": "real_cve_semantic",
+    "runtime_style": "baremetal_thread_model",
+    "inspiration": "zephyr",
+    "arch": "ARM_CORTEX_M",
+    "expected_channel_mode": "none",
+    "chain_shape": "same_context_multi_sink_semantic"
+  },
+  "annotation_status": {
+    "sources": "complete",
+    "objects": "complete",
+    "channels": "n/a",
+    "sinks": "complete",
+    "sink_roots": "complete",
+    "derive_checks": "complete",
+    "chains": "complete",
+    "negative_expectations": "complete",
+    "overall": "complete"
+  },
+  "todo_items": [
+    "Annotate rxmsg as payload object and header subfields used for derive facts.",
+    "Record two independent COPY_SINK roots: EVT and ACL.",
+    "Mark missing tailroom/upper-bound checks explicitly."
+  ],
+  "sources": [
+    {
+      "source_id": "R1",
+      "label": "MMIO_READ",
+      "function_name": "bt_spi_transceive",
+      "address": 1073819660,
+      "address_hex": "0x4001300c",
+      "site_kind": "mmio_read",
+      "context": "MAIN",
+      "role": "data",
+      "notes": "SPI1_DR payload byte read in bt_spi_transceive, used to fill rxmsg.",
+      "status": "complete",
+      "source_file": "cve_2020_10065_hci_spi.c",
+      "map_file": "cve_2020_10065_hci_spi.map"
+    }
+  ],
+  "objects": [
+    {
+      "object_id": "O1_rxmsg",
+      "region_kind": "SRAM_CLUSTER",
+      "addr_range": [
+        "0x20000100",
+        "0x200001fe"
+      ],
+      "members": [
+        "rxmsg"
+      ],
+      "producer_contexts": [
+        "MAIN"
+      ],
+      "consumer_contexts": [
+        "MAIN"
+      ],
+      "writer_sites": [
+        {
+          "function_name": "bt_spi_transceive",
+          "address_hex": "0x08000040",
+          "kind": "mmio_fill"
+        }
+      ],
+      "reader_sites": [
+        {
+          "function_name": "bt_spi_rx_thread",
+          "address_hex": "0x08000088",
+          "kind": "evt_parse"
+        },
+        {
+          "function_name": "bt_spi_rx_thread",
+          "address_hex": "0x08000088",
+          "kind": "acl_parse"
+        }
+      ],
+      "evidence_refs": [
+        "c:cve_2020_10065_hci_spi:176",
+        "m:cve_2020_10065_hci_spi:115"
+      ],
+      "confidence": 1.0,
+      "notes": "SPI payload staging buffer filled from attacker-controlled MMIO stream."
+    },
+    {
+      "object_id": "O2_g_evt_buf",
+      "region_kind": "SRAM_CLUSTER",
+      "addr_range": [
+        "0x20000250",
+        "0x2000029f"
+      ],
+      "members": [
+        "g_evt_buf"
+      ],
+      "producer_contexts": [
+        "MAIN"
+      ],
+      "consumer_contexts": [
+        "MAIN"
+      ],
+      "writer_sites": [
+        {
+          "function_name": "net_buf_add_mem",
+          "address_hex": "0x08000066",
+          "kind": "copy_dst"
+        }
+      ],
+      "reader_sites": [
+        {
+          "function_name": "bt_recv",
+          "address_hex": "0x08000088",
+          "kind": "consumer_after_sink"
+        }
+      ],
+      "evidence_refs": [
+        "c:cve_2020_10065_hci_spi:130",
+        "m:cve_2020_10065_hci_spi:119"
+      ],
+      "confidence": 0.95,
+      "notes": "Event receive buffer used by the EVT path."
+    },
+    {
+      "object_id": "O3_g_acl_buf",
+      "region_kind": "SRAM_CLUSTER",
+      "addr_range": [
+        "0x20000200",
+        "0x2000024f"
+      ],
+      "members": [
+        "g_acl_buf"
+      ],
+      "producer_contexts": [
+        "MAIN"
+      ],
+      "consumer_contexts": [
+        "MAIN"
+      ],
+      "writer_sites": [
+        {
+          "function_name": "net_buf_add_mem",
+          "address_hex": "0x08000066",
+          "kind": "copy_dst"
+        }
+      ],
+      "reader_sites": [
+        {
+          "function_name": "bt_recv",
+          "address_hex": "0x08000088",
+          "kind": "consumer_after_sink"
+        }
+      ],
+      "evidence_refs": [
+        "c:cve_2020_10065_hci_spi:131",
+        "m:cve_2020_10065_hci_spi:117"
+      ],
+      "confidence": 0.95,
+      "notes": "ACL receive buffer used by the ACL path."
+    }
+  ],
+  "channels": [],
+  "sinks": [
+    {
+      "sink_id": "S1",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "bt_spi_rx_thread",
+      "address": 134217864,
+      "address_hex": "0x08000088",
+      "site_kind": "copy_call_or_copy_idiom",
+      "notes": "HCI EVT path overflow",
+      "status": "complete",
+      "source_file": "cve_2020_10065_hci_spi.c",
+      "map_file": "cve_2020_10065_hci_spi.map"
+    },
+    {
+      "sink_id": "S2",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "bt_spi_rx_thread",
+      "address": 134217864,
+      "address_hex": "0x08000088",
+      "site_kind": "copy_call_or_copy_idiom",
+      "notes": "HCI ACL path overflow",
+      "status": "complete",
+      "source_file": "cve_2020_10065_hci_spi.c",
+      "map_file": "cve_2020_10065_hci_spi.map"
+    }
+  ],
+  "sink_roots": [
+    {
+      "root_id": "SR1_evt_len",
+      "sink_id": "S1",
+      "root_role": "len",
+      "expr": "rxmsg[EVT_HEADER_SIZE] + 2",
+      "status": "complete",
+      "controllability": "source_derived",
+      "evidence_refs": [
+        "c:cve_2020_10065_hci_spi:270"
+      ]
+    },
+    {
+      "root_id": "SR2_acl_len",
+      "sink_id": "S2",
+      "root_role": "len",
+      "expr": "sys_le16_to_cpu(acl_hdr.len)",
+      "status": "complete",
+      "controllability": "source_derived",
+      "evidence_refs": [
+        "c:cve_2020_10065_hci_spi:291"
+      ]
+    }
+  ],
+  "derive_checks": [
+    {
+      "derive_check_id": "D1_evt_len",
+      "sink_id": "S1",
+      "root_id": "SR1_evt_len",
+      "derive_facts": [
+        {
+          "expr": "bt_spi_transceive(txmsg, size, rxmsg, size) fills rxmsg from SPI1_DR",
+          "site": "bt_spi_rx_thread",
+          "evidence_refs": [
+            "c:cve_2020_10065_hci_spi:234"
+          ]
+        },
+        {
+          "expr": "len = rxmsg[EVT_HEADER_SIZE] + 2",
+          "site": "bt_spi_rx_thread",
+          "evidence_refs": [
+            "c:cve_2020_10065_hci_spi:270"
+          ]
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "No upper bound against NET_BUF_DATA_SIZE before net_buf_add_mem",
+          "strength": "absent",
+          "site": "bt_spi_rx_thread",
+          "evidence_refs": [
+            "c:cve_2020_10065_hci_spi:270"
+          ]
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D2_acl_len",
+      "sink_id": "S2",
+      "root_id": "SR2_acl_len",
+      "derive_facts": [
+        {
+          "expr": "memcpy(&acl_hdr, &rxmsg[1], sizeof(acl_hdr)) copies attacker-controlled bytes into acl_hdr",
+          "site": "bt_spi_rx_thread",
+          "evidence_refs": [
+            "c:cve_2020_10065_hci_spi:277"
+          ]
+        },
+        {
+          "expr": "len = sys_le16_to_cpu(acl_hdr.len)",
+          "site": "bt_spi_rx_thread",
+          "evidence_refs": [
+            "c:cve_2020_10065_hci_spi:291"
+          ]
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "No tailroom or NET_BUF_DATA_SIZE bound before ACL payload copy",
+          "strength": "absent",
+          "site": "bt_spi_rx_thread",
+          "evidence_refs": [
+            "c:cve_2020_10065_hci_spi:291"
+          ]
+        }
+      ],
+      "status": "complete"
+    }
+  ],
+  "chains": [
+    {
+      "chain_id": "C1_evt_overflow",
+      "sink_id": "S1",
+      "expected_verdict": "CONFIRMED",
+      "required_source_ids": [
+        "R1"
+      ],
+      "required_object_ids": [
+        "O1_rxmsg",
+        "O2_g_evt_buf"
+      ],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR1_evt_len"
+      ],
+      "required_derive_check_ids": [
+        "D1_evt_len"
+      ],
+      "must_use_channel": false,
+      "notes": "Event-path overflow chain from SPI1_DR into rxmsg-derived copy length."
+    },
+    {
+      "chain_id": "C2_acl_overflow",
+      "sink_id": "S2",
+      "expected_verdict": "CONFIRMED",
+      "required_source_ids": [
+        "R1"
+      ],
+      "required_object_ids": [
+        "O1_rxmsg",
+        "O3_g_acl_buf"
+      ],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR2_acl_len"
+      ],
+      "required_derive_check_ids": [
+        "D2_acl_len"
+      ],
+      "must_use_channel": false,
+      "notes": "ACL-path overflow chain from SPI1_DR into acl_hdr.len-controlled copy size."
+    }
+  ],
+  "negative_expectations": [
+    {
+      "negative_id": "N1_no_channel_required",
+      "target_kind": "sample",
+      "expected_verdict": "DROP",
+      "reason": "This benchmark is same-context; requiring a channel edge would be a false negative in the evaluator."
+    }
+  ],
+  "notes": [
+    "Fully annotated multi-sink semantic CVE sample with two independent confirmed chains."
+  ]
+}

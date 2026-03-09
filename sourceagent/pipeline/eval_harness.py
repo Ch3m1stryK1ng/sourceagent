@@ -266,12 +266,14 @@ def _gt_hint_label(gt: GroundTruthEntry) -> str:
 
 
 def _strict_label_matches(pred_label: str, gt: GroundTruthEntry) -> bool:
-    """Strict label match with optional GT hint alias support."""
+    """Strict label match: exact label only.
+
+    pipeline_label_hint is evaluated later as a partial alias rule so that
+    semantic subtype matches (for example PARSING_OVERFLOW_SINK -> STORE_SINK)
+    do not inflate strict exact-match metrics.
+    """
     gt_label = _normalize_label(gt.label)
-    if pred_label == gt_label:
-        return True
-    hint = _gt_hint_label(gt)
-    return bool(hint) and pred_label == hint
+    return pred_label == gt_label
 
 
 def _dedup_gt_entries(entries: List[GroundTruthEntry]) -> List[GroundTruthEntry]:
@@ -708,6 +710,16 @@ def compare_labels_detailed(
     for pred in fp_predictions:
         fp_by_label[pred["label"]] += 1
 
+    partial_breakdown: Dict[str, int] = defaultdict(int)
+    for d in details:
+        if d.get("status") != "partial":
+            continue
+        mtype = str(d.get("match_type", ""))
+        if mtype.startswith("label_hint_"):
+            partial_breakdown["label_hint"] += 1
+        elif mtype.startswith("sink_family_"):
+            partial_breakdown["sink_family"] += 1
+
     return {
         "binary_path": result.binary_path,
         "binary_stem": Path(result.binary_path).stem,
@@ -717,6 +729,7 @@ def compare_labels_detailed(
         "matches": details,
         "fp_predictions": fp_predictions,
         "fp_by_label": dict(sorted(fp_by_label.items())),
+        "partial_breakdown": dict(sorted(partial_breakdown.items())),
         "strict": {
             "tp": strict_tp,
             "fp": strict_fp,
@@ -774,6 +787,7 @@ async def run_eval(
     offline: bool = False,
     model: str = "",
     analysis_wait_sec: int = 60,
+    mcp_connect_timeout_sec: int = 30,
     accepted_verdicts: Optional[Set[VerificationVerdict]] = None,
     output_path: Optional[str] = None,
     run_id: Optional[str] = None,
@@ -793,6 +807,7 @@ async def run_eval(
             offline=offline,
             model=model,
             analysis_wait_sec=analysis_wait_sec,
+            mcp_connect_timeout_sec=mcp_connect_timeout_sec,
             output_path=output_path,
             run_id=run_id,
         )
@@ -811,6 +826,7 @@ async def _run_pipeline(
     offline: bool = False,
     model: str = "",
     analysis_wait_sec: int = 60,
+    mcp_connect_timeout_sec: int = 30,
     output_path: Optional[str] = None,
     run_id: Optional[str] = None,
 ) -> PipelineResult:
@@ -825,6 +841,7 @@ async def _run_pipeline(
         run_id=run_id or f"eval-{Path(binary_path).stem}",
         offline=offline,
         analysis_wait_sec=analysis_wait_sec,
+        mcp_connect_timeout_sec=mcp_connect_timeout_sec,
         output=output_path,
     )
     result = await _cmd_mine(args)

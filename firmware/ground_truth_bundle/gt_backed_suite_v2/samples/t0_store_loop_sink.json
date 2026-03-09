@@ -1,0 +1,323 @@
+{
+  "schema_version": "2.0-seed",
+  "binary_stem": "t0_store_loop_sink",
+  "binary_paths": {
+    "source_file": "firmware/microbench/t0_store_loop_sink.c",
+    "map_file": "firmware/microbench/t0_store_loop_sink.map",
+    "elf_file": "firmware/microbench/t0_store_loop_sink.elf",
+    "bin_file": "firmware/microbench/t0_store_loop_sink.bin"
+  },
+  "sample_meta": {
+    "title": "Store, memset, and loop-write sink archetypes",
+    "mechanism_group": "sink_archetype",
+    "runtime_style": "baremetal_polling",
+    "inspiration": "toy_store_loop",
+    "arch": "ARM_CORTEX_M",
+    "expected_channel_mode": "none",
+    "chain_shape": "same_context_mixed_sinks"
+  },
+  "annotation_status": {
+    "sources": "complete",
+    "objects": "complete",
+    "channels": "n/a",
+    "sinks": "complete",
+    "sink_roots": "complete",
+    "derive_checks": "complete",
+    "chains": "complete",
+    "negative_expectations": "complete",
+    "overall": "complete"
+  },
+  "todo_items": [
+    "Annotate STORE_SINK, MEMSET_SINK, and LOOP_WRITE_SINK sites separately.",
+    "Record which object each sink writes through.",
+    "Capture effective vs absent bounds checks per sink root."
+  ],
+  "sources": [
+    {
+      "source_id": "R1",
+      "label": "MMIO_READ",
+      "function_name": "spi_read_byte",
+      "address": 1073759232,
+      "address_hex": "0x40004400",
+      "site_kind": "mmio_read",
+      "context": "MAIN",
+      "role": "control",
+      "notes": "SPI1_SR polling gate.",
+      "status": "complete",
+      "source_file": "t0_store_loop_sink.c",
+      "map_file": "t0_store_loop_sink.map"
+    },
+    {
+      "source_id": "R2",
+      "label": "MMIO_READ",
+      "function_name": "spi_read_byte",
+      "address": 1073759236,
+      "address_hex": "0x40004404",
+      "site_kind": "mmio_read",
+      "context": "MAIN",
+      "role": "data",
+      "notes": "SPI1_DR payload byte read.",
+      "status": "complete",
+      "source_file": "t0_store_loop_sink.c",
+      "map_file": "t0_store_loop_sink.map"
+    }
+  ],
+  "objects": [
+    {
+      "object_id": "O1_main_data_buf",
+      "region_kind": "STACK_LOCAL",
+      "addr_range": [
+        "0x00000000",
+        "0x00000000"
+      ],
+      "members": [
+        "data"
+      ],
+      "producer_contexts": [
+        "MAIN"
+      ],
+      "consumer_contexts": [
+        "MAIN"
+      ],
+      "writer_sites": [
+        {
+          "function_name": "fill_buffer",
+          "address_hex": "0x08000060",
+          "kind": "loop_write"
+        }
+      ],
+      "reader_sites": [
+        {
+          "function_name": "clear_buffer",
+          "address_hex": "0x0800007a",
+          "kind": "memset_dst"
+        }
+      ],
+      "evidence_refs": [
+        "c:t0_store_loop_sink:74",
+        "c:t0_store_loop_sink:75"
+      ],
+      "confidence": 0.8,
+      "notes": "Fixed-size local array data[64] in main used by fill_buffer and clear_buffer."
+    }
+  ],
+  "channels": [],
+  "sinks": [
+    {
+      "sink_id": "S3",
+      "label": "MEMSET_SINK",
+      "pipeline_label_hint": "MEMSET_SINK",
+      "function_name": "clear_buffer",
+      "address": 134217850,
+      "address_hex": "0x0800007a",
+      "site_kind": "memset_call",
+      "notes": "memset with variable length",
+      "status": "complete",
+      "source_file": "t0_store_loop_sink.c",
+      "map_file": "t0_store_loop_sink.map"
+    },
+    {
+      "sink_id": "S2",
+      "label": "LOOP_WRITE_SINK",
+      "pipeline_label_hint": "LOOP_WRITE_SINK",
+      "function_name": "fill_buffer",
+      "address": 134217824,
+      "address_hex": "0x08000060",
+      "site_kind": "loop_write",
+      "notes": "variable-bound loop write",
+      "status": "complete",
+      "source_file": "t0_store_loop_sink.c",
+      "map_file": "t0_store_loop_sink.map"
+    },
+    {
+      "sink_id": "S1",
+      "label": "STORE_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "write_register",
+      "address": 134217820,
+      "address_hex": "0x0800005c",
+      "site_kind": "pointer_store",
+      "notes": "store through argument pointer",
+      "status": "complete",
+      "source_file": "t0_store_loop_sink.c",
+      "map_file": "t0_store_loop_sink.map"
+    }
+  ],
+  "sink_roots": [
+    {
+      "root_id": "SR1_reg_ptr",
+      "sink_id": "S1",
+      "root_role": "ptr",
+      "expr": "reg",
+      "status": "complete",
+      "controllability": "constant_callsite",
+      "evidence_refs": [
+        "c:t0_store_loop_sink:52"
+      ]
+    },
+    {
+      "root_id": "SR2_fill_n",
+      "sink_id": "S2",
+      "root_role": "len",
+      "expr": "n",
+      "status": "complete",
+      "controllability": "caller_controlled_bounded",
+      "evidence_refs": [
+        "c:t0_store_loop_sink:58"
+      ]
+    },
+    {
+      "root_id": "SR3_memset_n",
+      "sink_id": "S3",
+      "root_role": "len",
+      "expr": "n",
+      "status": "complete",
+      "controllability": "caller_controlled_bounded",
+      "evidence_refs": [
+        "c:t0_store_loop_sink:66"
+      ]
+    }
+  ],
+  "derive_checks": [
+    {
+      "derive_check_id": "D1_store",
+      "sink_id": "S1",
+      "root_id": "SR1_reg_ptr",
+      "status": "complete",
+      "derive_facts": [
+        {
+          "expr": "write_register((volatile uint32_t*)0x40004408u, 0x01u)",
+          "site": "main",
+          "evidence_refs": [
+            "c:t0_store_loop_sink:76"
+          ]
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "Pointer target is constant MMIO register literal",
+          "strength": "effective",
+          "site": "main",
+          "evidence_refs": [
+            "c:t0_store_loop_sink:76"
+          ]
+        }
+      ]
+    },
+    {
+      "derive_check_id": "D2_loop",
+      "sink_id": "S2",
+      "root_id": "SR2_fill_n",
+      "status": "complete",
+      "derive_facts": [
+        {
+          "expr": "buf[i] = spi_read_byte() for i < n",
+          "site": "fill_buffer",
+          "evidence_refs": [
+            "c:t0_store_loop_sink:59"
+          ]
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "main calls fill_buffer(data, 48) with data[64] buffer",
+          "strength": "effective",
+          "site": "main",
+          "evidence_refs": [
+            "c:t0_store_loop_sink:75"
+          ]
+        }
+      ]
+    },
+    {
+      "derive_check_id": "D3_memset",
+      "sink_id": "S3",
+      "root_id": "SR3_memset_n",
+      "status": "complete",
+      "derive_facts": [
+        {
+          "expr": "memset(buf, 0, n)",
+          "site": "clear_buffer",
+          "evidence_refs": [
+            "c:t0_store_loop_sink:67"
+          ]
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "main calls clear_buffer(data, 48) with data[64] buffer",
+          "strength": "effective",
+          "site": "main",
+          "evidence_refs": [
+            "c:t0_store_loop_sink:77"
+          ]
+        }
+      ]
+    }
+  ],
+  "chains": [
+    {
+      "chain_id": "C1_loop_write_safe",
+      "sink_id": "S2",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [
+        "R2"
+      ],
+      "required_object_ids": [
+        "O1_main_data_buf"
+      ],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR2_fill_n"
+      ],
+      "required_derive_check_ids": [
+        "D2_loop"
+      ],
+      "must_use_channel": false,
+      "notes": "SPI payload reaches loop-write sink, but callsite bound keeps writes within data[64].",
+      "optional_object_ids": [
+        "O1_main_data_buf"
+      ]
+    },
+    {
+      "chain_id": "C2_memset_safe",
+      "sink_id": "S3",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "O1_main_data_buf"
+      ],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR3_memset_n"
+      ],
+      "required_derive_check_ids": [
+        "D3_memset"
+      ],
+      "must_use_channel": false,
+      "notes": "Variable-length memset exists, but benchmark callsite bounds n to 48 within data[64].",
+      "optional_object_ids": [
+        "O1_main_data_buf"
+      ]
+    }
+  ],
+  "negative_expectations": [
+    {
+      "negative_id": "N1_status_not_payload",
+      "target_kind": "source",
+      "target_id": "R1",
+      "expected_verdict": "DROP",
+      "reason": "SPI status read should not anchor payload chain."
+    },
+    {
+      "negative_id": "N2_store_sink_constant_target",
+      "target_kind": "sink",
+      "target_id": "S1",
+      "expected_verdict": "DROP",
+      "reason": "write_register is a sink archetype but not attacker-controlled in this benchmark callsite."
+    }
+  ],
+  "notes": [
+    "Annotated sink-archetype sample with two safe chains and one sink-only negative control."
+  ]
+}

@@ -1,0 +1,133 @@
+{
+  "schema_version": "2.0-seed",
+  "binary_stem": "t0_dma_backed_buffer",
+  "binary_paths": {
+    "source_file": "firmware/microbench/t0_dma_backed_buffer.c",
+    "map_file": "firmware/microbench/t0_dma_backed_buffer.map",
+    "elf_file": "firmware/microbench/t0_dma_backed_buffer.elf",
+    "bin_file": "firmware/microbench/t0_dma_backed_buffer.bin"
+  },
+  "sample_meta": {
+    "title": "DMA-backed buffer consumed in main loop",
+    "mechanism_group": "dma_cross_context",
+    "runtime_style": "baremetal_dma",
+    "inspiration": "toy_dma_consumer",
+    "arch": "ARM_CORTEX_M",
+    "expected_channel_mode": "required",
+    "chain_shape": "source_object_channel_consume"
+  },
+  "annotation_status": {
+    "sources": "complete",
+    "objects": "complete",
+    "channels": "complete",
+    "sinks": "n/a",
+    "sink_roots": "n/a",
+    "derive_checks": "n/a",
+    "chains": "complete",
+    "negative_expectations": "complete",
+    "overall": "complete"
+  },
+  "todo_items": [
+    "Bind DMA CMAR/CNDTR configuration to g_dma_rx_buf.",
+    "Annotate DMA->MAIN channel and buf[0]!=0 gate.",
+    "Record that this sample has source/object/channel but no vulnerability sink."
+  ],
+  "sources": [
+    {
+      "source_id": "R1",
+      "label": "DMA_BACKED_BUFFER",
+      "function_name": "dma_uart_rx_init",
+      "address": 1073872896,
+      "address_hex": "0x40020000",
+      "site_kind": "dma_buffer",
+      "context": "DMA",
+      "role": "channel_payload",
+      "notes": "DMA configuration binds USART1_DR to g_dma_rx_buf via CMAR/CNDTR.",
+      "status": "complete",
+      "source_file": "t0_dma_backed_buffer.c",
+      "map_file": "t0_dma_backed_buffer.map"
+    }
+  ],
+  "objects": [
+    {
+      "object_id": "O1_g_dma_rx_buf",
+      "region_kind": "DMA_BUFFER",
+      "addr_range": [
+        "0x20000000",
+        "0x200000ff"
+      ],
+      "members": [
+        "g_dma_rx_buf"
+      ],
+      "producer_contexts": [
+        "DMA"
+      ],
+      "consumer_contexts": [
+        "MAIN"
+      ],
+      "writer_sites": [
+        {
+          "function_name": "dma_uart_rx_init",
+          "address_hex": "0x08000044",
+          "kind": "dma_config_cmar"
+        }
+      ],
+      "reader_sites": [
+        {
+          "function_name": "main",
+          "address_hex": "0x0800008c",
+          "kind": "poll"
+        },
+        {
+          "function_name": "parse_frame",
+          "address_hex": "0x0800006c",
+          "kind": "consumer_read"
+        }
+      ],
+      "evidence_refs": [
+        "c:t0_dma_backed_buffer:56",
+        "m:t0_dma_backed_buffer:97"
+      ],
+      "confidence": 1.0,
+      "notes": "DMA destination buffer configured via CMAR and consumed in main."
+    }
+  ],
+  "channels": [
+    {
+      "channel_id": "C1_dma_to_main_rxbuf",
+      "src_context": "DMA",
+      "object_id": "O1_g_dma_rx_buf",
+      "dst_context": "MAIN",
+      "edge_kind": "DATA",
+      "constraints": [
+        {
+          "expr": "g_dma_rx_buf[0] != 0",
+          "vars": [
+            "g_dma_rx_buf"
+          ],
+          "strength": "effective"
+        }
+      ],
+      "evidence_refs": [
+        "c:t0_dma_backed_buffer:62",
+        "c:t0_dma_backed_buffer:84"
+      ],
+      "score": 1.0
+    }
+  ],
+  "sinks": [],
+  "sink_roots": [],
+  "derive_checks": [],
+  "chains": [],
+  "negative_expectations": [
+    {
+      "negative_id": "N1_no_vuln_chain_expected",
+      "target_kind": "sample",
+      "expected_verdict": "DROP",
+      "reason": "This sample validates DMA object/channel recovery only; no vulnerability sink should be emitted."
+    }
+  ],
+  "notes": [
+    "Fully annotated DMA source/object/channel sample with no positive sink or chain GT."
+  ]
+}

@@ -89,6 +89,8 @@ class MemoryAccessIndex:
     mmio_accesses: List[MemoryAccess] = field(default_factory=list)
     isr_functions: List[str] = field(default_factory=list)
     typed_bases: Dict[int, str] = field(default_factory=dict)
+    global_symbol_table: Dict[str, int] = field(default_factory=dict)
+    # Maps global/static symbol_name -> SRAM address (Stage 2 symbol enumeration)
     # Maps base_addr → peripheral_type, e.g. {0x40013800: "USART_TypeDef"}
     decompiled_cache: Dict[str, str] = field(default_factory=dict)
     # Maps function_name → decompiled C code (populated during Stage 2)

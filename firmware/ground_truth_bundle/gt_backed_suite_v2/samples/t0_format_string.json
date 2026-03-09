@@ -1,0 +1,195 @@
+{
+  "schema_version": "2.0-seed",
+  "binary_stem": "t0_format_string",
+  "binary_paths": {
+    "source_file": "firmware/microbench/t0_format_string.c",
+    "map_file": "firmware/microbench/t0_format_string.map",
+    "elf_file": "firmware/microbench/t0_format_string.elf",
+    "bin_file": "firmware/microbench/t0_format_string.bin"
+  },
+  "sample_meta": {
+    "title": "Format-string sink archetype",
+    "mechanism_group": "sink_archetype",
+    "runtime_style": "baremetal_polling",
+    "inspiration": "toy_format_string",
+    "arch": "ARM_CORTEX_M",
+    "expected_channel_mode": "none",
+    "chain_shape": "same_context_format_string"
+  },
+  "annotation_status": {
+    "sources": "complete",
+    "objects": "complete",
+    "channels": "n/a",
+    "sinks": "complete",
+    "sink_roots": "complete",
+    "derive_checks": "complete",
+    "chains": "complete",
+    "negative_expectations": "complete",
+    "overall": "complete"
+  },
+  "todo_items": [
+    "Annotate format argument root and its controllability.",
+    "Record safe local formatting helpers that must not be promoted."
+  ],
+  "sources": [
+    {
+      "source_id": "R1",
+      "label": "MMIO_READ",
+      "function_name": "uart_read_byte",
+      "address": 1073811456,
+      "address_hex": "0x40011000",
+      "site_kind": "mmio_read",
+      "context": "MAIN",
+      "role": "control",
+      "notes": "USART SR polling gate.",
+      "status": "complete",
+      "source_file": "t0_format_string.c",
+      "map_file": "t0_format_string.map"
+    },
+    {
+      "source_id": "R2",
+      "label": "MMIO_READ",
+      "function_name": "uart_read_byte",
+      "address": 1073811460,
+      "address_hex": "0x40011004",
+      "site_kind": "mmio_read",
+      "context": "MAIN",
+      "role": "data",
+      "notes": "USART DR fills cmd_buf via uart_read_string.",
+      "status": "complete",
+      "source_file": "t0_format_string.c",
+      "map_file": "t0_format_string.map"
+    }
+  ],
+  "objects": [
+    {
+      "object_id": "O1_g_log_buf",
+      "region_kind": "SRAM_CLUSTER",
+      "addr_range": [
+        "0x20000050",
+        "0x200000cf"
+      ],
+      "members": [
+        "g_log_buf"
+      ],
+      "producer_contexts": [
+        "MAIN"
+      ],
+      "consumer_contexts": [
+        "MAIN"
+      ],
+      "writer_sites": [
+        {
+          "function_name": "log_message",
+          "address_hex": "0x08000090",
+          "kind": "sprintf_dst"
+        }
+      ],
+      "reader_sites": [],
+      "evidence_refs": [
+        "c:t0_format_string:66",
+        "m:t0_format_string:288"
+      ],
+      "confidence": 1.0,
+      "notes": "Global logging buffer written by sprintf."
+    }
+  ],
+  "channels": [],
+  "sinks": [
+    {
+      "sink_id": "S1",
+      "label": "FORMAT_STRING_SINK",
+      "pipeline_label_hint": null,
+      "function_name": "log_message",
+      "address": 134217872,
+      "address_hex": "0x08000090",
+      "site_kind": "format_call",
+      "notes": "attacker-controlled format string in sprintf",
+      "status": "complete",
+      "source_file": "t0_format_string.c",
+      "map_file": "t0_format_string.map"
+    }
+  ],
+  "sink_roots": [
+    {
+      "root_id": "SR1_fmt",
+      "sink_id": "S1",
+      "root_role": "format_arg",
+      "expr": "fmt",
+      "status": "complete",
+      "controllability": "source_derived_via_caller",
+      "evidence_refs": [
+        "c:t0_format_string:68",
+        "c:t0_format_string:77"
+      ]
+    }
+  ],
+  "derive_checks": [
+    {
+      "derive_check_id": "D1_fmt",
+      "sink_id": "S1",
+      "root_id": "SR1_fmt",
+      "status": "complete",
+      "derive_facts": [
+        {
+          "expr": "uart_read_string(cmd_buf, sizeof(cmd_buf)) fills cmd_buf from uart_read_byte()",
+          "site": "handle_command",
+          "evidence_refs": [
+            "c:t0_format_string:76"
+          ]
+        },
+        {
+          "expr": "log_message(cmd_buf)",
+          "site": "handle_command",
+          "evidence_refs": [
+            "c:t0_format_string:77"
+          ]
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "No literal-format enforcement before sprintf(g_log_buf, fmt)",
+          "strength": "absent",
+          "site": "log_message",
+          "evidence_refs": [
+            "c:t0_format_string:70"
+          ]
+        }
+      ]
+    }
+  ],
+  "chains": [
+    {
+      "chain_id": "C1_format_string",
+      "sink_id": "S1",
+      "expected_verdict": "CONFIRMED",
+      "required_source_ids": [
+        "R2"
+      ],
+      "required_object_ids": [
+        "O1_g_log_buf"
+      ],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR1_fmt"
+      ],
+      "required_derive_check_ids": [
+        "D1_fmt"
+      ],
+      "must_use_channel": false,
+      "notes": "UART-controlled string reaches sprintf as format argument."
+    }
+  ],
+  "negative_expectations": [
+    {
+      "negative_id": "N1_status_not_payload",
+      "target_kind": "source",
+      "target_id": "R1",
+      "expected_verdict": "DROP",
+      "reason": "Status read should not be treated as the format-string source."
+    }
+  ],
+  "notes": [
+    "Annotated format-string chain with caller-propagated fmt root."
+  ]
+}

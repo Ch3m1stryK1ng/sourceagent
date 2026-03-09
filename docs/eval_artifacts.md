@@ -8,7 +8,7 @@ This document describes the new evaluation artifacts used for strict source/sink
 python3 -m sourceagent.interface.main eval \
   --all firmware/microbench \
   --formats elf,bin \
-  --gt-json firmware/ground_truth_bundle/normalized_gt_sinks.json \
+  --gt-json firmware/ground_truth_bundle/normalized_gt_bundle.json \
   --output-dir /tmp/sourceagent_eval \
   --stage 7 \
   --online \
@@ -16,6 +16,12 @@ python3 -m sourceagent.interface.main eval \
 ```
 
 Default mode is offline; add `--online` to enable MCP-backed stages.
+
+MCP stability note:
+
+- Current default is **shared** Ghidra project mode (more stable on this host).
+- Avoid forcing isolated mode unless needed:
+  `SOURCEAGENT_GHIDRA_PROJECT_MODE=isolated ...`
 
 ## 2) Output Layout
 
@@ -50,7 +56,7 @@ Weighted scoring adds partial credit for unresolved sink-label mismatches:
 
 This formalizes manual bookkeeping like `~1` in reports.
 
-## 4) Machine-Readable GT Sink List
+## 4) Machine-Readable GT Lists
 
 Generate/update normalized sink GT:
 
@@ -71,3 +77,24 @@ Fields include:
 - `address` / `address_hex`
 - `address_status` (`resolved` or `unresolved`)
 - `notes`
+
+Generate/update normalized source GT:
+
+```bash
+python3 -m sourceagent.interface.main gt-sources \
+  --output-json firmware/ground_truth_bundle/normalized_gt_sources.json \
+  --output-csv  firmware/ground_truth_bundle/normalized_gt_sources.csv
+```
+
+Generate/update combined GT bundle (sources + sinks):
+
+```bash
+python3 -m sourceagent.interface.main gt-bundle \
+  --microbench-dir firmware/microbench \
+  --output-json firmware/ground_truth_bundle/normalized_gt_bundle.json \
+  --output-csv  firmware/ground_truth_bundle/normalized_gt_bundle.csv
+```
+
+Bundle-specific field:
+
+- `gt_kind` (`source` or `sink`)

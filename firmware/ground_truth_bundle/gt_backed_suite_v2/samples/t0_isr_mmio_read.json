@@ -1,0 +1,155 @@
+{
+  "schema_version": "2.0-seed",
+  "binary_stem": "t0_isr_mmio_read",
+  "binary_paths": {
+    "source_file": "firmware/microbench/t0_isr_mmio_read.c",
+    "map_file": "firmware/microbench/t0_isr_mmio_read.map",
+    "elf_file": "firmware/microbench/t0_isr_mmio_read.elf",
+    "bin_file": "firmware/microbench/t0_isr_mmio_read.bin"
+  },
+  "sample_meta": {
+    "title": "ISR MMIO read without downstream sink",
+    "mechanism_group": "isr_source_only",
+    "runtime_style": "baremetal_interrupt",
+    "inspiration": "toy_isr_mmio",
+    "arch": "ARM_CORTEX_M",
+    "expected_channel_mode": "optional",
+    "chain_shape": "source_only"
+  },
+  "annotation_status": {
+    "sources": "complete",
+    "objects": "complete",
+    "channels": "complete",
+    "sinks": "n/a",
+    "sink_roots": "n/a",
+    "derive_checks": "n/a",
+    "chains": "complete",
+    "negative_expectations": "complete",
+    "overall": "complete"
+  },
+  "todo_items": [
+    "Annotate ISR data source sites and any shared flag/object if present.",
+    "Record that no vulnerability sink is expected."
+  ],
+  "sources": [
+    {
+      "source_id": "R1",
+      "label": "ISR_MMIO_READ",
+      "function_name": "USART1_IRQHandler",
+      "address": 1073811456,
+      "address_hex": "0x40011000",
+      "site_kind": "mmio_read_in_isr",
+      "context": "ISR",
+      "role": "control",
+      "notes": "ISR status read gating RXNE.",
+      "status": "complete",
+      "source_file": "t0_isr_mmio_read.c",
+      "map_file": "t0_isr_mmio_read.map"
+    },
+    {
+      "source_id": "R2",
+      "label": "ISR_MMIO_READ",
+      "function_name": "USART1_IRQHandler",
+      "address": 1073811460,
+      "address_hex": "0x40011004",
+      "site_kind": "mmio_read_in_isr",
+      "context": "ISR",
+      "role": "data",
+      "notes": "ISR payload byte read from USART1_DR.",
+      "status": "complete",
+      "source_file": "t0_isr_mmio_read.c",
+      "map_file": "t0_isr_mmio_read.map"
+    }
+  ],
+  "objects": [
+    {
+      "object_id": "O1_g_last_byte",
+      "region_kind": "FLAG",
+      "addr_range": [
+        "0x20000000",
+        "0x20000000"
+      ],
+      "members": [
+        "g_last_byte"
+      ],
+      "producer_contexts": [
+        "ISR",
+        "MAIN"
+      ],
+      "consumer_contexts": [
+        "ISR",
+        "MAIN"
+      ],
+      "writer_sites": [
+        {
+          "function_name": "USART1_IRQHandler",
+          "address_hex": "0x08000100",
+          "kind": "isr_write"
+        },
+        {
+          "function_name": "main",
+          "address_hex": "0x08000124",
+          "kind": "main_clear"
+        }
+      ],
+      "reader_sites": [
+        {
+          "function_name": "main",
+          "address_hex": "0x08000124",
+          "kind": "main_poll"
+        }
+      ],
+      "evidence_refs": [
+        "c:t0_isr_mmio_read:95",
+        "m:t0_isr_mmio_read:94"
+      ],
+      "confidence": 1.0,
+      "notes": "Single-byte shared flag/payload handoff from ISR to main."
+    }
+  ],
+  "channels": [
+    {
+      "channel_id": "C1_isr_to_main_last_byte",
+      "src_context": "ISR",
+      "object_id": "O1_g_last_byte",
+      "dst_context": "MAIN",
+      "edge_kind": "DATA",
+      "constraints": [
+        {
+          "expr": "g_last_byte != 0",
+          "vars": [
+            "g_last_byte"
+          ],
+          "strength": "effective"
+        }
+      ],
+      "evidence_refs": [
+        "c:t0_isr_mmio_read:100",
+        "c:t0_isr_mmio_read:111"
+      ],
+      "score": 0.95
+    }
+  ],
+  "sinks": [],
+  "sink_roots": [],
+  "derive_checks": [],
+  "chains": [],
+  "negative_expectations": [
+    {
+      "negative_id": "N1_source_only_no_sink",
+      "target_kind": "sample",
+      "expected_verdict": "DROP",
+      "reason": "This benchmark validates ISR source and channel recovery only; no sink or vulnerability chain should be emitted."
+    },
+    {
+      "negative_id": "N2_status_not_payload",
+      "target_kind": "source",
+      "target_id": "R1",
+      "expected_verdict": "DROP",
+      "reason": "Status read is control-only and should not be treated as payload source for downstream chaining."
+    }
+  ],
+  "notes": [
+    "Annotated source-only ISR sample with shared single-byte ISR->MAIN object/channel and no positive sink chain."
+  ]
+}

@@ -1,0 +1,1971 @@
+{
+  "schema_version": "1.0-seed",
+  "sample_id": "zephyr_cve_2020_10066",
+  "binary_stem": "zephyr-CVE-2020-10066",
+  "annotation_level": "full_gt",
+  "dataset": "monolithic-firmware-collection",
+  "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
+  "priority": "high",
+  "role": "primary_chain_driver",
+  "type_family": "type_ii_or_iii_ready",
+  "title": "Zephyr CVE-2020-10066 prebuilt sample",
+  "binary_artifacts": {
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10066/zephyr-CVE-2020-10066.elf",
+    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10066/zephyr-CVE-2020-10066.bin",
+    "formats": [
+      "elf",
+      "bin"
+    ]
+  },
+  "source_code": {
+    "source_repo_id": "zephyr",
+    "source_repo_url": "https://github.com/zephyrproject-rtos/zephyr",
+    "local_checkout": "firmware/source_repos/zephyr",
+    "source_code_level": "full_upstream_repo",
+    "source_locator": [
+      "firmware/source_repos/zephyr",
+      "resolve vulnerable subsystem using CVE tag"
+    ],
+    "repo_notes": "Primary source anchor for Zephyr prebuilt CVE samples from D_FUZZWARE."
+  },
+  "analysis_hints": {
+    "chain_depth": "deep",
+    "chain_breadth": "medium",
+    "expected_channel_mode": "optional",
+    "likely_source_labels": [
+      "MMIO_READ",
+      "ISR_MMIO_READ",
+      "DMA_BACKED_BUFFER"
+    ],
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "LOOP_WRITE_SINK",
+      "STORE_SINK"
+    ],
+    "current_support_status": "target_for_artifact_gt"
+  },
+  "sources": [],
+  "objects": [
+    {
+      "object_id": "obj_sram_20003300_200033ff",
+      "region_kind": "SRAM_CLUSTER",
+      "addr_range": [
+        "0x20003300",
+        "0x200033ff"
+      ],
+      "members": [
+        "__device_POST_KERNEL_start",
+        "__device_PRE_KERNEL_2_start",
+        "__device_exti_stm32",
+        "__device_gpio_stm32_a",
+        "__device_gpio_stm32_b",
+        "__device_gpio_stm32_c",
+        "__device_gpio_stm32_d",
+        "__device_gpio_stm32_e",
+        "__device_gpio_stm32_f",
+        "__device_gpio_stm32_g",
+        "__device_gpio_stm32_h",
+        "__device_spi_stm32_0",
+        "__device_spi_stm32_1",
+        "__device_sys_init_arm_mpu_init0",
+        "__device_sys_init_bt_spi_init1",
+        "__device_sys_init_init_mem_slab_module2",
+        "__device_sys_init_k_sys_work_q_init1",
+        "__device_sys_init_statics_init2",
+        "__device_sys_init_uart_console_init0",
+        "__device_sys_init_z_clock_driver_init0",
+        "__device_uart_stm32_0",
+        "__device_uart_stm32_1",
+        "__device_uart_stm32_2",
+        "data"
+      ],
+      "producer_contexts": [
+        "MAIN"
+      ],
+      "consumer_contexts": [
+        "MAIN",
+        "TASK"
+      ],
+      "writer_sites": [
+        "cf_write"
+      ],
+      "reader_sites": [
+        "att_chan_read",
+        "att_confirm",
+        "att_find_info_req",
+        "att_find_type_req",
+        "att_handle_rsp",
+        "att_read_blob_req",
+        "att_read_group_req",
+        "att_read_mult_req",
+        "att_read_req",
+        "att_read_rsp",
+        "att_read_type_req",
+        "att_sent",
+        "att_write_cmd",
+        "att_write_req",
+        "attr_read_group_cb",
+        "attr_read_type_cb",
+        "bt_buf_get_cmd_complete",
+        "bt_buf_get_evt",
+        "bt_buf_get_rx",
+        "bt_conn_recv",
+        "bt_conn_send_cb",
+        "bt_enable",
+        "bt_gatt_attr_read_ccc",
+        "bt_gatt_attr_read_chrc",
+        "bt_gatt_attr_read_service",
+        "bt_gatt_attr_value_handle",
+        "bt_gatt_attr_write_ccc",
+        "bt_gatt_change_aware",
+        "bt_gatt_disconnected",
+        "bt_gatt_foreach_attr_type",
+        "bt_gatt_indicate",
+        "bt_hci_cmd_create",
+        "bt_hci_cmd_send_sync",
+        "bt_init",
+        "bt_l2cap_send_cb",
+        "bt_le_adv_start",
+        "bt_le_adv_start_legacy",
+        "bt_recv",
+        "bt_recv_prio",
+        "bt_setup_public_id_addr",
+        "bt_spi_open",
+        "bt_spi_rx_thread",
+        "bt_spi_send",
+        "bt_uuid_create",
+        "ccc_load",
+        "ccc_save",
+        "cf_read",
+        "cf_set",
+        "cf_write",
+        "chan_send",
+        "clear_cf_cfg",
+        "conn_auto_initiate",
+        "create_frag",
+        "disconnected_cb",
+        "find_info_cb",
+        "find_type_cb",
+        "fixed_data_alloc",
+        "gatt_indicate",
+        "gatt_notify",
+        "gatt_notify_mult_send",
+        "gen_hash_m",
+        "gpio_pin_configure",
+        "gpio_stm32_manage_callback",
+        "gpio_stm32_pin_interrupt_configure",
+        "hci_cmd_complete",
+        "hci_cmd_done",
+        "hci_disconn_complete",
+        "hci_num_completed_packets",
+        "hci_rx_thread",
+        "hci_set_ad",
+        "k_mem_pool_malloc",
+        "k_mem_slab_alloc",
+        "k_queue_append",
+        "k_queue_append_list",
+        "k_queue_prepend",
+        "le_adv_update",
+        "le_conn_param_req",
+        "le_conn_update_complete",
+        "le_data_len_change",
+        "le_legacy_conn_complete",
+        "le_phy_update_complete",
+        "le_remote_feat_complete",
+        "net_buf_alloc_fixed",
+        "net_buf_alloc_len",
+        "net_buf_simple_add_mem",
+        "net_buf_simple_add_u8",
+        "net_buf_simple_pull",
+        "net_buf_simple_pull_le16",
+        "net_buf_simple_pull_mem",
+        "net_buf_simple_push",
+        "net_buf_simple_push_u8",
+        "notify_cb",
+        "prng_init",
+        "read_cb",
+        "read_group_cb",
+        "read_str",
+        "read_type_cb",
+        "register_events",
+        "sc_indicate_rsp",
+        "sc_restore_rsp",
+        "sc_save",
+        "sc_set",
+        "sc_store",
+        "send_frag",
+        "set_le_adv_enable_legacy",
+        "settings_runtime_read_cb",
+        "settings_runtime_set",
+        "spi_stm32_complete",
+        "spi_stm32_init",
+        "spi_stm32_isr",
+        "spi_stm32_transceive",
+        "stm32_exti_set_callback",
+        "stm32_exti_unset_callback",
+        "tc_cmac_update",
+        "tc_hmac_update",
+        "tc_sha256_update",
+        "tx_notify",
+        "uart_stm32_config_get",
+        "uart_stm32_configure",
+        "uart_stm32_fifo_fill",
+        "uart_stm32_fifo_read",
+        "uart_stm32_init",
+        "uart_stm32_irq_callback_set",
+        "uart_stm32_set_baudrate",
+        "update_ccc",
+        "work_cancel",
+        "write_cb",
+        "z_cstart",
+        "z_impl_k_queue_get",
+        "z_init_static_threads"
+      ],
+      "evidence_refs": [],
+      "confidence": 0.95,
+      "notes": "Auto-promoted from channel_graph object node."
+    },
+    {
+      "object_id": "obj_sram_20000200_200002ff",
+      "region_kind": "SRAM_CLUSTER",
+      "addr_range": [
+        "0x20000200",
+        "0x200002ff"
+      ],
+      "members": [
+        "announced_cycles",
+        "cmd_data",
+        "cycle_count",
+        "last_load",
+        "overflow_cyc",
+        "ready_cb",
+        "rx_thread_data",
+        "spi_tx_buf"
+      ],
+      "producer_contexts": [
+        "MAIN"
+      ],
+      "consumer_contexts": [
+        "ISR",
+        "MAIN"
+      ],
+      "writer_sites": [
+        "bt_hci_cmd_create",
+        "hci_cmd_done",
+        "set_le_adv_enable_legacy"
+      ],
+      "reader_sites": [
+        "bt_enable",
+        "bt_hci_cmd_send_sync",
+        "bt_spi_open",
+        "hci_cmd_done",
+        "init_work",
+        "z_clock_elapsed",
+        "z_clock_isr",
+        "z_clock_set_timeout"
+      ],
+      "evidence_refs": [],
+      "confidence": 0.95,
+      "notes": "Auto-promoted from channel_graph object node."
+    }
+  ],
+  "channels": [
+    {
+      "channel_id": "CH_AUTO_001",
+      "src_context": "MAIN",
+      "object_id": "obj_sram_20003300_200033ff",
+      "dst_context": "TASK",
+      "edge_kind": "DATA",
+      "constraints": [],
+      "evidence_refs": [],
+      "score": 0.95,
+      "notes": "Auto-promoted from non-drop chain channel step."
+    },
+    {
+      "channel_id": "CH_AUTO_002",
+      "src_context": "MAIN",
+      "object_id": "obj_sram_20000200_200002ff",
+      "dst_context": "ISR",
+      "edge_kind": "DATA",
+      "constraints": [],
+      "evidence_refs": [],
+      "score": 0.95,
+      "notes": "Auto-promoted from non-drop chain channel step."
+    }
+  ],
+  "sinks": [
+    {
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0000",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "settings_runtime_read_cb",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0002",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "gatt_notify",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0006",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "gatt_indicate",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0012",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "le_legacy_conn_complete",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SAFE_OR_LOW_RISK."
+    },
+    {
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0014",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "le_remote_feat_complete",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SAFE_OR_LOW_RISK."
+    },
+    {
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0015",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "enh_conn_complete",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SAFE_OR_LOW_RISK."
+    },
+    {
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0016",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "find_info_cb",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SAFE_OR_LOW_RISK."
+    },
+    {
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0017",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "cf_read",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SAFE_OR_LOW_RISK."
+    },
+    {
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0020",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "bt_uuid_create",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SAFE_OR_LOW_RISK."
+    },
+    {
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0022",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "bt_gatt_attr_read_chrc",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SAFE_OR_LOW_RISK."
+    },
+    {
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0023",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "bt_gatt_foreach_attr_type",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SAFE_OR_LOW_RISK."
+    },
+    {
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0024",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "k_mem_pool_malloc",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SAFE_OR_LOW_RISK."
+    },
+    {
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0025",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "bt_spi_rx_thread",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SAFE_OR_LOW_RISK."
+    },
+    {
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0026",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "set_random_address",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SAFE_OR_LOW_RISK."
+    },
+    {
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0027",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "bt_init",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SAFE_OR_LOW_RISK."
+    },
+    {
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0029",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "bt_setup_public_id_addr",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SAFE_OR_LOW_RISK."
+    },
+    {
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0041",
+      "label": "STORE_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "le_adv_start_add_conn",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0043",
+      "label": "STORE_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "sys_slist_find_and_remove",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0046",
+      "label": "FUNC_PTR_SINK",
+      "pipeline_label_hint": "FUNC_PTR_SINK",
+      "function_name": "bt_spi_open",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0048",
+      "label": "FUNC_PTR_SINK",
+      "pipeline_label_hint": "FUNC_PTR_SINK",
+      "function_name": "uart_stm32_isr",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0049",
+      "label": "FUNC_PTR_SINK",
+      "pipeline_label_hint": "FUNC_PTR_SINK",
+      "function_name": "att_sent",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    }
+  ],
+  "sink_roots": [
+    {
+      "root_id": "SR_AUTO_001_SINK_zephyr-CVE-2020-10066_0000_primary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0000",
+      "root_role": "primary",
+      "expr": "uVar1",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_002_SINK_zephyr-CVE-2020-10066_0000_secondary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0000",
+      "root_role": "secondary",
+      "expr": "data",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_003_SINK_zephyr-CVE-2020-10066_0000_secondary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0000",
+      "root_role": "secondary",
+      "expr": "*(void **)cb_arg",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_004_SINK_zephyr-CVE-2020-10066_0002_primary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0002",
+      "root_role": "primary",
+      "expr": "(uint)params->len",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_005_SINK_zephyr-CVE-2020-10066_0002_secondary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0002",
+      "root_role": "secondary",
+      "expr": "puVar7 + 1",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_006_SINK_zephyr-CVE-2020-10066_0002_secondary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0002",
+      "root_role": "secondary",
+      "expr": "params->data",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_007_SINK_zephyr-CVE-2020-10066_0006_primary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0006",
+      "root_role": "primary",
+      "expr": "(uint)params->len",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_008_SINK_zephyr-CVE-2020-10066_0006_secondary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0006",
+      "root_role": "secondary",
+      "expr": "puVar2 + 1",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_009_SINK_zephyr-CVE-2020-10066_0006_secondary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0006",
+      "root_role": "secondary",
+      "expr": "params->data",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_010_SINK_zephyr-CVE-2020-10066_0012_primary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0012",
+      "root_role": "primary",
+      "expr": "6",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_011_SINK_zephyr-CVE-2020-10066_0012_secondary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0012",
+      "root_role": "secondary",
+      "expr": "&enh.local_rpa",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_012_SINK_zephyr-CVE-2020-10066_0012_secondary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0012",
+      "root_role": "secondary",
+      "expr": "&local_30",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_013_SINK_zephyr-CVE-2020-10066_0014_primary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0014",
+      "root_role": "primary",
+      "expr": "8",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_014_SINK_zephyr-CVE-2020-10066_0014_secondary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0014",
+      "root_role": "secondary",
+      "expr": "(void *)((int)&conn->field_17 + 0x24)",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_015_SINK_zephyr-CVE-2020-10066_0014_secondary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0014",
+      "root_role": "secondary",
+      "expr": "puVar1 + 3",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_016_SINK_zephyr-CVE-2020-10066_0015_primary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0015",
+      "root_role": "primary",
+      "expr": "6",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_017_SINK_zephyr-CVE-2020-10066_0015_secondary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0015",
+      "root_role": "secondary",
+      "expr": "&peer_addr.a",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_018_SINK_zephyr-CVE-2020-10066_0015_secondary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0015",
+      "root_role": "secondary",
+      "expr": "&evt->peer_rpa",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_019_SINK_zephyr-CVE-2020-10066_0016_primary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0016",
+      "root_role": "primary",
+      "expr": "0x10",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_020_SINK_zephyr-CVE-2020-10066_0016_secondary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0016",
+      "root_role": "secondary",
+      "expr": "puVar3 + 1",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_021_SINK_zephyr-CVE-2020-10066_0016_secondary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0016",
+      "root_role": "secondary",
+      "expr": "pbVar6 + 1",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_022_SINK_zephyr-CVE-2020-10066_0017_primary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0017",
+      "root_role": "primary",
+      "expr": "1",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_023_SINK_zephyr-CVE-2020-10066_0017_secondary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0017",
+      "root_role": "secondary",
+      "expr": "data",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_024_SINK_zephyr-CVE-2020-10066_0017_secondary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0017",
+      "root_role": "secondary",
+      "expr": "pgVar1->data",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_025_SINK_zephyr-CVE-2020-10066_0020_primary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0020",
+      "root_role": "primary",
+      "expr": "0x10",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_026_SINK_zephyr-CVE-2020-10066_0020_secondary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0020",
+      "root_role": "secondary",
+      "expr": "uuid + 1",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_027_SINK_zephyr-CVE-2020-10066_0020_secondary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0020",
+      "root_role": "secondary",
+      "expr": "data",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_028_SINK_zephyr-CVE-2020-10066_0022_primary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0022",
+      "root_role": "primary",
+      "expr": "0x10",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_029_SINK_zephyr-CVE-2020-10066_0022_secondary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0022",
+      "root_role": "secondary",
+      "expr": "&pdu.field_2",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_030_SINK_zephyr-CVE-2020-10066_0022_secondary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0022",
+      "root_role": "secondary",
+      "expr": "pcVar1 + 1",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_031_SINK_zephyr-CVE-2020-10066_0023_primary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0023",
+      "root_role": "primary",
+      "expr": "0x14",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_032_SINK_zephyr-CVE-2020-10066_0023_secondary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0023",
+      "root_role": "secondary",
+      "expr": "&attr",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_033_SINK_zephyr-CVE-2020-10066_0023_secondary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0023",
+      "root_role": "secondary",
+      "expr": "pbVar6[-1].attrs + uVar4",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_034_SINK_zephyr-CVE-2020-10066_0024_primary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0024",
+      "root_role": "primary",
+      "expr": "8",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_035_SINK_zephyr-CVE-2020-10066_0024_secondary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0024",
+      "root_role": "secondary",
+      "expr": "block.field_0.data",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_036_SINK_zephyr-CVE-2020-10066_0024_secondary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0024",
+      "root_role": "secondary",
+      "expr": "&block",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_037_SINK_zephyr-CVE-2020-10066_0025_primary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0025",
+      "root_role": "primary",
+      "expr": "4",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_038_SINK_zephyr-CVE-2020-10066_0025_secondary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0025",
+      "root_role": "secondary",
+      "expr": "&acl_hdr",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_039_SINK_zephyr-CVE-2020-10066_0025_secondary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0025",
+      "root_role": "secondary",
+      "expr": "rxmsg + 1",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_040_SINK_zephyr-CVE-2020-10066_0026_primary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0026",
+      "root_role": "primary",
+      "expr": "6",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_041_SINK_zephyr-CVE-2020-10066_0026_secondary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0026",
+      "root_role": "secondary",
+      "expr": "&bt_dev.random_addr.a",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_042_SINK_zephyr-CVE-2020-10066_0026_secondary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0026",
+      "root_role": "secondary",
+      "expr": "addr",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_043_SINK_zephyr-CVE-2020-10066_0027_primary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0027",
+      "root_role": "primary",
+      "expr": "8",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_044_SINK_zephyr-CVE-2020-10066_0027_secondary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0027",
+      "root_role": "secondary",
+      "expr": "bt_dev.features",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_045_SINK_zephyr-CVE-2020-10066_0027_secondary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0027",
+      "root_role": "secondary",
+      "expr": "(rsp->field_4).field_0.data + 1",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_046_SINK_zephyr-CVE-2020-10066_0029_primary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0029",
+      "root_role": "primary",
+      "expr": "6",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_047_SINK_zephyr-CVE-2020-10066_0029_secondary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0029",
+      "root_role": "secondary",
+      "expr": "&addr.a",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_048_SINK_zephyr-CVE-2020-10066_0029_secondary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0029",
+      "root_role": "secondary",
+      "expr": "m1",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_049_SINK_zephyr-CVE-2020-10066_0041_primary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0041",
+      "root_role": "primary",
+      "expr": "out_conn",
+      "root_kind": "dst_ptr",
+      "root_source": "param_name",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_050_SINK_zephyr-CVE-2020-10066_0043_primary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0043",
+      "root_role": "primary",
+      "expr": "list",
+      "root_kind": "dst_ptr",
+      "root_source": "param_name",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_051_SINK_zephyr-CVE-2020-10066_0046_primary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0046",
+      "root_role": "primary",
+      "expr": "pcVar1",
+      "root_kind": "dispatch",
+      "root_source": "matched_text",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_052_SINK_zephyr-CVE-2020-10066_0048_primary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0048",
+      "root_role": "primary",
+      "expr": "UNRECOVERED_JUMPTABLE",
+      "root_kind": "dispatch",
+      "root_source": "matched_text",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_053_SINK_zephyr-CVE-2020-10066_0049_primary",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0049",
+      "root_role": "primary",
+      "expr": "UNRECOVERED_JUMPTABLE",
+      "root_kind": "dispatch",
+      "root_source": "matched_text",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    }
+  ],
+  "derive_checks": [
+    {
+      "derive_check_id": "D_AUTO_001_SINK_zephyr-CVE-2020-10066_0000",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0000",
+      "root_id": "SR_AUTO_003_SINK_zephyr-CVE-2020-10066_0000_secondary",
+      "derive_facts": [
+        {
+          "expr": "*(void **)cb_arg",
+          "kind": "root_expr",
+          "site": "settings_runtime_read_cb"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "absent",
+          "site": "settings_runtime_read_cb"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_002_SINK_zephyr-CVE-2020-10066_0002",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0002",
+      "root_id": "SR_AUTO_006_SINK_zephyr-CVE-2020-10066_0002_secondary",
+      "derive_facts": [
+        {
+          "expr": "params->data",
+          "kind": "root_expr",
+          "site": "gatt_notify"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "absent",
+          "site": "gatt_notify"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_003_SINK_zephyr-CVE-2020-10066_0006",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0006",
+      "root_id": "SR_AUTO_007_SINK_zephyr-CVE-2020-10066_0006_primary",
+      "derive_facts": [
+        {
+          "expr": "(uint)params->len",
+          "kind": "root_expr",
+          "site": "gatt_indicate"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "absent",
+          "site": "gatt_indicate"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_004_SINK_zephyr-CVE-2020-10066_0012",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0012",
+      "root_id": "SR_AUTO_010_SINK_zephyr-CVE-2020-10066_0012_primary",
+      "derive_facts": [
+        {
+          "expr": "6",
+          "kind": "root_expr",
+          "site": "le_legacy_conn_complete"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "len_is_constant",
+          "strength": "effective",
+          "site": "le_legacy_conn_complete"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_005_SINK_zephyr-CVE-2020-10066_0014",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0014",
+      "root_id": "SR_AUTO_013_SINK_zephyr-CVE-2020-10066_0014_primary",
+      "derive_facts": [
+        {
+          "expr": "8",
+          "kind": "root_expr",
+          "site": "le_remote_feat_complete"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "len_is_constant",
+          "strength": "effective",
+          "site": "le_remote_feat_complete"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_006_SINK_zephyr-CVE-2020-10066_0015",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0015",
+      "root_id": "SR_AUTO_016_SINK_zephyr-CVE-2020-10066_0015_primary",
+      "derive_facts": [
+        {
+          "expr": "6",
+          "kind": "root_expr",
+          "site": "enh_conn_complete"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "len_is_constant",
+          "strength": "effective",
+          "site": "enh_conn_complete"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_007_SINK_zephyr-CVE-2020-10066_0016",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0016",
+      "root_id": "SR_AUTO_019_SINK_zephyr-CVE-2020-10066_0016_primary",
+      "derive_facts": [
+        {
+          "expr": "0x10",
+          "kind": "root_expr",
+          "site": "find_info_cb"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "len_is_constant",
+          "strength": "effective",
+          "site": "find_info_cb"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_008_SINK_zephyr-CVE-2020-10066_0017",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0017",
+      "root_id": "SR_AUTO_022_SINK_zephyr-CVE-2020-10066_0017_primary",
+      "derive_facts": [
+        {
+          "expr": "1",
+          "kind": "root_expr",
+          "site": "cf_read"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "code_guard_root_bound",
+          "strength": "effective",
+          "site": "cf_read"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_009_SINK_zephyr-CVE-2020-10066_0020",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0020",
+      "root_id": "SR_AUTO_025_SINK_zephyr-CVE-2020-10066_0020_primary",
+      "derive_facts": [
+        {
+          "expr": "0x10",
+          "kind": "root_expr",
+          "site": "bt_uuid_create"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "len_is_constant",
+          "strength": "effective",
+          "site": "bt_uuid_create"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_010_SINK_zephyr-CVE-2020-10066_0022",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0022",
+      "root_id": "SR_AUTO_028_SINK_zephyr-CVE-2020-10066_0022_primary",
+      "derive_facts": [
+        {
+          "expr": "0x10",
+          "kind": "root_expr",
+          "site": "bt_gatt_attr_read_chrc"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "code_guard_root_bound",
+          "strength": "effective",
+          "site": "bt_gatt_attr_read_chrc"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_011_SINK_zephyr-CVE-2020-10066_0023",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0023",
+      "root_id": "SR_AUTO_031_SINK_zephyr-CVE-2020-10066_0023_primary",
+      "derive_facts": [
+        {
+          "expr": "0x14",
+          "kind": "root_expr",
+          "site": "bt_gatt_foreach_attr_type"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "code_guard_root_bound",
+          "strength": "effective",
+          "site": "bt_gatt_foreach_attr_type"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_012_SINK_zephyr-CVE-2020-10066_0024",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0024",
+      "root_id": "SR_AUTO_034_SINK_zephyr-CVE-2020-10066_0024_primary",
+      "derive_facts": [
+        {
+          "expr": "8",
+          "kind": "root_expr",
+          "site": "k_mem_pool_malloc"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "code_guard_root_bound",
+          "strength": "effective",
+          "site": "k_mem_pool_malloc"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_013_SINK_zephyr-CVE-2020-10066_0025",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0025",
+      "root_id": "SR_AUTO_037_SINK_zephyr-CVE-2020-10066_0025_primary",
+      "derive_facts": [
+        {
+          "expr": "4",
+          "kind": "root_expr",
+          "site": "bt_spi_rx_thread"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "effective",
+          "site": "bt_spi_rx_thread"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_014_SINK_zephyr-CVE-2020-10066_0026",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0026",
+      "root_id": "SR_AUTO_041_SINK_zephyr-CVE-2020-10066_0026_secondary",
+      "derive_facts": [
+        {
+          "expr": "&bt_dev.random_addr.a",
+          "kind": "root_expr",
+          "site": "set_random_address"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "effective",
+          "site": "set_random_address"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_015_SINK_zephyr-CVE-2020-10066_0027",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0027",
+      "root_id": "SR_AUTO_043_SINK_zephyr-CVE-2020-10066_0027_primary",
+      "derive_facts": [
+        {
+          "expr": "8",
+          "kind": "root_expr",
+          "site": "bt_init"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "effective",
+          "site": "bt_init"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_016_SINK_zephyr-CVE-2020-10066_0029",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0029",
+      "root_id": "SR_AUTO_046_SINK_zephyr-CVE-2020-10066_0029_primary",
+      "derive_facts": [
+        {
+          "expr": "6",
+          "kind": "root_expr",
+          "site": "bt_setup_public_id_addr"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "effective",
+          "site": "bt_setup_public_id_addr"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_017_SINK_zephyr-CVE-2020-10066_0041",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0041",
+      "root_id": "SR_AUTO_049_SINK_zephyr-CVE-2020-10066_0041_primary",
+      "derive_facts": [
+        {
+          "expr": "out_conn",
+          "kind": "root_expr",
+          "site": "le_adv_start_add_conn"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "param_store_without_explicit_guard",
+          "strength": "weak",
+          "site": "le_adv_start_add_conn"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_018_SINK_zephyr-CVE-2020-10066_0043",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0043",
+      "root_id": "SR_AUTO_050_SINK_zephyr-CVE-2020-10066_0043_primary",
+      "derive_facts": [
+        {
+          "expr": "list",
+          "kind": "root_expr",
+          "site": "sys_slist_find_and_remove"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "param_store_without_explicit_guard",
+          "strength": "weak",
+          "site": "sys_slist_find_and_remove"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_019_SINK_zephyr-CVE-2020-10066_0046",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0046",
+      "root_id": "SR_AUTO_051_SINK_zephyr-CVE-2020-10066_0046_primary",
+      "derive_facts": [
+        {
+          "expr": "pcVar1",
+          "kind": "root_expr",
+          "site": "bt_spi_open"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "dispatch_index_guard",
+          "strength": "absent",
+          "site": "bt_spi_open"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_020_SINK_zephyr-CVE-2020-10066_0048",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0048",
+      "root_id": "SR_AUTO_052_SINK_zephyr-CVE-2020-10066_0048_primary",
+      "derive_facts": [
+        {
+          "expr": "UNRECOVERED_JUMPTABLE",
+          "kind": "root_expr",
+          "site": "uart_stm32_isr"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "dispatch_index_guard",
+          "strength": "absent",
+          "site": "uart_stm32_isr"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_021_SINK_zephyr-CVE-2020-10066_0049",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0049",
+      "root_id": "SR_AUTO_053_SINK_zephyr-CVE-2020-10066_0049_primary",
+      "derive_facts": [
+        {
+          "expr": "UNRECOVERED_JUMPTABLE",
+          "kind": "root_expr",
+          "site": "att_sent"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "dispatch_index_guard",
+          "strength": "absent",
+          "site": "att_sent"
+        }
+      ],
+      "status": "complete"
+    }
+  ],
+  "chains": [
+    {
+      "chain_id": "chain_zephyr-CVE-2020-10066_SINK_zephyr-CVE-2020-10066_0000_aa346d01",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0000",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20003300_200033ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_001_SINK_zephyr-CVE-2020-10066_0000_primary",
+        "SR_AUTO_002_SINK_zephyr-CVE-2020-10066_0000_secondary",
+        "SR_AUTO_003_SINK_zephyr-CVE-2020-10066_0000_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_001_SINK_zephyr-CVE-2020-10066_0000"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: settings_runtime_read_cb"
+    },
+    {
+      "chain_id": "chain_zephyr-CVE-2020-10066_SINK_zephyr-CVE-2020-10066_0002_531986f9",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0002",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20003300_200033ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_004_SINK_zephyr-CVE-2020-10066_0002_primary",
+        "SR_AUTO_005_SINK_zephyr-CVE-2020-10066_0002_secondary",
+        "SR_AUTO_006_SINK_zephyr-CVE-2020-10066_0002_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_002_SINK_zephyr-CVE-2020-10066_0002"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: gatt_notify"
+    },
+    {
+      "chain_id": "chain_zephyr-CVE-2020-10066_SINK_zephyr-CVE-2020-10066_0006_e72ac38e",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0006",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20003300_200033ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_007_SINK_zephyr-CVE-2020-10066_0006_primary",
+        "SR_AUTO_008_SINK_zephyr-CVE-2020-10066_0006_secondary",
+        "SR_AUTO_009_SINK_zephyr-CVE-2020-10066_0006_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_003_SINK_zephyr-CVE-2020-10066_0006"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: gatt_indicate"
+    },
+    {
+      "chain_id": "chain_zephyr-CVE-2020-10066_SINK_zephyr-CVE-2020-10066_0012_f3223a4b",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0012",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20003300_200033ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_010_SINK_zephyr-CVE-2020-10066_0012_primary",
+        "SR_AUTO_011_SINK_zephyr-CVE-2020-10066_0012_secondary",
+        "SR_AUTO_012_SINK_zephyr-CVE-2020-10066_0012_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_004_SINK_zephyr-CVE-2020-10066_0012"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: le_legacy_conn_complete"
+    },
+    {
+      "chain_id": "chain_zephyr-CVE-2020-10066_SINK_zephyr-CVE-2020-10066_0014_72c4f95d",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0014",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20003300_200033ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_013_SINK_zephyr-CVE-2020-10066_0014_primary",
+        "SR_AUTO_014_SINK_zephyr-CVE-2020-10066_0014_secondary",
+        "SR_AUTO_015_SINK_zephyr-CVE-2020-10066_0014_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_005_SINK_zephyr-CVE-2020-10066_0014"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: le_remote_feat_complete"
+    },
+    {
+      "chain_id": "chain_zephyr-CVE-2020-10066_SINK_zephyr-CVE-2020-10066_0015_56fbd15c",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0015",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20003300_200033ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_016_SINK_zephyr-CVE-2020-10066_0015_primary",
+        "SR_AUTO_017_SINK_zephyr-CVE-2020-10066_0015_secondary",
+        "SR_AUTO_018_SINK_zephyr-CVE-2020-10066_0015_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_006_SINK_zephyr-CVE-2020-10066_0015"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: enh_conn_complete"
+    },
+    {
+      "chain_id": "chain_zephyr-CVE-2020-10066_SINK_zephyr-CVE-2020-10066_0016_7881608e",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0016",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20003300_200033ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_019_SINK_zephyr-CVE-2020-10066_0016_primary",
+        "SR_AUTO_020_SINK_zephyr-CVE-2020-10066_0016_secondary",
+        "SR_AUTO_021_SINK_zephyr-CVE-2020-10066_0016_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_007_SINK_zephyr-CVE-2020-10066_0016"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: find_info_cb"
+    },
+    {
+      "chain_id": "chain_zephyr-CVE-2020-10066_SINK_zephyr-CVE-2020-10066_0017_1b3ce183",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0017",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20003300_200033ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_022_SINK_zephyr-CVE-2020-10066_0017_primary",
+        "SR_AUTO_023_SINK_zephyr-CVE-2020-10066_0017_secondary",
+        "SR_AUTO_024_SINK_zephyr-CVE-2020-10066_0017_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_008_SINK_zephyr-CVE-2020-10066_0017"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: cf_read"
+    },
+    {
+      "chain_id": "chain_zephyr-CVE-2020-10066_SINK_zephyr-CVE-2020-10066_0020_090fe154",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0020",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20003300_200033ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_025_SINK_zephyr-CVE-2020-10066_0020_primary",
+        "SR_AUTO_026_SINK_zephyr-CVE-2020-10066_0020_secondary",
+        "SR_AUTO_027_SINK_zephyr-CVE-2020-10066_0020_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_009_SINK_zephyr-CVE-2020-10066_0020"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: bt_uuid_create"
+    },
+    {
+      "chain_id": "chain_zephyr-CVE-2020-10066_SINK_zephyr-CVE-2020-10066_0022_845ea4e7",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0022",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20003300_200033ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_028_SINK_zephyr-CVE-2020-10066_0022_primary",
+        "SR_AUTO_029_SINK_zephyr-CVE-2020-10066_0022_secondary",
+        "SR_AUTO_030_SINK_zephyr-CVE-2020-10066_0022_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_010_SINK_zephyr-CVE-2020-10066_0022"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: bt_gatt_attr_read_chrc"
+    },
+    {
+      "chain_id": "chain_zephyr-CVE-2020-10066_SINK_zephyr-CVE-2020-10066_0023_c6f32159",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0023",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20003300_200033ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_031_SINK_zephyr-CVE-2020-10066_0023_primary",
+        "SR_AUTO_032_SINK_zephyr-CVE-2020-10066_0023_secondary",
+        "SR_AUTO_033_SINK_zephyr-CVE-2020-10066_0023_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_011_SINK_zephyr-CVE-2020-10066_0023"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: bt_gatt_foreach_attr_type"
+    },
+    {
+      "chain_id": "chain_zephyr-CVE-2020-10066_SINK_zephyr-CVE-2020-10066_0024_ae26e818",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0024",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20003300_200033ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_034_SINK_zephyr-CVE-2020-10066_0024_primary",
+        "SR_AUTO_035_SINK_zephyr-CVE-2020-10066_0024_secondary",
+        "SR_AUTO_036_SINK_zephyr-CVE-2020-10066_0024_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_012_SINK_zephyr-CVE-2020-10066_0024"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: k_mem_pool_malloc"
+    },
+    {
+      "chain_id": "chain_zephyr-CVE-2020-10066_SINK_zephyr-CVE-2020-10066_0025_e1198710",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0025",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20003300_200033ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_037_SINK_zephyr-CVE-2020-10066_0025_primary",
+        "SR_AUTO_038_SINK_zephyr-CVE-2020-10066_0025_secondary",
+        "SR_AUTO_039_SINK_zephyr-CVE-2020-10066_0025_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_013_SINK_zephyr-CVE-2020-10066_0025"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: bt_spi_rx_thread"
+    },
+    {
+      "chain_id": "chain_zephyr-CVE-2020-10066_SINK_zephyr-CVE-2020-10066_0026_df9e65d6",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0026",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20003300_200033ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_040_SINK_zephyr-CVE-2020-10066_0026_primary",
+        "SR_AUTO_041_SINK_zephyr-CVE-2020-10066_0026_secondary",
+        "SR_AUTO_042_SINK_zephyr-CVE-2020-10066_0026_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_014_SINK_zephyr-CVE-2020-10066_0026"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: set_random_address"
+    },
+    {
+      "chain_id": "chain_zephyr-CVE-2020-10066_SINK_zephyr-CVE-2020-10066_0027_36bbccc9",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0027",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20003300_200033ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_043_SINK_zephyr-CVE-2020-10066_0027_primary",
+        "SR_AUTO_044_SINK_zephyr-CVE-2020-10066_0027_secondary",
+        "SR_AUTO_045_SINK_zephyr-CVE-2020-10066_0027_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_015_SINK_zephyr-CVE-2020-10066_0027"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: bt_init"
+    },
+    {
+      "chain_id": "chain_zephyr-CVE-2020-10066_SINK_zephyr-CVE-2020-10066_0029_ed7e614f",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0029",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20003300_200033ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_046_SINK_zephyr-CVE-2020-10066_0029_primary",
+        "SR_AUTO_047_SINK_zephyr-CVE-2020-10066_0029_secondary",
+        "SR_AUTO_048_SINK_zephyr-CVE-2020-10066_0029_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_016_SINK_zephyr-CVE-2020-10066_0029"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: bt_setup_public_id_addr"
+    },
+    {
+      "chain_id": "chain_zephyr-CVE-2020-10066_SINK_zephyr-CVE-2020-10066_0041_4b259c97",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0041",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20003300_200033ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_049_SINK_zephyr-CVE-2020-10066_0041_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_017_SINK_zephyr-CVE-2020-10066_0041"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: le_adv_start_add_conn"
+    },
+    {
+      "chain_id": "chain_zephyr-CVE-2020-10066_SINK_zephyr-CVE-2020-10066_0043_c6e78cd3",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0043",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20003300_200033ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_050_SINK_zephyr-CVE-2020-10066_0043_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_018_SINK_zephyr-CVE-2020-10066_0043"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: sys_slist_find_and_remove"
+    },
+    {
+      "chain_id": "chain_zephyr-CVE-2020-10066_SINK_zephyr-CVE-2020-10066_0046_3fdf4f5c",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0046",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20000200_200002ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_002"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_051_SINK_zephyr-CVE-2020-10066_0046_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_019_SINK_zephyr-CVE-2020-10066_0046"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: bt_spi_open"
+    },
+    {
+      "chain_id": "chain_zephyr-CVE-2020-10066_SINK_zephyr-CVE-2020-10066_0048_f77e3be9",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0048",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20003300_200033ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_052_SINK_zephyr-CVE-2020-10066_0048_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_020_SINK_zephyr-CVE-2020-10066_0048"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: uart_stm32_isr"
+    },
+    {
+      "chain_id": "chain_zephyr-CVE-2020-10066_SINK_zephyr-CVE-2020-10066_0049_13bba757",
+      "sink_id": "SINK_zephyr-CVE-2020-10066_0049",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20003300_200033ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_053_SINK_zephyr-CVE-2020-10066_0049_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_021_SINK_zephyr-CVE-2020-10066_0049"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: att_sent"
+    }
+  ],
+  "negative_expectations": [],
+  "todo_items": [],
+  "notes": [
+    "Complements 10064/10065 with a different Zephyr chain shape.",
+    "Auto-promoted to full_gt from current pipeline eval outputs; exhaustive within declared pipeline_scope."
+  ],
+  "chain_gt_scope": "exhaustive",
+  "gt_provenance": {
+    "mode": "auto_promoted_from_eval",
+    "eval_dir": "/tmp/eval_mesobench_missing18_20260308_153906",
+    "scope": "pipeline_scope",
+    "warning": "This full GT is exhaustive within the current SourceAgent pipeline scope and source-backed focus region; manual semantic refinement may still improve subtype fidelity."
+  }
+}

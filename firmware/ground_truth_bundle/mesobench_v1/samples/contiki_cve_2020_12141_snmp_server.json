@@ -1,0 +1,3602 @@
+{
+  "schema_version": "1.0-seed",
+  "sample_id": "contiki_cve_2020_12141_snmp_server",
+  "binary_stem": "snmp-server",
+  "annotation_level": "full_gt",
+  "dataset": "monolithic-firmware-collection",
+  "subset": "D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples",
+  "priority": "high",
+  "role": "primary_chain_driver",
+  "type_family": "type_ii_or_iii_ready",
+  "title": "Contiki-NG SNMP server CVE sample",
+  "binary_artifacts": {
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-2020-12141/snmp-server.elf",
+    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-2020-12141/snmp-server.bin",
+    "formats": [
+      "elf",
+      "bin"
+    ]
+  },
+  "source_code": {
+    "source_repo_id": "contiki-ng",
+    "source_repo_url": "https://github.com/contiki-ng/contiki-ng",
+    "local_checkout": "firmware/source_repos/contiki-ng",
+    "source_code_level": "full_upstream_repo",
+    "source_locator": [
+      "firmware/source_repos/contiki-ng",
+      "inspect SNMP server application and parser paths"
+    ],
+    "repo_notes": "Primary source anchor for Contiki-NG prebuilt CVE samples from D_FUZZWARE."
+  },
+  "analysis_hints": {
+    "chain_depth": "deep",
+    "chain_breadth": "wide",
+    "expected_channel_mode": "optional",
+    "likely_source_labels": [
+      "MMIO_READ",
+      "ISR_MMIO_READ",
+      "DMA_BACKED_BUFFER"
+    ],
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "STORE_SINK",
+      "LOOP_WRITE_SINK"
+    ],
+    "current_support_status": "target_for_artifact_gt"
+  },
+  "sources": [
+    {
+      "source_id": "R_AUTO_001",
+      "label": "DMA_BACKED_BUFFER",
+      "function_name": "set_poll_mode",
+      "address": 1074298880,
+      "address_hex": "0x40088000",
+      "site_kind": "dma_buffer",
+      "context": "DMA",
+      "role": "channel_payload",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain in /tmp/eval_gt_backed_suite_v1_20260308_150048."
+    },
+    {
+      "source_id": "R_AUTO_002",
+      "label": "MMIO_READ",
+      "function_name": "random_rand",
+      "address": 1074622464,
+      "address_hex": "0x400d7000",
+      "site_kind": "mmio_read",
+      "context": "MAIN",
+      "role": "control",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain in /tmp/eval_gt_backed_suite_v1_20260308_150048."
+    },
+    {
+      "source_id": "R_AUTO_003",
+      "label": "MMIO_READ",
+      "function_name": "get_value",
+      "address": 1074300364,
+      "address_hex": "0x400885cc",
+      "site_kind": "mmio_read",
+      "context": "MAIN",
+      "role": "control",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain in /tmp/eval_gt_backed_suite_v1_20260308_150048."
+    },
+    {
+      "source_id": "R_AUTO_004",
+      "label": "MMIO_READ",
+      "function_name": "process_thread_cc2538_rf_process",
+      "address": 1074300488,
+      "address_hex": "0x40088648",
+      "site_kind": "mmio_read",
+      "context": "MAIN",
+      "role": "control",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain in /tmp/eval_gt_backed_suite_v1_20260308_150048."
+    },
+    {
+      "source_id": "R_AUTO_005",
+      "label": "MMIO_READ",
+      "function_name": "rtimer_arch_now",
+      "address": 1074614336,
+      "address_hex": "0x400d5040",
+      "site_kind": "mmio_read",
+      "context": "MAIN",
+      "role": "control",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain in /tmp/eval_gt_backed_suite_v1_20260308_150048."
+    },
+    {
+      "source_id": "R_AUTO_006",
+      "label": "MMIO_READ",
+      "function_name": "select_32_mhz_xosc",
+      "address": 1074601988,
+      "address_hex": "0x400d2004",
+      "site_kind": "mmio_read",
+      "context": "MAIN",
+      "role": "control",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain in /tmp/eval_gt_backed_suite_v1_20260308_150048."
+    }
+  ],
+  "objects": [
+    {
+      "object_id": "obj_sram_20000500_200005ff",
+      "region_kind": "SRAM_CLUSTER",
+      "addr_range": [
+        "0x20000500",
+        "0x200005ff"
+      ],
+      "members": [
+        "snmp_packet",
+        "snmp_packet.out",
+        "response_buffer"
+      ],
+      "producer_contexts": [
+        "MAIN"
+      ],
+      "consumer_contexts": [
+        "TASK"
+      ],
+      "writer_sites": [
+        "snmp_engine",
+        "snmp_message_encode"
+      ],
+      "reader_sites": [
+        "buffer_str"
+      ],
+      "evidence_refs": [],
+      "confidence": 0.9,
+      "notes": "Targeted object for the response-buffer copy path observed in buffer_str."
+    },
+    {
+      "object_id": "obj_sram_20000e00_20000eff",
+      "region_kind": "DMA_BUFFER",
+      "addr_range": [
+        "0x20000e00",
+        "0x20000eff"
+      ],
+      "members": [
+        "bufmem_memb_mem",
+        "button_event_handler",
+        "et",
+        "handlers_list",
+        "nbr_table_keys_list",
+        "neighbor_addr_mem_memb_mem",
+        "ptr"
+      ],
+      "producer_contexts": [
+        "UNKNOWN",
+        "DMA"
+      ],
+      "consumer_contexts": [
+        "MAIN",
+        "TASK"
+      ],
+      "writer_sites": [
+        "clock_init",
+        "gpio_hal_arch_no_port_pin_cfg_set",
+        "platform_idle",
+        "rtimer_arch_schedule",
+        "set_poll_mode",
+        "sys_ctrl_init"
+      ],
+      "reader_sites": [
+        "add_timer",
+        "clock_isr",
+        "ctimer_expired",
+        "ctimer_set",
+        "ctimer_set_with_process",
+        "ctimer_stop",
+        "debounce_handler",
+        "etimer_expired",
+        "etimer_pending",
+        "etimer_reset",
+        "etimer_set",
+        "etimer_stop",
+        "exit_process",
+        "ext_hdr_options_process",
+        "gpio_hal_event_handler",
+        "gpio_hal_register_handler",
+        "index_from_lladdr",
+        "max_payload",
+        "memb_free",
+        "na_input",
+        "nbr_table_add_lladdr",
+        "nbr_table_get_from_lladdr",
+        "nbr_table_head",
+        "nbr_table_next",
+        "nbr_table_remove",
+        "netstack_init",
+        "ns_input",
+        "packetbuf_dataptr",
+        "process_thread_cc2538_rf_process",
+        "process_thread_ctimer_process",
+        "process_thread_etimer_process",
+        "process_thread_serial_line_process",
+        "process_thread_snmp_process",
+        "process_thread_stack_check_process",
+        "process_thread_tcpip_process",
+        "ringbuf_get",
+        "ringbuf_init",
+        "rm_routelist_callback",
+        "rs_input",
+        "send_packet",
+        "snmp_api_set_oid",
+        "snmp_engine",
+        "tcpip_ipv6_output",
+        "tcpip_output",
+        "uip_ds6_defrt_periodic",
+        "uip_ds6_nbr_get_ll",
+        "uip_ds6_nbr_ipaddr_from_lladdr",
+        "uip_ds6_nbr_ll_lookup",
+        "uip_ds6_neighbor_periodic",
+        "uip_ds6_periodic",
+        "uip_ds6_route_nexthop",
+        "uip_ds6_select_src",
+        "uip_nd6_ra_output",
+        "uip_process",
+        "uipbuf_get_last_header",
+        "update_ticks",
+        "update_time",
+        "upper_layer_chksum"
+      ],
+      "evidence_refs": [
+        "E1",
+        "E2"
+      ],
+      "confidence": 1.0,
+      "notes": "Auto-promoted from channel_graph object node."
+    },
+    {
+      "object_id": "obj_sram_20000b00_20000bff",
+      "region_kind": "SRAM_CLUSTER",
+      "addr_range": [
+        "0x20000b00",
+        "0x20000bff"
+      ],
+      "members": [
+        "nd6_opt_llao",
+        "packet_len.7064",
+        "snmp_mib_list",
+        "snmp_udp_conn",
+        "varbind_length",
+        "varbind_length.7147",
+        "varbinds"
+      ],
+      "producer_contexts": [
+        "MAIN"
+      ],
+      "consumer_contexts": [
+        "MAIN",
+        "TASK"
+      ],
+      "writer_sites": [
+        "snmp_engine_get_bulk"
+      ],
+      "reader_sites": [
+        "extract_lladdr_from_llao_aligned",
+        "na_input",
+        "ns_input",
+        "process_thread_snmp_process",
+        "rs_input",
+        "snmp_api_add_resource",
+        "snmp_engine",
+        "snmp_engine_get",
+        "snmp_engine_get_bulk",
+        "snmp_engine_get_next",
+        "snmp_message_decode",
+        "snmp_message_encode",
+        "snmp_mib_add",
+        "snmp_mib_find",
+        "snmp_mib_find_next"
+      ],
+      "evidence_refs": [],
+      "confidence": 0.95,
+      "notes": "Auto-promoted from channel_graph object node."
+    },
+    {
+      "object_id": "obj_sram_20004200_200042ff",
+      "region_kind": "SRAM_CLUSTER",
+      "addr_range": [
+        "0x20004200",
+        "0x200042ff"
+      ],
+      "members": [
+        "bufmem_memb_used",
+        "buframmem_memb_used",
+        "locked_map",
+        "neighbor_addr_mem_memb_used",
+        "packet",
+        "used_map"
+      ],
+      "producer_contexts": [
+        "MAIN"
+      ],
+      "consumer_contexts": [
+        "MAIN",
+        "TASK"
+      ],
+      "writer_sites": [
+        "nbr_table_add_lladdr"
+      ],
+      "reader_sites": [
+        "nbr_get_bit",
+        "nbr_table_add_lladdr",
+        "nbr_table_remove",
+        "packetbuf_attr_clear",
+        "packetbuf_copyfrom",
+        "packetbuf_dataptr",
+        "process_thread_cc2538_rf_process",
+        "process_thread_snmp_process",
+        "send_packet"
+      ],
+      "evidence_refs": [],
+      "confidence": 0.95,
+      "notes": "Auto-promoted from channel_graph object node."
+    }
+  ],
+  "channels": [
+    {
+      "channel_id": "CH_snmp_buffer_task_handoff",
+      "src_context": "MAIN",
+      "object_id": "obj_sram_20000500_200005ff",
+      "dst_context": "TASK",
+      "edge_kind": "DATA",
+      "constraints": [],
+      "evidence_refs": [],
+      "score": 0.8,
+      "notes": "Current pipeline models this path as MAIN->TASK handoff; source-side radio ingress remains TODO."
+    },
+    {
+      "channel_id": "CH_AUTO_001",
+      "src_context": "MAIN",
+      "object_id": "obj_sram_20000500_200005ff",
+      "dst_context": "TASK",
+      "edge_kind": "DATA",
+      "constraints": [],
+      "evidence_refs": [],
+      "score": 0.95,
+      "notes": "Auto-promoted from non-drop chain channel step."
+    },
+    {
+      "channel_id": "CH_AUTO_002",
+      "src_context": "DMA",
+      "object_id": "obj_sram_20000e00_20000eff",
+      "dst_context": "MAIN",
+      "edge_kind": "DATA",
+      "constraints": [],
+      "evidence_refs": [
+        "E1",
+        "E2"
+      ],
+      "score": 1.0,
+      "notes": "Auto-promoted from non-drop chain channel step."
+    },
+    {
+      "channel_id": "CH_AUTO_003",
+      "src_context": "MAIN",
+      "object_id": "obj_sram_20000b00_20000bff",
+      "dst_context": "TASK",
+      "edge_kind": "DATA",
+      "constraints": [],
+      "evidence_refs": [],
+      "score": 0.95,
+      "notes": "Auto-promoted from non-drop chain channel step."
+    },
+    {
+      "channel_id": "CH_AUTO_004",
+      "src_context": "MAIN",
+      "object_id": "obj_sram_20004200_200042ff",
+      "dst_context": "TASK",
+      "edge_kind": "DATA",
+      "constraints": [],
+      "evidence_refs": [],
+      "score": 0.95,
+      "notes": "Auto-promoted from non-drop chain channel step."
+    }
+  ],
+  "sinks": [
+    {
+      "sink_id": "S_snmp_buffer_str_copy",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "buffer_str",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Contiki snprintf/sprintf backend copy helper."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0000",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "buffer_str",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0001",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "packetbuf_copyfrom",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0002",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "uip_udp_packet_send",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0003",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "uip_icmp6_error_output",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0004",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "ext_header_remove",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SAFE_OR_LOW_RISK."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0005",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "uip_remove_ext_hdr",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SAFE_OR_LOW_RISK."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0006",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "uiplib_ipaddr_snprint",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SAFE_OR_LOW_RISK."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0007",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "extract_lladdr_from_llao_aligned",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SAFE_OR_LOW_RISK."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0008",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "create_llao",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SAFE_OR_LOW_RISK."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0009",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "ns_input",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SAFE_OR_LOW_RISK."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0012",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "uip_ds6_nbr_update_ll",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SAFE_OR_LOW_RISK."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0013",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "uip_ds6_set_addr_iid",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SAFE_OR_LOW_RISK."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0014",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "uipbuf_clear_attr",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SAFE_OR_LOW_RISK."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0015",
+      "label": "MEMSET_SINK",
+      "pipeline_label_hint": "MEMSET_SINK",
+      "function_name": "nbr_table_add_lladdr",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0016",
+      "label": "MEMSET_SINK",
+      "pipeline_label_hint": "MEMSET_SINK",
+      "function_name": "memb_init",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0017",
+      "label": "LOOP_WRITE_SINK",
+      "pipeline_label_hint": "LOOP_WRITE_SINK",
+      "function_name": "process_thread_sensors_process",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0018",
+      "label": "LOOP_WRITE_SINK",
+      "pipeline_label_hint": "LOOP_WRITE_SINK",
+      "function_name": "echo_request_input",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0020",
+      "label": "LOOP_WRITE_SINK",
+      "pipeline_label_hint": "LOOP_WRITE_SINK",
+      "function_name": "nbr_table_add_lladdr",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0021",
+      "label": "LOOP_WRITE_SINK",
+      "pipeline_label_hint": "LOOP_WRITE_SINK",
+      "function_name": "uip_nd6_ns_output",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0022",
+      "label": "LOOP_WRITE_SINK",
+      "pipeline_label_hint": "LOOP_WRITE_SINK",
+      "function_name": "uip_nd6_ra_output",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SAFE_OR_LOW_RISK."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0023",
+      "label": "LOOP_WRITE_SINK",
+      "pipeline_label_hint": "LOOP_WRITE_SINK",
+      "function_name": "get_value",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0024",
+      "label": "LOOP_WRITE_SINK",
+      "pipeline_label_hint": "LOOP_WRITE_SINK",
+      "function_name": "snmp_api_replace_oid",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=CONFIRMED."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0026",
+      "label": "LOOP_WRITE_SINK",
+      "pipeline_label_hint": "LOOP_WRITE_SINK",
+      "function_name": "memb_alloc",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0027",
+      "label": "LOOP_WRITE_SINK",
+      "pipeline_label_hint": "LOOP_WRITE_SINK",
+      "function_name": "memb_free",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0028",
+      "label": "STORE_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "process_thread_cc2538_rf_process",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0029",
+      "label": "STORE_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "get_object",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0030",
+      "label": "STORE_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "process_thread_tcpip_process",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0031",
+      "label": "STORE_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "create_llao",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0033",
+      "label": "STORE_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "add_timer",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0034",
+      "label": "STORE_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "process_thread_ctimer_process",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0035",
+      "label": "STORE_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "exit_process",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0036",
+      "label": "STORE_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "process_thread_stack_check_process",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0037",
+      "label": "STORE_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "process_thread_button_hal_process",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0038",
+      "label": "FORMAT_STRING_SINK",
+      "pipeline_label_hint": "FORMAT_STRING_SINK",
+      "function_name": "process_thread_stack_check_process",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0039",
+      "label": "FORMAT_STRING_SINK",
+      "pipeline_label_hint": "FORMAT_STRING_SINK",
+      "function_name": "snmp_engine",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0040",
+      "label": "FORMAT_STRING_SINK",
+      "pipeline_label_hint": "FORMAT_STRING_SINK",
+      "function_name": "uiplib_ipaddr_snprint",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SAFE_OR_LOW_RISK."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0041",
+      "label": "FUNC_PTR_SINK",
+      "pipeline_label_hint": "FUNC_PTR_SINK",
+      "function_name": "uart_isr",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0042",
+      "label": "FUNC_PTR_SINK",
+      "pipeline_label_hint": "FUNC_PTR_SINK",
+      "function_name": "platform_idle",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SAFE_OR_LOW_RISK."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0043",
+      "label": "FUNC_PTR_SINK",
+      "pipeline_label_hint": "FUNC_PTR_SINK",
+      "function_name": "nbr_table_add_lladdr",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SAFE_OR_LOW_RISK."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0044",
+      "label": "FUNC_PTR_SINK",
+      "pipeline_label_hint": "FUNC_PTR_SINK",
+      "function_name": "lpm_enter",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SAFE_OR_LOW_RISK."
+    },
+    {
+      "sink_id": "SINK_snmp-server_0045",
+      "label": "FUNC_PTR_SINK",
+      "pipeline_label_hint": "FUNC_PTR_SINK",
+      "function_name": "netstack_process_ip_callback",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    }
+  ],
+  "sink_roots": [
+    {
+      "root_id": "R_snmp_buffer_str_len",
+      "sink_id": "S_snmp_buffer_str_copy",
+      "root_role": "len",
+      "expr": "len",
+      "status": "complete",
+      "notes": "Primary copy-length root recovered from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_001_SINK_snmp-server_0000_primary",
+      "sink_id": "SINK_snmp-server_0000",
+      "root_role": "primary",
+      "expr": "len",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_002_SINK_snmp-server_0000_secondary",
+      "sink_id": "SINK_snmp-server_0000",
+      "root_role": "secondary",
+      "expr": "*(void **)user_data",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_003_SINK_snmp-server_0000_secondary",
+      "sink_id": "SINK_snmp-server_0000",
+      "root_role": "secondary",
+      "expr": "data",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_004_SINK_snmp-server_0001_primary",
+      "sink_id": "SINK_snmp-server_0001",
+      "root_role": "primary",
+      "expr": "__n",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_005_SINK_snmp-server_0001_secondary",
+      "sink_id": "SINK_snmp-server_0001",
+      "root_role": "secondary",
+      "expr": "packetbuf_aligned",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_006_SINK_snmp-server_0001_secondary",
+      "sink_id": "SINK_snmp-server_0001",
+      "root_role": "secondary",
+      "expr": "from",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_007_SINK_snmp-server_0002_primary",
+      "sink_id": "SINK_snmp-server_0002",
+      "root_role": "primary",
+      "expr": "len",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_008_SINK_snmp-server_0002_secondary",
+      "sink_id": "SINK_snmp-server_0002",
+      "root_role": "secondary",
+      "expr": "uip_aligned_buf.u32 + 0xc",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_009_SINK_snmp-server_0002_secondary",
+      "sink_id": "SINK_snmp-server_0002",
+      "root_role": "secondary",
+      "expr": "data",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_010_SINK_snmp-server_0003_primary",
+      "sink_id": "SINK_snmp-server_0003",
+      "root_role": "primary",
+      "expr": "uVar5 - 0x30",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_011_SINK_snmp-server_0003_secondary",
+      "sink_id": "SINK_snmp-server_0003",
+      "root_role": "secondary",
+      "expr": "uip_aligned_buf.u32 + 0xc",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_012_SINK_snmp-server_0003_secondary",
+      "sink_id": "SINK_snmp-server_0003",
+      "root_role": "secondary",
+      "expr": "&uip_aligned_buf",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_013_SINK_snmp-server_0004_primary",
+      "sink_id": "SINK_snmp-server_0004",
+      "root_role": "primary",
+      "expr": "(uip_len - 0x28) - uVar2",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_014_SINK_snmp-server_0004_secondary",
+      "sink_id": "SINK_snmp-server_0004",
+      "root_role": "secondary",
+      "expr": "uip_aligned_buf.u32 + 10",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_015_SINK_snmp-server_0004_secondary",
+      "sink_id": "SINK_snmp-server_0004",
+      "root_role": "secondary",
+      "expr": "(void *)((int)&uip_aligned_buf + uVar2 + 0x28)",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_016_SINK_snmp-server_0005_primary",
+      "sink_id": "SINK_snmp-server_0005",
+      "root_role": "primary",
+      "expr": "(uip_len - 0x28) - uVar2",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_017_SINK_snmp-server_0005_secondary",
+      "sink_id": "SINK_snmp-server_0005",
+      "root_role": "secondary",
+      "expr": "uip_aligned_buf.u32 + 10",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_018_SINK_snmp-server_0005_secondary",
+      "sink_id": "SINK_snmp-server_0005",
+      "root_role": "secondary",
+      "expr": "(void *)((int)&uip_aligned_buf + uVar2 + 0x28)",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_019_SINK_snmp-server_0006_primary",
+      "sink_id": "SINK_snmp-server_0006",
+      "root_role": "primary",
+      "expr": "\"(NULL IP addr)\"",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_020_SINK_snmp-server_0006_secondary",
+      "sink_id": "SINK_snmp-server_0006",
+      "root_role": "secondary",
+      "expr": "buf",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_021_SINK_snmp-server_0006_secondary",
+      "sink_id": "SINK_snmp-server_0006",
+      "root_role": "secondary",
+      "expr": "size",
+      "root_kind": "src_data",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_022_SINK_snmp-server_0007_primary",
+      "sink_id": "SINK_snmp-server_0007",
+      "root_role": "primary",
+      "expr": "8",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_023_SINK_snmp-server_0007_secondary",
+      "sink_id": "SINK_snmp-server_0007",
+      "root_role": "secondary",
+      "expr": "dest",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_024_SINK_snmp-server_0007_secondary",
+      "sink_id": "SINK_snmp-server_0007",
+      "root_role": "secondary",
+      "expr": "nd6_opt_llao + 2",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_025_SINK_snmp-server_0008_primary",
+      "sink_id": "SINK_snmp-server_0008",
+      "root_role": "primary",
+      "expr": "8",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_026_SINK_snmp-server_0008_secondary",
+      "sink_id": "SINK_snmp-server_0008",
+      "root_role": "secondary",
+      "expr": "llao + 2",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_027_SINK_snmp-server_0008_secondary",
+      "sink_id": "SINK_snmp-server_0008",
+      "root_role": "secondary",
+      "expr": "&uip_lladdr",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_028_SINK_snmp-server_0009_primary",
+      "sink_id": "SINK_snmp-server_0009",
+      "root_role": "primary",
+      "expr": "0x10",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_029_SINK_snmp-server_0009_secondary",
+      "sink_id": "SINK_snmp-server_0009",
+      "root_role": "secondary",
+      "expr": "(void *)((int)&uip_aligned_buf + uVar3 + 0x30)",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_030_SINK_snmp-server_0009_secondary",
+      "sink_id": "SINK_snmp-server_0009",
+      "root_role": "secondary",
+      "expr": "&puVar2->ipaddr",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_031_SINK_snmp-server_0012_primary",
+      "sink_id": "SINK_snmp-server_0012",
+      "root_role": "primary",
+      "expr": "0x28",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_032_SINK_snmp-server_0012_secondary",
+      "sink_id": "SINK_snmp-server_0012",
+      "root_role": "secondary",
+      "expr": "&nbr_backup",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_033_SINK_snmp-server_0012_secondary",
+      "sink_id": "SINK_snmp-server_0012",
+      "root_role": "secondary",
+      "expr": "*nbr_pp",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_034_SINK_snmp-server_0013_primary",
+      "sink_id": "SINK_snmp-server_0013",
+      "root_role": "primary",
+      "expr": "8",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_035_SINK_snmp-server_0013_secondary",
+      "sink_id": "SINK_snmp-server_0013",
+      "root_role": "secondary",
+      "expr": "ipaddr->u8 + 8",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_036_SINK_snmp-server_0013_secondary",
+      "sink_id": "SINK_snmp-server_0013",
+      "root_role": "secondary",
+      "expr": "lladdr",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_037_SINK_snmp-server_0014_primary",
+      "sink_id": "SINK_snmp-server_0014",
+      "root_role": "primary",
+      "expr": "0xc",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_038_SINK_snmp-server_0014_secondary",
+      "sink_id": "SINK_snmp-server_0014",
+      "root_role": "secondary",
+      "expr": "uipbuf_attrs",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_039_SINK_snmp-server_0014_secondary",
+      "sink_id": "SINK_snmp-server_0014",
+      "root_role": "secondary",
+      "expr": "uipbuf_default_attrs",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_040_SINK_snmp-server_0015_primary",
+      "sink_id": "SINK_snmp-server_0015",
+      "root_role": "primary",
+      "expr": "table->item_size",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_041_SINK_snmp-server_0015_secondary",
+      "sink_id": "SINK_snmp-server_0015",
+      "root_role": "secondary",
+      "expr": "__s",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_042_SINK_snmp-server_0016_primary",
+      "sink_id": "SINK_snmp-server_0016",
+      "root_role": "primary",
+      "expr": "(uint)m->num",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_043_SINK_snmp-server_0016_secondary",
+      "sink_id": "SINK_snmp-server_0016",
+      "root_role": "secondary",
+      "expr": "m->used",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_044_SINK_snmp-server_0017_primary",
+      "sink_id": "SINK_snmp-server_0017",
+      "root_role": "primary",
+      "expr": "process_thread_sensors_process::i",
+      "root_kind": "index_or_bound",
+      "root_source": "miner_facts",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_045_SINK_snmp-server_0017_secondary",
+      "sink_id": "SINK_snmp-server_0017",
+      "root_role": "secondary",
+      "expr": "sensors_flags[process_thread_sensors_process::i]",
+      "root_kind": "dst_ptr",
+      "root_source": "miner_facts",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_046_SINK_snmp-server_0018_primary",
+      "sink_id": "SINK_snmp-server_0018",
+      "root_role": "primary",
+      "expr": "puVar6",
+      "root_kind": "index_or_bound",
+      "root_source": "miner_facts",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_047_SINK_snmp-server_0018_secondary",
+      "sink_id": "SINK_snmp-server_0018",
+      "root_role": "secondary",
+      "expr": "*puVar6 (post-incr)",
+      "root_kind": "dst_ptr",
+      "root_source": "miner_facts",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_048_SINK_snmp-server_0020_primary",
+      "sink_id": "SINK_snmp-server_0020",
+      "root_role": "primary",
+      "expr": "(nbr_table_key_t *",
+      "root_kind": "index_or_bound",
+      "root_source": "miner_facts",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_049_SINK_snmp-server_0020_secondary",
+      "sink_id": "SINK_snmp-server_0020",
+      "root_role": "secondary",
+      "expr": "used_map[iVar1]",
+      "root_kind": "dst_ptr",
+      "root_source": "miner_facts",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_050_SINK_snmp-server_0021_primary",
+      "sink_id": "SINK_snmp-server_0021",
+      "root_role": "primary",
+      "expr": "puVar7",
+      "root_kind": "index_or_bound",
+      "root_source": "miner_facts",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_051_SINK_snmp-server_0021_secondary",
+      "sink_id": "SINK_snmp-server_0021",
+      "root_role": "secondary",
+      "expr": "*puVar7 (post-incr)",
+      "root_kind": "dst_ptr",
+      "root_source": "miner_facts",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_052_SINK_snmp-server_0022_primary",
+      "sink_id": "SINK_snmp-server_0022",
+      "root_role": "primary",
+      "expr": "puVar13",
+      "root_kind": "index_or_bound",
+      "root_source": "miner_facts",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_053_SINK_snmp-server_0022_secondary",
+      "sink_id": "SINK_snmp-server_0022",
+      "root_role": "secondary",
+      "expr": "*puVar13 (post-incr)",
+      "root_kind": "dst_ptr",
+      "root_source": "miner_facts",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_054_SINK_snmp-server_0023_secondary",
+      "sink_id": "SINK_snmp-server_0023",
+      "root_role": "secondary",
+      "expr": "value[i]",
+      "root_kind": "dst_ptr",
+      "root_source": "miner_facts",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_055_SINK_snmp-server_0024_primary",
+      "sink_id": "SINK_snmp-server_0024",
+      "root_role": "primary",
+      "expr": "bVar1",
+      "root_kind": "index_or_bound",
+      "root_source": "miner_facts",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_056_SINK_snmp-server_0024_secondary",
+      "sink_id": "SINK_snmp-server_0024",
+      "root_role": "secondary",
+      "expr": "oid[bVar1]",
+      "root_kind": "dst_ptr",
+      "root_source": "miner_facts",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_057_SINK_snmp-server_0026_primary",
+      "sink_id": "SINK_snmp-server_0026",
+      "root_role": "primary",
+      "expr": "iVar1",
+      "root_kind": "index_or_bound",
+      "root_source": "miner_facts",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_058_SINK_snmp-server_0026_secondary",
+      "sink_id": "SINK_snmp-server_0026",
+      "root_role": "secondary",
+      "expr": "used[iVar1]",
+      "root_kind": "dst_ptr",
+      "root_source": "miner_facts",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_059_SINK_snmp-server_0027_primary",
+      "sink_id": "SINK_snmp-server_0027",
+      "root_role": "primary",
+      "expr": "iVar2",
+      "root_kind": "index_or_bound",
+      "root_source": "miner_facts",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_060_SINK_snmp-server_0027_secondary",
+      "sink_id": "SINK_snmp-server_0027",
+      "root_role": "secondary",
+      "expr": "used[iVar2]",
+      "root_kind": "dst_ptr",
+      "root_source": "miner_facts",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_061_SINK_snmp-server_0028_primary",
+      "sink_id": "SINK_snmp-server_0028",
+      "root_role": "primary",
+      "expr": "process_pt",
+      "root_kind": "dst_ptr",
+      "root_source": "param_name",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_062_SINK_snmp-server_0029_primary",
+      "sink_id": "SINK_snmp-server_0029",
+      "root_role": "primary",
+      "expr": "dest",
+      "root_kind": "dst_ptr",
+      "root_source": "param_name",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_063_SINK_snmp-server_0030_primary",
+      "sink_id": "SINK_snmp-server_0030",
+      "root_role": "primary",
+      "expr": "process_pt",
+      "root_kind": "dst_ptr",
+      "root_source": "param_name",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_064_SINK_snmp-server_0031_primary",
+      "sink_id": "SINK_snmp-server_0031",
+      "root_role": "primary",
+      "expr": "llao",
+      "root_kind": "dst_ptr",
+      "root_source": "param_name",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_065_SINK_snmp-server_0033_primary",
+      "sink_id": "SINK_snmp-server_0033",
+      "root_role": "primary",
+      "expr": "timer",
+      "root_kind": "dst_ptr",
+      "root_source": "param_name",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_066_SINK_snmp-server_0034_primary",
+      "sink_id": "SINK_snmp-server_0034",
+      "root_role": "primary",
+      "expr": "process_pt",
+      "root_kind": "dst_ptr",
+      "root_source": "param_name",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_067_SINK_snmp-server_0035_primary",
+      "sink_id": "SINK_snmp-server_0035",
+      "root_role": "primary",
+      "expr": "p",
+      "root_kind": "dst_ptr",
+      "root_source": "param_name",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_068_SINK_snmp-server_0036_primary",
+      "sink_id": "SINK_snmp-server_0036",
+      "root_role": "primary",
+      "expr": "process_pt",
+      "root_kind": "dst_ptr",
+      "root_source": "param_name",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_069_SINK_snmp-server_0037_primary",
+      "sink_id": "SINK_snmp-server_0037",
+      "root_role": "primary",
+      "expr": "process_pt",
+      "root_kind": "dst_ptr",
+      "root_source": "param_name",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_070_SINK_snmp-server_0038_primary",
+      "sink_id": "SINK_snmp-server_0038",
+      "root_role": "primary",
+      "expr": "fmt",
+      "root_kind": "format_arg",
+      "root_source": "decompile_fallback",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_071_SINK_snmp-server_0039_primary",
+      "sink_id": "SINK_snmp-server_0039",
+      "root_role": "primary",
+      "expr": "fmt",
+      "root_kind": "format_arg",
+      "root_source": "decompile_fallback",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_072_SINK_snmp-server_0040_primary",
+      "sink_id": "SINK_snmp-server_0040",
+      "root_role": "primary",
+      "expr": "size",
+      "root_kind": "format_arg",
+      "root_source": "decompile_fallback",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_073_SINK_snmp-server_0041_primary",
+      "sink_id": "SINK_snmp-server_0041",
+      "root_role": "primary",
+      "expr": "uart",
+      "root_kind": "dispatch",
+      "root_source": "matched_text",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_074_SINK_snmp-server_0042_primary",
+      "sink_id": "SINK_snmp-server_0042",
+      "root_role": "primary",
+      "expr": "iVar4",
+      "root_kind": "dispatch",
+      "root_source": "matched_text",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_075_SINK_snmp-server_0043_primary",
+      "sink_id": "SINK_snmp-server_0043",
+      "root_role": "primary",
+      "expr": "pnVar5",
+      "root_kind": "dispatch",
+      "root_source": "matched_text",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_076_SINK_snmp-server_0044_primary",
+      "sink_id": "SINK_snmp-server_0044",
+      "root_role": "primary",
+      "expr": "iVar4",
+      "root_kind": "dispatch",
+      "root_source": "matched_text",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_077_SINK_snmp-server_0045_primary",
+      "sink_id": "SINK_snmp-server_0045",
+      "root_role": "primary",
+      "expr": "(code **",
+      "root_kind": "dispatch",
+      "root_source": "matched_text",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    }
+  ],
+  "derive_checks": [
+    {
+      "derive_check_id": "D_snmp_buffer_str_len",
+      "sink_id": "S_snmp_buffer_str_copy",
+      "root_id": "R_snmp_buffer_str_len",
+      "derive_facts": [
+        {
+          "expr": "len",
+          "kind": "root_expr",
+          "site": "buffer_str"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "absent",
+          "site": "buffer_str"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_001_SINK_snmp-server_0000",
+      "sink_id": "SINK_snmp-server_0000",
+      "root_id": "SR_AUTO_001_SINK_snmp-server_0000_primary",
+      "derive_facts": [
+        {
+          "expr": "len",
+          "kind": "root_expr",
+          "site": "buffer_str"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "absent",
+          "site": "buffer_str"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_002_SINK_snmp-server_0001",
+      "sink_id": "SINK_snmp-server_0001",
+      "root_id": "SR_AUTO_006_SINK_snmp-server_0001_secondary",
+      "derive_facts": [
+        {
+          "expr": "from",
+          "kind": "root_expr",
+          "site": "packetbuf_copyfrom"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "absent",
+          "site": "packetbuf_copyfrom"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_003_SINK_snmp-server_0002",
+      "sink_id": "SINK_snmp-server_0002",
+      "root_id": "SR_AUTO_008_SINK_snmp-server_0002_secondary",
+      "derive_facts": [
+        {
+          "expr": "uip_aligned_buf.u32 + 0xc",
+          "kind": "root_expr",
+          "site": "uip_udp_packet_send"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "absent",
+          "site": "uip_udp_packet_send"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_004_SINK_snmp-server_0003",
+      "sink_id": "SINK_snmp-server_0003",
+      "root_id": "SR_AUTO_011_SINK_snmp-server_0003_secondary",
+      "derive_facts": [
+        {
+          "expr": "uip_aligned_buf.u32 + 0xc",
+          "kind": "root_expr",
+          "site": "uip_icmp6_error_output"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "absent",
+          "site": "uip_icmp6_error_output"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_005_SINK_snmp-server_0003",
+      "sink_id": "SINK_snmp-server_0003",
+      "root_id": "SR_AUTO_012_SINK_snmp-server_0003_secondary",
+      "derive_facts": [
+        {
+          "expr": "&uip_aligned_buf",
+          "kind": "root_expr",
+          "site": "uip_icmp6_error_output"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "absent",
+          "site": "uip_icmp6_error_output"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_006_SINK_snmp-server_0004",
+      "sink_id": "SINK_snmp-server_0004",
+      "root_id": "SR_AUTO_015_SINK_snmp-server_0004_secondary",
+      "derive_facts": [
+        {
+          "expr": "(void *)((int)&uip_aligned_buf + uVar2 + 0x28)",
+          "kind": "root_expr",
+          "site": "ext_header_remove"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "effective",
+          "site": "ext_header_remove"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_007_SINK_snmp-server_0004",
+      "sink_id": "SINK_snmp-server_0004",
+      "root_id": "SR_AUTO_014_SINK_snmp-server_0004_secondary",
+      "derive_facts": [
+        {
+          "expr": "uip_aligned_buf.u32 + 10",
+          "kind": "root_expr",
+          "site": "ext_header_remove"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "effective",
+          "site": "ext_header_remove"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_008_SINK_snmp-server_0005",
+      "sink_id": "SINK_snmp-server_0005",
+      "root_id": "SR_AUTO_017_SINK_snmp-server_0005_secondary",
+      "derive_facts": [
+        {
+          "expr": "uip_aligned_buf.u32 + 10",
+          "kind": "root_expr",
+          "site": "uip_remove_ext_hdr"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "effective",
+          "site": "uip_remove_ext_hdr"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_009_SINK_snmp-server_0005",
+      "sink_id": "SINK_snmp-server_0005",
+      "root_id": "SR_AUTO_018_SINK_snmp-server_0005_secondary",
+      "derive_facts": [
+        {
+          "expr": "(void *)((int)&uip_aligned_buf + uVar2 + 0x28)",
+          "kind": "root_expr",
+          "site": "uip_remove_ext_hdr"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "effective",
+          "site": "uip_remove_ext_hdr"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_010_SINK_snmp-server_0006",
+      "sink_id": "SINK_snmp-server_0006",
+      "root_id": "SR_AUTO_020_SINK_snmp-server_0006_secondary",
+      "derive_facts": [
+        {
+          "expr": "buf",
+          "kind": "root_expr",
+          "site": "uiplib_ipaddr_snprint"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "effective",
+          "site": "uiplib_ipaddr_snprint"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_011_SINK_snmp-server_0007",
+      "sink_id": "SINK_snmp-server_0007",
+      "root_id": "SR_AUTO_022_SINK_snmp-server_0007_primary",
+      "derive_facts": [
+        {
+          "expr": "8",
+          "kind": "root_expr",
+          "site": "extract_lladdr_from_llao_aligned"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "len_is_constant",
+          "strength": "effective",
+          "site": "extract_lladdr_from_llao_aligned"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_012_SINK_snmp-server_0008",
+      "sink_id": "SINK_snmp-server_0008",
+      "root_id": "SR_AUTO_025_SINK_snmp-server_0008_primary",
+      "derive_facts": [
+        {
+          "expr": "8",
+          "kind": "root_expr",
+          "site": "create_llao"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "len_is_constant",
+          "strength": "effective",
+          "site": "create_llao"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_013_SINK_snmp-server_0009",
+      "sink_id": "SINK_snmp-server_0009",
+      "root_id": "SR_AUTO_030_SINK_snmp-server_0009_secondary",
+      "derive_facts": [
+        {
+          "expr": "&puVar2->ipaddr",
+          "kind": "root_expr",
+          "site": "ns_input"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "len_is_constant",
+          "strength": "effective",
+          "site": "ns_input"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_014_SINK_snmp-server_0009",
+      "sink_id": "SINK_snmp-server_0009",
+      "root_id": "SR_AUTO_029_SINK_snmp-server_0009_secondary",
+      "derive_facts": [
+        {
+          "expr": "(void *)((int)&uip_aligned_buf + uVar3 + 0x30)",
+          "kind": "root_expr",
+          "site": "ns_input"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "len_is_constant",
+          "strength": "effective",
+          "site": "ns_input"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_015_SINK_snmp-server_0012",
+      "sink_id": "SINK_snmp-server_0012",
+      "root_id": "SR_AUTO_031_SINK_snmp-server_0012_primary",
+      "derive_facts": [
+        {
+          "expr": "0x28",
+          "kind": "root_expr",
+          "site": "uip_ds6_nbr_update_ll"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "len_is_constant",
+          "strength": "effective",
+          "site": "uip_ds6_nbr_update_ll"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_016_SINK_snmp-server_0013",
+      "sink_id": "SINK_snmp-server_0013",
+      "root_id": "SR_AUTO_034_SINK_snmp-server_0013_primary",
+      "derive_facts": [
+        {
+          "expr": "8",
+          "kind": "root_expr",
+          "site": "uip_ds6_set_addr_iid"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "len_is_constant",
+          "strength": "effective",
+          "site": "uip_ds6_set_addr_iid"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_017_SINK_snmp-server_0014",
+      "sink_id": "SINK_snmp-server_0014",
+      "root_id": "SR_AUTO_037_SINK_snmp-server_0014_primary",
+      "derive_facts": [
+        {
+          "expr": "0xc",
+          "kind": "root_expr",
+          "site": "uipbuf_clear_attr"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "len_is_constant",
+          "strength": "effective",
+          "site": "uipbuf_clear_attr"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_018_SINK_snmp-server_0015",
+      "sink_id": "SINK_snmp-server_0015",
+      "root_id": "SR_AUTO_041_SINK_snmp-server_0015_secondary",
+      "derive_facts": [
+        {
+          "expr": "__s",
+          "kind": "root_expr",
+          "site": "nbr_table_add_lladdr"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "absent",
+          "site": "nbr_table_add_lladdr"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_019_SINK_snmp-server_0016",
+      "sink_id": "SINK_snmp-server_0016",
+      "root_id": "SR_AUTO_042_SINK_snmp-server_0016_primary",
+      "derive_facts": [
+        {
+          "expr": "(uint)m->num",
+          "kind": "root_expr",
+          "site": "memb_init"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "absent",
+          "site": "memb_init"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_020_SINK_snmp-server_0017",
+      "sink_id": "SINK_snmp-server_0017",
+      "root_id": "SR_AUTO_044_SINK_snmp-server_0017_primary",
+      "derive_facts": [
+        {
+          "expr": "process_thread_sensors_process::i",
+          "kind": "root_expr",
+          "site": "process_thread_sensors_process"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "absent",
+          "site": "process_thread_sensors_process"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_021_SINK_snmp-server_0018",
+      "sink_id": "SINK_snmp-server_0018",
+      "root_id": "SR_AUTO_046_SINK_snmp-server_0018_primary",
+      "derive_facts": [
+        {
+          "expr": "puVar6",
+          "kind": "root_expr",
+          "site": "echo_request_input"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "absent",
+          "site": "echo_request_input"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_022_SINK_snmp-server_0020",
+      "sink_id": "SINK_snmp-server_0020",
+      "root_id": "SR_AUTO_049_SINK_snmp-server_0020_secondary",
+      "derive_facts": [
+        {
+          "expr": "used_map[iVar1]",
+          "kind": "root_expr",
+          "site": "nbr_table_add_lladdr"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "unknown",
+          "strength": "unknown",
+          "site": "nbr_table_add_lladdr"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_023_SINK_snmp-server_0021",
+      "sink_id": "SINK_snmp-server_0021",
+      "root_id": "SR_AUTO_050_SINK_snmp-server_0021_primary",
+      "derive_facts": [
+        {
+          "expr": "puVar7",
+          "kind": "root_expr",
+          "site": "uip_nd6_ns_output"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "absent",
+          "site": "uip_nd6_ns_output"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_024_SINK_snmp-server_0022",
+      "sink_id": "SINK_snmp-server_0022",
+      "root_id": "SR_AUTO_052_SINK_snmp-server_0022_primary",
+      "derive_facts": [
+        {
+          "expr": "puVar13",
+          "kind": "root_expr",
+          "site": "uip_nd6_ra_output"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "code_guard_root_bound",
+          "strength": "effective",
+          "site": "uip_nd6_ra_output"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_025_SINK_snmp-server_0023",
+      "sink_id": "SINK_snmp-server_0023",
+      "root_id": "SR_AUTO_054_SINK_snmp-server_0023_secondary",
+      "derive_facts": [
+        {
+          "expr": "value[i]",
+          "kind": "root_expr",
+          "site": "get_value"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "unknown",
+          "strength": "unknown",
+          "site": "get_value"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_026_SINK_snmp-server_0024",
+      "sink_id": "SINK_snmp-server_0024",
+      "root_id": "SR_AUTO_055_SINK_snmp-server_0024_primary",
+      "derive_facts": [
+        {
+          "expr": "bVar1",
+          "kind": "root_expr",
+          "site": "snmp_api_replace_oid"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "absent",
+          "site": "snmp_api_replace_oid"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_027_SINK_snmp-server_0026",
+      "sink_id": "SINK_snmp-server_0026",
+      "root_id": "SR_AUTO_058_SINK_snmp-server_0026_secondary",
+      "derive_facts": [
+        {
+          "expr": "used[iVar1]",
+          "kind": "root_expr",
+          "site": "memb_alloc"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "unknown",
+          "strength": "unknown",
+          "site": "memb_alloc"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_028_SINK_snmp-server_0027",
+      "sink_id": "SINK_snmp-server_0027",
+      "root_id": "SR_AUTO_060_SINK_snmp-server_0027_secondary",
+      "derive_facts": [
+        {
+          "expr": "used[iVar2]",
+          "kind": "root_expr",
+          "site": "memb_free"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "unknown",
+          "strength": "unknown",
+          "site": "memb_free"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_029_SINK_snmp-server_0028",
+      "sink_id": "SINK_snmp-server_0028",
+      "root_id": "SR_AUTO_061_SINK_snmp-server_0028_primary",
+      "derive_facts": [
+        {
+          "expr": "process_pt",
+          "kind": "root_expr",
+          "site": "process_thread_cc2538_rf_process"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "param_store_without_explicit_guard",
+          "strength": "weak",
+          "site": "process_thread_cc2538_rf_process"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_030_SINK_snmp-server_0029",
+      "sink_id": "SINK_snmp-server_0029",
+      "root_id": "SR_AUTO_062_SINK_snmp-server_0029_primary",
+      "derive_facts": [
+        {
+          "expr": "dest",
+          "kind": "root_expr",
+          "site": "get_object"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "param_store_without_explicit_guard",
+          "strength": "weak",
+          "site": "get_object"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_031_SINK_snmp-server_0030",
+      "sink_id": "SINK_snmp-server_0030",
+      "root_id": "SR_AUTO_063_SINK_snmp-server_0030_primary",
+      "derive_facts": [
+        {
+          "expr": "process_pt",
+          "kind": "root_expr",
+          "site": "process_thread_tcpip_process"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "param_store_without_explicit_guard",
+          "strength": "weak",
+          "site": "process_thread_tcpip_process"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_032_SINK_snmp-server_0031",
+      "sink_id": "SINK_snmp-server_0031",
+      "root_id": "SR_AUTO_064_SINK_snmp-server_0031_primary",
+      "derive_facts": [
+        {
+          "expr": "llao",
+          "kind": "root_expr",
+          "site": "create_llao"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "param_store_without_explicit_guard",
+          "strength": "weak",
+          "site": "create_llao"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_033_SINK_snmp-server_0033",
+      "sink_id": "SINK_snmp-server_0033",
+      "root_id": "SR_AUTO_065_SINK_snmp-server_0033_primary",
+      "derive_facts": [
+        {
+          "expr": "timer",
+          "kind": "root_expr",
+          "site": "add_timer"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "param_store_without_explicit_guard",
+          "strength": "weak",
+          "site": "add_timer"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_034_SINK_snmp-server_0034",
+      "sink_id": "SINK_snmp-server_0034",
+      "root_id": "SR_AUTO_066_SINK_snmp-server_0034_primary",
+      "derive_facts": [
+        {
+          "expr": "process_pt",
+          "kind": "root_expr",
+          "site": "process_thread_ctimer_process"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "param_store_without_explicit_guard",
+          "strength": "weak",
+          "site": "process_thread_ctimer_process"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_035_SINK_snmp-server_0035",
+      "sink_id": "SINK_snmp-server_0035",
+      "root_id": "SR_AUTO_067_SINK_snmp-server_0035_primary",
+      "derive_facts": [
+        {
+          "expr": "p",
+          "kind": "root_expr",
+          "site": "exit_process"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "param_store_without_explicit_guard",
+          "strength": "weak",
+          "site": "exit_process"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_036_SINK_snmp-server_0036",
+      "sink_id": "SINK_snmp-server_0036",
+      "root_id": "SR_AUTO_068_SINK_snmp-server_0036_primary",
+      "derive_facts": [
+        {
+          "expr": "process_pt",
+          "kind": "root_expr",
+          "site": "process_thread_stack_check_process"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "param_store_without_explicit_guard",
+          "strength": "weak",
+          "site": "process_thread_stack_check_process"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_037_SINK_snmp-server_0037",
+      "sink_id": "SINK_snmp-server_0037",
+      "root_id": "SR_AUTO_069_SINK_snmp-server_0037_primary",
+      "derive_facts": [
+        {
+          "expr": "process_pt",
+          "kind": "root_expr",
+          "site": "process_thread_button_hal_process"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "param_store_without_explicit_guard",
+          "strength": "weak",
+          "site": "process_thread_button_hal_process"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_038_SINK_snmp-server_0038",
+      "sink_id": "SINK_snmp-server_0038",
+      "root_id": "SR_AUTO_070_SINK_snmp-server_0038_primary",
+      "derive_facts": [
+        {
+          "expr": "fmt",
+          "kind": "root_expr",
+          "site": "process_thread_stack_check_process"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "format_arg_non_literal",
+          "strength": "absent",
+          "site": "process_thread_stack_check_process"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_039_SINK_snmp-server_0039",
+      "sink_id": "SINK_snmp-server_0039",
+      "root_id": "SR_AUTO_071_SINK_snmp-server_0039_primary",
+      "derive_facts": [
+        {
+          "expr": "fmt",
+          "kind": "root_expr",
+          "site": "snmp_engine"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "format_arg_non_literal",
+          "strength": "absent",
+          "site": "snmp_engine"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_040_SINK_snmp-server_0040",
+      "sink_id": "SINK_snmp-server_0040",
+      "root_id": "SR_AUTO_072_SINK_snmp-server_0040_primary",
+      "derive_facts": [
+        {
+          "expr": "size",
+          "kind": "root_expr",
+          "site": "uiplib_ipaddr_snprint"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "code_guard_root_bound",
+          "strength": "effective",
+          "site": "uiplib_ipaddr_snprint"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_041_SINK_snmp-server_0041",
+      "sink_id": "SINK_snmp-server_0041",
+      "root_id": "SR_AUTO_073_SINK_snmp-server_0041_primary",
+      "derive_facts": [
+        {
+          "expr": "uart",
+          "kind": "root_expr",
+          "site": "uart_isr"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "dispatch_index_guard",
+          "strength": "absent",
+          "site": "uart_isr"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_042_SINK_snmp-server_0042",
+      "sink_id": "SINK_snmp-server_0042",
+      "root_id": "SR_AUTO_074_SINK_snmp-server_0042_primary",
+      "derive_facts": [
+        {
+          "expr": "iVar4",
+          "kind": "root_expr",
+          "site": "platform_idle"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "code_guard_root_bound",
+          "strength": "effective",
+          "site": "platform_idle"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_043_SINK_snmp-server_0043",
+      "sink_id": "SINK_snmp-server_0043",
+      "root_id": "SR_AUTO_075_SINK_snmp-server_0043_primary",
+      "derive_facts": [
+        {
+          "expr": "pnVar5",
+          "kind": "root_expr",
+          "site": "nbr_table_add_lladdr"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "code_guard_root_bound",
+          "strength": "effective",
+          "site": "nbr_table_add_lladdr"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_044_SINK_snmp-server_0044",
+      "sink_id": "SINK_snmp-server_0044",
+      "root_id": "SR_AUTO_076_SINK_snmp-server_0044_primary",
+      "derive_facts": [
+        {
+          "expr": "iVar4",
+          "kind": "root_expr",
+          "site": "lpm_enter"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "code_guard_root_bound",
+          "strength": "effective",
+          "site": "lpm_enter"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_045_SINK_snmp-server_0045",
+      "sink_id": "SINK_snmp-server_0045",
+      "root_id": "SR_AUTO_077_SINK_snmp-server_0045_primary",
+      "derive_facts": [
+        {
+          "expr": "(code **",
+          "kind": "root_expr",
+          "site": "netstack_process_ip_callback"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "dispatch_index_guard",
+          "strength": "absent",
+          "site": "netstack_process_ip_callback"
+        }
+      ],
+      "status": "complete"
+    }
+  ],
+  "chains": [
+    {
+      "chain_id": "C_snmp_buffer_str_copy",
+      "sink_id": "S_snmp_buffer_str_copy",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20000500_200005ff"
+      ],
+      "required_channel_ids": [
+        "CH_snmp_buffer_task_handoff"
+      ],
+      "required_root_ids": [
+        "R_snmp_buffer_str_len"
+      ],
+      "required_derive_check_ids": [
+        "D_snmp_buffer_str_len"
+      ],
+      "must_use_channel": true,
+      "notes": "Targeted chain anchored on the response-buffer copy path; ingress source GT deferred."
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0000_c4a8a7b9",
+      "sink_id": "SINK_snmp-server_0000",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20000500_200005ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_001_SINK_snmp-server_0000_primary",
+        "SR_AUTO_002_SINK_snmp-server_0000_secondary",
+        "SR_AUTO_003_SINK_snmp-server_0000_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_001_SINK_snmp-server_0000"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: buffer_str"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0001_c771e83a",
+      "sink_id": "SINK_snmp-server_0001",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [
+        "R_AUTO_001"
+      ],
+      "required_object_ids": [
+        "obj_sram_20000e00_20000eff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_002"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_004_SINK_snmp-server_0001_primary",
+        "SR_AUTO_005_SINK_snmp-server_0001_secondary",
+        "SR_AUTO_006_SINK_snmp-server_0001_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_002_SINK_snmp-server_0001"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: packetbuf_copyfrom"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0002_26244527",
+      "sink_id": "SINK_snmp-server_0002",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [
+        "R_AUTO_001"
+      ],
+      "required_object_ids": [
+        "obj_sram_20000e00_20000eff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_002"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_007_SINK_snmp-server_0002_primary",
+        "SR_AUTO_008_SINK_snmp-server_0002_secondary",
+        "SR_AUTO_009_SINK_snmp-server_0002_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_003_SINK_snmp-server_0002"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: uip_udp_packet_send"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0003_134332f4",
+      "sink_id": "SINK_snmp-server_0003",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [
+        "R_AUTO_001"
+      ],
+      "required_object_ids": [
+        "obj_sram_20000e00_20000eff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_002"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_010_SINK_snmp-server_0003_primary",
+        "SR_AUTO_011_SINK_snmp-server_0003_secondary",
+        "SR_AUTO_012_SINK_snmp-server_0003_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_004_SINK_snmp-server_0003"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: uip_icmp6_error_output"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0003_60223154",
+      "sink_id": "SINK_snmp-server_0003",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [
+        "R_AUTO_001"
+      ],
+      "required_object_ids": [
+        "obj_sram_20000e00_20000eff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_002"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_010_SINK_snmp-server_0003_primary",
+        "SR_AUTO_011_SINK_snmp-server_0003_secondary",
+        "SR_AUTO_012_SINK_snmp-server_0003_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_005_SINK_snmp-server_0003"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: uip_icmp6_error_output"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0004_bf008e08",
+      "sink_id": "SINK_snmp-server_0004",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [
+        "R_AUTO_001"
+      ],
+      "required_object_ids": [
+        "obj_sram_20000e00_20000eff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_002"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_013_SINK_snmp-server_0004_primary",
+        "SR_AUTO_014_SINK_snmp-server_0004_secondary",
+        "SR_AUTO_015_SINK_snmp-server_0004_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_006_SINK_snmp-server_0004"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: ext_header_remove"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0004_bfc29e4e",
+      "sink_id": "SINK_snmp-server_0004",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [
+        "R_AUTO_001"
+      ],
+      "required_object_ids": [
+        "obj_sram_20000e00_20000eff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_002"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_013_SINK_snmp-server_0004_primary",
+        "SR_AUTO_014_SINK_snmp-server_0004_secondary",
+        "SR_AUTO_015_SINK_snmp-server_0004_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_007_SINK_snmp-server_0004"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: ext_header_remove"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0005_644c0fa1",
+      "sink_id": "SINK_snmp-server_0005",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [
+        "R_AUTO_001"
+      ],
+      "required_object_ids": [
+        "obj_sram_20000e00_20000eff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_002"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_016_SINK_snmp-server_0005_primary",
+        "SR_AUTO_017_SINK_snmp-server_0005_secondary",
+        "SR_AUTO_018_SINK_snmp-server_0005_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_008_SINK_snmp-server_0005"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: uip_remove_ext_hdr"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0005_9e7b812c",
+      "sink_id": "SINK_snmp-server_0005",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [
+        "R_AUTO_001"
+      ],
+      "required_object_ids": [
+        "obj_sram_20000e00_20000eff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_002"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_016_SINK_snmp-server_0005_primary",
+        "SR_AUTO_017_SINK_snmp-server_0005_secondary",
+        "SR_AUTO_018_SINK_snmp-server_0005_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_009_SINK_snmp-server_0005"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: uip_remove_ext_hdr"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0006_c9a3362a",
+      "sink_id": "SINK_snmp-server_0006",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [
+        "R_AUTO_001"
+      ],
+      "required_object_ids": [
+        "obj_sram_20000e00_20000eff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_002"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_019_SINK_snmp-server_0006_primary",
+        "SR_AUTO_020_SINK_snmp-server_0006_secondary",
+        "SR_AUTO_021_SINK_snmp-server_0006_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_010_SINK_snmp-server_0006"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: uiplib_ipaddr_snprint"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0007_53fc8bc8",
+      "sink_id": "SINK_snmp-server_0007",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20000b00_20000bff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_003"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_022_SINK_snmp-server_0007_primary",
+        "SR_AUTO_023_SINK_snmp-server_0007_secondary",
+        "SR_AUTO_024_SINK_snmp-server_0007_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_011_SINK_snmp-server_0007"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: extract_lladdr_from_llao_aligned"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0008_58569944",
+      "sink_id": "SINK_snmp-server_0008",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [
+        "R_AUTO_002"
+      ],
+      "required_object_ids": [],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR_AUTO_025_SINK_snmp-server_0008_primary",
+        "SR_AUTO_026_SINK_snmp-server_0008_secondary",
+        "SR_AUTO_027_SINK_snmp-server_0008_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_012_SINK_snmp-server_0008"
+      ],
+      "must_use_channel": false,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: create_llao"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0009_2ff27487",
+      "sink_id": "SINK_snmp-server_0009",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [
+        "R_AUTO_001"
+      ],
+      "required_object_ids": [
+        "obj_sram_20000e00_20000eff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_002"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_028_SINK_snmp-server_0009_primary",
+        "SR_AUTO_029_SINK_snmp-server_0009_secondary",
+        "SR_AUTO_030_SINK_snmp-server_0009_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_013_SINK_snmp-server_0009"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: ns_input"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0009_81d4707e",
+      "sink_id": "SINK_snmp-server_0009",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [
+        "R_AUTO_001"
+      ],
+      "required_object_ids": [
+        "obj_sram_20000e00_20000eff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_002"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_028_SINK_snmp-server_0009_primary",
+        "SR_AUTO_029_SINK_snmp-server_0009_secondary",
+        "SR_AUTO_030_SINK_snmp-server_0009_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_014_SINK_snmp-server_0009"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: ns_input"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0012_56a6af1e",
+      "sink_id": "SINK_snmp-server_0012",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20000500_200005ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_031_SINK_snmp-server_0012_primary",
+        "SR_AUTO_032_SINK_snmp-server_0012_secondary",
+        "SR_AUTO_033_SINK_snmp-server_0012_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_015_SINK_snmp-server_0012"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: uip_ds6_nbr_update_ll"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0013_de0be317",
+      "sink_id": "SINK_snmp-server_0013",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [
+        "R_AUTO_001"
+      ],
+      "required_object_ids": [
+        "obj_sram_20000e00_20000eff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_002"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_034_SINK_snmp-server_0013_primary",
+        "SR_AUTO_035_SINK_snmp-server_0013_secondary",
+        "SR_AUTO_036_SINK_snmp-server_0013_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_016_SINK_snmp-server_0013"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: uip_ds6_set_addr_iid"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0014_6164d82b",
+      "sink_id": "SINK_snmp-server_0014",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20004200_200042ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_004"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_037_SINK_snmp-server_0014_primary",
+        "SR_AUTO_038_SINK_snmp-server_0014_secondary",
+        "SR_AUTO_039_SINK_snmp-server_0014_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_017_SINK_snmp-server_0014"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: uipbuf_clear_attr"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0015_07d88d99",
+      "sink_id": "SINK_snmp-server_0015",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20004200_200042ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_004"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_040_SINK_snmp-server_0015_primary",
+        "SR_AUTO_041_SINK_snmp-server_0015_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_018_SINK_snmp-server_0015"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: nbr_table_add_lladdr"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0016_408cc810",
+      "sink_id": "SINK_snmp-server_0016",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20000500_200005ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_042_SINK_snmp-server_0016_primary",
+        "SR_AUTO_043_SINK_snmp-server_0016_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_019_SINK_snmp-server_0016"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: memb_init"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0017_b9e930a6",
+      "sink_id": "SINK_snmp-server_0017",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20000500_200005ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_044_SINK_snmp-server_0017_primary",
+        "SR_AUTO_045_SINK_snmp-server_0017_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_020_SINK_snmp-server_0017"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: process_thread_sensors_process"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0018_b9bc098a",
+      "sink_id": "SINK_snmp-server_0018",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20000500_200005ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_046_SINK_snmp-server_0018_primary",
+        "SR_AUTO_047_SINK_snmp-server_0018_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_021_SINK_snmp-server_0018"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: echo_request_input"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0020_cbf2f54a",
+      "sink_id": "SINK_snmp-server_0020",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20000500_200005ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_048_SINK_snmp-server_0020_primary",
+        "SR_AUTO_049_SINK_snmp-server_0020_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_022_SINK_snmp-server_0020"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: nbr_table_add_lladdr"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0021_bd581294",
+      "sink_id": "SINK_snmp-server_0021",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20000500_200005ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_050_SINK_snmp-server_0021_primary",
+        "SR_AUTO_051_SINK_snmp-server_0021_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_023_SINK_snmp-server_0021"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: uip_nd6_ns_output"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0022_ad0c7042",
+      "sink_id": "SINK_snmp-server_0022",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [
+        "R_AUTO_001"
+      ],
+      "required_object_ids": [
+        "obj_sram_20000e00_20000eff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_002"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_052_SINK_snmp-server_0022_primary",
+        "SR_AUTO_053_SINK_snmp-server_0022_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_024_SINK_snmp-server_0022"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: uip_nd6_ra_output"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0023_e647f151",
+      "sink_id": "SINK_snmp-server_0023",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [
+        "R_AUTO_003"
+      ],
+      "required_object_ids": [],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR_AUTO_054_SINK_snmp-server_0023_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_025_SINK_snmp-server_0023"
+      ],
+      "must_use_channel": false,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: get_value"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0024_49588c64",
+      "sink_id": "SINK_snmp-server_0024",
+      "expected_verdict": "CONFIRMED",
+      "required_source_ids": [
+        "R_AUTO_001"
+      ],
+      "required_object_ids": [
+        "obj_sram_20000e00_20000eff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_002"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_055_SINK_snmp-server_0024_primary",
+        "SR_AUTO_056_SINK_snmp-server_0024_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_026_SINK_snmp-server_0024"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: snmp_api_replace_oid"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0026_2bf6fffa",
+      "sink_id": "SINK_snmp-server_0026",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20000500_200005ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_057_SINK_snmp-server_0026_primary",
+        "SR_AUTO_058_SINK_snmp-server_0026_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_027_SINK_snmp-server_0026"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: memb_alloc"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0027_653d8c4c",
+      "sink_id": "SINK_snmp-server_0027",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20000500_200005ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_059_SINK_snmp-server_0027_primary",
+        "SR_AUTO_060_SINK_snmp-server_0027_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_028_SINK_snmp-server_0027"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: memb_free"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0028_cd9bf5c2",
+      "sink_id": "SINK_snmp-server_0028",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [
+        "R_AUTO_004"
+      ],
+      "required_object_ids": [],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR_AUTO_061_SINK_snmp-server_0028_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_029_SINK_snmp-server_0028"
+      ],
+      "must_use_channel": false,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: process_thread_cc2538_rf_process"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0029_30407838",
+      "sink_id": "SINK_snmp-server_0029",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [
+        "R_AUTO_005"
+      ],
+      "required_object_ids": [],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR_AUTO_062_SINK_snmp-server_0029_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_030_SINK_snmp-server_0029"
+      ],
+      "must_use_channel": false,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: get_object"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0030_77646433",
+      "sink_id": "SINK_snmp-server_0030",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20000500_200005ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_063_SINK_snmp-server_0030_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_031_SINK_snmp-server_0030"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: process_thread_tcpip_process"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0031_6d82ddc6",
+      "sink_id": "SINK_snmp-server_0031",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [
+        "R_AUTO_002"
+      ],
+      "required_object_ids": [],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR_AUTO_064_SINK_snmp-server_0031_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_032_SINK_snmp-server_0031"
+      ],
+      "must_use_channel": false,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: create_llao"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0033_8fec4a49",
+      "sink_id": "SINK_snmp-server_0033",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20000500_200005ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_065_SINK_snmp-server_0033_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_033_SINK_snmp-server_0033"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: add_timer"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0034_e54ceafb",
+      "sink_id": "SINK_snmp-server_0034",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20000500_200005ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_066_SINK_snmp-server_0034_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_034_SINK_snmp-server_0034"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: process_thread_ctimer_process"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0035_1a784e45",
+      "sink_id": "SINK_snmp-server_0035",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20000500_200005ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_067_SINK_snmp-server_0035_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_035_SINK_snmp-server_0035"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: exit_process"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0036_c78c78de",
+      "sink_id": "SINK_snmp-server_0036",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20000500_200005ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_068_SINK_snmp-server_0036_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_036_SINK_snmp-server_0036"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: process_thread_stack_check_process"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0037_11cde4a4",
+      "sink_id": "SINK_snmp-server_0037",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20000500_200005ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_069_SINK_snmp-server_0037_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_037_SINK_snmp-server_0037"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: process_thread_button_hal_process"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0038_c7ee08d5",
+      "sink_id": "SINK_snmp-server_0038",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20000500_200005ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_070_SINK_snmp-server_0038_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_038_SINK_snmp-server_0038"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: process_thread_stack_check_process"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0039_6c86de6c",
+      "sink_id": "SINK_snmp-server_0039",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20000500_200005ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_071_SINK_snmp-server_0039_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_039_SINK_snmp-server_0039"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: snmp_engine"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0040_f21800a1",
+      "sink_id": "SINK_snmp-server_0040",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20000500_200005ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_072_SINK_snmp-server_0040_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_040_SINK_snmp-server_0040"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: uiplib_ipaddr_snprint"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0041_2021fbb3",
+      "sink_id": "SINK_snmp-server_0041",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20000500_200005ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_073_SINK_snmp-server_0041_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_041_SINK_snmp-server_0041"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: uart_isr"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0042_11cc652e",
+      "sink_id": "SINK_snmp-server_0042",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [
+        "R_AUTO_006"
+      ],
+      "required_object_ids": [],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR_AUTO_074_SINK_snmp-server_0042_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_042_SINK_snmp-server_0042"
+      ],
+      "must_use_channel": false,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: platform_idle"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0043_e4bb0406",
+      "sink_id": "SINK_snmp-server_0043",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20004200_200042ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_004"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_075_SINK_snmp-server_0043_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_043_SINK_snmp-server_0043"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: nbr_table_add_lladdr"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0044_4fc0cb87",
+      "sink_id": "SINK_snmp-server_0044",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [
+        "R_AUTO_006"
+      ],
+      "required_object_ids": [],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR_AUTO_076_SINK_snmp-server_0044_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_044_SINK_snmp-server_0044"
+      ],
+      "must_use_channel": false,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: lpm_enter"
+    },
+    {
+      "chain_id": "chain_snmp-server_SINK_snmp-server_0045_81e48e47",
+      "sink_id": "SINK_snmp-server_0045",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [],
+      "required_object_ids": [
+        "obj_sram_20000500_200005ff"
+      ],
+      "required_channel_ids": [
+        "CH_AUTO_001"
+      ],
+      "required_root_ids": [
+        "SR_AUTO_077_SINK_snmp-server_0045_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_045_SINK_snmp-server_0045"
+      ],
+      "must_use_channel": true,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: netstack_process_ip_callback"
+    }
+  ],
+  "negative_expectations": [],
+  "todo_items": [],
+  "notes": [
+    "Targeted GT: one representative copy chain rooted at buffer_str().",
+    "Auto-promoted to full_gt from current pipeline eval outputs; exhaustive within declared pipeline_scope."
+  ],
+  "chain_gt_scope": "exhaustive",
+  "gt_provenance": {
+    "mode": "auto_promoted_from_eval",
+    "eval_dir": "/tmp/eval_gt_backed_suite_v1_20260308_150048",
+    "scope": "pipeline_scope",
+    "warning": "This full GT is exhaustive within the current SourceAgent pipeline scope and source-backed focus region; manual semantic refinement may still improve subtype fidelity."
+  }
+}

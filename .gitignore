@@ -30,10 +30,28 @@ hs_err_pid*
 pyghidra_mcp_projects/
 
 # Firmware policy for GitHub upload:
-# keep only microbench as requested
+# keep microbench, ground-truth metadata, and eval manifests; exclude large firmware corpora/source mirrors
 firmware/*
 !firmware/microbench/
 !firmware/microbench/**
+!firmware/ground_truth_bundle/
+firmware/ground_truth_bundle/*
+!firmware/ground_truth_bundle/*.json
+!firmware/ground_truth_bundle/*.csv
+!firmware/ground_truth_bundle/*.md
+!firmware/ground_truth_bundle/microbench_v2/
+!firmware/ground_truth_bundle/microbench_v2/**
+!firmware/ground_truth_bundle/mesobench_v1/
+!firmware/ground_truth_bundle/mesobench_v1/**
+!firmware/ground_truth_bundle/gt_backed_suite_v2/
+!firmware/ground_truth_bundle/gt_backed_suite_v2/**
+!firmware/ground_truth_bundle/references/
+firmware/ground_truth_bundle/references/*
+!firmware/ground_truth_bundle/references/mesobench/
+!firmware/ground_truth_bundle/references/mesobench/**
+!firmware/eval_suite/
+firmware/eval_suite/*
+!firmware/eval_suite/*manifest.json
 
 # Ignore nested Git metadata if any path gets included
 **/.git

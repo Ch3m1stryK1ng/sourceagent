@@ -1,0 +1,265 @@
+{
+  "schema_version": "2.0-seed",
+  "binary_stem": "t0_copy_sink",
+  "binary_paths": {
+    "source_file": "firmware/microbench/t0_copy_sink.c",
+    "map_file": "firmware/microbench/t0_copy_sink.map",
+    "elf_file": "firmware/microbench/t0_copy_sink.elf",
+    "bin_file": "firmware/microbench/t0_copy_sink.bin"
+  },
+  "sample_meta": {
+    "title": "Same-context memcpy/strcpy sink",
+    "mechanism_group": "same_context_direct",
+    "runtime_style": "baremetal_polling",
+    "inspiration": "toy_copy_sink",
+    "arch": "ARM_CORTEX_M",
+    "expected_channel_mode": "none",
+    "chain_shape": "same_context_direct_call"
+  },
+  "annotation_status": {
+    "sources": "complete",
+    "objects": "complete",
+    "channels": "n/a",
+    "sinks": "complete",
+    "sink_roots": "complete",
+    "derive_checks": "complete",
+    "chains": "complete",
+    "negative_expectations": "complete",
+    "overall": "complete"
+  },
+  "todo_items": [
+    "Annotate all payload objects touched by handler/handle_name.",
+    "Record which roots are attacker-controlled and which are not.",
+    "Mark g_name path separately if it should remain dropped."
+  ],
+  "sources": [
+    {
+      "source_id": "R1",
+      "label": "MMIO_READ",
+      "function_name": "uart_read_byte",
+      "address": 1073811456,
+      "address_hex": "0x40011000",
+      "site_kind": "mmio_read",
+      "context": "MAIN",
+      "role": "control",
+      "notes": "USART SR polling read used only as RX-ready gate.",
+      "status": "complete",
+      "source_file": "t0_copy_sink.c",
+      "map_file": "t0_copy_sink.map"
+    },
+    {
+      "source_id": "R2",
+      "label": "MMIO_READ",
+      "function_name": "uart_read_byte",
+      "address": 1073811460,
+      "address_hex": "0x40011004",
+      "site_kind": "mmio_read",
+      "context": "MAIN",
+      "role": "data",
+      "notes": "USART DR payload byte read in uart_read_byte.",
+      "status": "complete",
+      "source_file": "t0_copy_sink.c",
+      "map_file": "t0_copy_sink.map"
+    }
+  ],
+  "objects": [
+    {
+      "object_id": "O1_g_name",
+      "region_kind": "SRAM_CLUSTER",
+      "addr_range": [
+        "0x20000000",
+        "0x200000ff"
+      ],
+      "members": [
+        "g_name"
+      ],
+      "producer_contexts": [
+        "MAIN"
+      ],
+      "consumer_contexts": [
+        "MAIN"
+      ],
+      "writer_sites": [],
+      "reader_sites": [
+        {
+          "function_name": "handle_name",
+          "address_hex": "0x08000094",
+          "kind": "strcpy_src"
+        }
+      ],
+      "evidence_refs": [
+        "c:t0_copy_sink:49",
+        "m:t0_copy_sink:115"
+      ],
+      "confidence": 1.0,
+      "notes": "Global name buffer used as strcpy source in handle_name(). No source path is defined in this benchmark."
+    }
+  ],
+  "channels": [],
+  "sinks": [
+    {
+      "sink_id": "S2",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "handle_name",
+      "address": 134217876,
+      "address_hex": "0x08000094",
+      "site_kind": "copy_call_or_copy_idiom",
+      "notes": "strcpy unbounded copy",
+      "status": "complete",
+      "source_file": "t0_copy_sink.c",
+      "map_file": "t0_copy_sink.map"
+    },
+    {
+      "sink_id": "S1",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "handler",
+      "address": 134217820,
+      "address_hex": "0x0800005c",
+      "site_kind": "copy_call_or_copy_idiom",
+      "notes": "memcpy with DR-controlled length",
+      "status": "complete",
+      "source_file": "t0_copy_sink.c",
+      "map_file": "t0_copy_sink.map"
+    }
+  ],
+  "sink_roots": [
+    {
+      "root_id": "SR1_handler_len",
+      "sink_id": "S1",
+      "root_role": "len",
+      "expr": "n",
+      "status": "complete",
+      "controllability": "caller_controlled",
+      "evidence_refs": [
+        "c:t0_copy_sink:52"
+      ]
+    },
+    {
+      "root_id": "SR2_name_src",
+      "sink_id": "S2",
+      "root_role": "src_object",
+      "expr": "g_name",
+      "status": "complete",
+      "controllability": "unknown_without_source_path",
+      "evidence_refs": [
+        "c:t0_copy_sink:64"
+      ]
+    }
+  ],
+  "derive_checks": [
+    {
+      "derive_check_id": "D1_handler",
+      "sink_id": "S1",
+      "root_id": "SR1_handler_len",
+      "status": "complete",
+      "derive_facts": [
+        {
+          "expr": "src[i] = uart_read_byte() for i < n && i < 64",
+          "site": "handler",
+          "evidence_refs": [
+            "c:t0_copy_sink:54"
+          ]
+        },
+        {
+          "expr": "main calls handler(buf, 32)",
+          "site": "main",
+          "evidence_refs": [
+            "c:t0_copy_sink:73"
+          ]
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "if (n < 16) n = 16",
+          "strength": "weak",
+          "site": "handler",
+          "evidence_refs": [
+            "c:t0_copy_sink:57"
+          ]
+        },
+        {
+          "expr": "No upper bound against destination buffer size 16 before memcpy",
+          "strength": "absent",
+          "site": "handler",
+          "evidence_refs": [
+            "c:t0_copy_sink:58"
+          ]
+        }
+      ]
+    },
+    {
+      "derive_check_id": "D2_handle_name",
+      "sink_id": "S2",
+      "root_id": "SR2_name_src",
+      "status": "complete",
+      "derive_facts": [
+        {
+          "expr": "strcpy(local_name, g_name)",
+          "site": "handle_name",
+          "evidence_refs": [
+            "c:t0_copy_sink:64"
+          ]
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "No bound check against local_name[32]",
+          "strength": "absent",
+          "site": "handle_name",
+          "evidence_refs": [
+            "c:t0_copy_sink:64"
+          ]
+        },
+        {
+          "expr": "No source path into g_name is defined in this benchmark",
+          "strength": "unknown",
+          "site": "handle_name",
+          "evidence_refs": [
+            "c:t0_copy_sink:49"
+          ]
+        }
+      ]
+    }
+  ],
+  "chains": [
+    {
+      "chain_id": "C1_handler_overflow",
+      "sink_id": "S1",
+      "expected_verdict": "CONFIRMED",
+      "required_source_ids": [
+        "R2"
+      ],
+      "required_object_ids": [],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR1_handler_len"
+      ],
+      "required_derive_check_ids": [
+        "D1_handler"
+      ],
+      "must_use_channel": false,
+      "notes": "UART DR controls the copied payload and main passes n=32 into buf[16]."
+    }
+  ],
+  "negative_expectations": [
+    {
+      "negative_id": "N1_status_not_payload",
+      "target_kind": "source",
+      "target_id": "R1",
+      "expected_verdict": "DROP",
+      "reason": "Status register read must not anchor payload chain."
+    },
+    {
+      "negative_id": "N2_handle_name_needs_real_source",
+      "target_kind": "sink",
+      "target_id": "S2",
+      "expected_verdict": "DROP",
+      "reason": "handle_name sink should drop until a real upstream source/object path into g_name is proven."
+    }
+  ],
+  "notes": [
+    "Annotated same-context sample with one positive chain and one sink-only negative expectation."
+  ]
+}

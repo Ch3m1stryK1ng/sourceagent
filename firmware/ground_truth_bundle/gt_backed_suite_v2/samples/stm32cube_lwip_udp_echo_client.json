@@ -1,0 +1,685 @@
+{
+  "schema_version": "1.0-seed",
+  "sample_id": "stm32cube_lwip_udp_echo_client",
+  "binary_stem": "stm32_udp_echo_client",
+  "eval_stem": "stm32cube_lwip_udp_echo_client",
+  "annotation_level": "full_gt",
+  "chain_gt_scope": "exhaustive",
+  "dataset": "monolithic-firmware-collection",
+  "subset": "ARMCortex-M",
+  "priority": "high",
+  "role": "primary_chain_driver",
+  "type_family": "type_ii_or_iii_ready",
+  "title": "STM32CubeF4 LwIP UDP echo client",
+  "binary_artifacts": {
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/stm32_udp_echo_client/stm32_udp_echo_client.elf",
+    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/stm32_udp_echo_client/stm32_udp_echo_client.bin",
+    "formats": [
+      "elf",
+      "bin"
+    ]
+  },
+  "source_code": {
+    "source_repo_id": "stm32cubef4",
+    "source_repo_url": "https://github.com/STMicroelectronics/STM32CubeF4",
+    "local_checkout": "firmware/source_repos/STM32CubeF4",
+    "source_code_level": "full_upstream_repo",
+    "source_locator": [
+      "firmware/source_repos/STM32CubeF4/Projects/STM32469I_EVAL/Applications/LwIP/LwIP_UDP_Echo_Client",
+      "focus on udp_echoclient.c, app_ethernet.c, ethernetif.c"
+    ],
+    "repo_notes": "Base source anchor for STM32469I_EVAL networking examples used by uSBS; combine with uSBS injected snippets and trigger inputs."
+  },
+  "analysis_hints": {
+    "chain_depth": "deep",
+    "chain_breadth": "medium",
+    "expected_channel_mode": "likely",
+    "likely_source_labels": [
+      "MMIO_READ",
+      "ISR_MMIO_READ",
+      "DMA_BACKED_BUFFER"
+    ],
+    "likely_sink_labels": [
+      "COPY_SINK",
+      "STORE_SINK"
+    ],
+    "current_support_status": "target_for_artifact_gt"
+  },
+  "sources": [
+    {
+      "source_id": "R_AUTO_001",
+      "label": "MMIO_READ",
+      "function_name": "HAL_GPIO_EXTI_IRQHandler",
+      "address": 1073822740,
+      "address_hex": "0x40013c14",
+      "site_kind": "mmio_read",
+      "context": "MAIN",
+      "role": "control",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain in /tmp/eval_mesobench_missing18_20260308_153906."
+    },
+    {
+      "source_id": "R_AUTO_002",
+      "label": "MMIO_READ",
+      "function_name": "I2C_IsAcknowledgeFailed",
+      "address": 1073763348,
+      "address_hex": "0x40005414",
+      "site_kind": "mmio_read",
+      "context": "MAIN",
+      "role": "control",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain in /tmp/eval_mesobench_missing18_20260308_153906."
+    },
+    {
+      "source_id": "R_AUTO_003",
+      "label": "MMIO_READ",
+      "function_name": "I2C_WaitOnRXNEFlagUntilTimeout",
+      "address": 1073763348,
+      "address_hex": "0x40005414",
+      "site_kind": "mmio_read",
+      "context": "MAIN",
+      "role": "control",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain in /tmp/eval_mesobench_missing18_20260308_153906."
+    },
+    {
+      "source_id": "R_AUTO_004",
+      "label": "MMIO_READ",
+      "function_name": "I2C_WaitOnMasterAddressFlagUntilTimeout",
+      "address": 1073763328,
+      "address_hex": "0x40005400",
+      "site_kind": "mmio_read",
+      "context": "MAIN",
+      "role": "control",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain in /tmp/eval_mesobench_missing18_20260308_153906."
+    }
+  ],
+  "objects": [],
+  "channels": [],
+  "sinks": [
+    {
+      "sink_id": "SINK_stm32_udp_echo_client_0000",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "udp_echoclient_send",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=CONFIRMED."
+    },
+    {
+      "sink_id": "SINK_stm32_udp_echo_client_0003",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "pbuf_take",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "copy_call_or_copy_idiom",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=CONFIRMED."
+    },
+    {
+      "sink_id": "SINK_stm32_udp_echo_client_0019",
+      "label": "STORE_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "I2C_WaitOnTXEFlagUntilTimeout",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_stm32_udp_echo_client_0020",
+      "label": "STORE_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "I2C_WaitOnBTFFlagUntilTimeout",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_stm32_udp_echo_client_0021",
+      "label": "STORE_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "I2C_WaitOnRXNEFlagUntilTimeout",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_stm32_udp_echo_client_0022",
+      "label": "STORE_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "I2C_WaitOnMasterAddressFlagUntilTimeout",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_stm32_udp_echo_client_0023",
+      "label": "STORE_SINK",
+      "pipeline_label_hint": "STORE_SINK",
+      "function_name": "I2C_IsAcknowledgeFailed",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=SUSPICIOUS."
+    },
+    {
+      "sink_id": "SINK_stm32_udp_echo_client_0029",
+      "label": "FORMAT_STRING_SINK",
+      "pipeline_label_hint": "FORMAT_STRING_SINK",
+      "function_name": "udp_echoclient_send",
+      "address": 0,
+      "address_hex": "0x00000000",
+      "site_kind": "sink_site",
+      "status": "complete",
+      "notes": "Auto-promoted from non-drop chain; verdict=CONFIRMED."
+    }
+  ],
+  "sink_roots": [
+    {
+      "root_id": "SR_AUTO_001_SINK_stm32_udp_echo_client_0000_primary",
+      "sink_id": "SINK_stm32_udp_echo_client_0000",
+      "root_role": "primary",
+      "expr": "message_count",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_002_SINK_stm32_udp_echo_client_0000_secondary",
+      "sink_id": "SINK_stm32_udp_echo_client_0000",
+      "root_role": "secondary",
+      "expr": "(char *)data",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_003_SINK_stm32_udp_echo_client_0000_secondary",
+      "sink_id": "SINK_stm32_udp_echo_client_0000",
+      "root_role": "secondary",
+      "expr": "\"sending udp client message %d\"",
+      "root_kind": "src_data",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_004_SINK_stm32_udp_echo_client_0003_primary",
+      "sink_id": "SINK_stm32_udp_echo_client_0003",
+      "root_role": "primary",
+      "expr": "(uint)local_e",
+      "root_kind": "length",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_005_SINK_stm32_udp_echo_client_0003_secondary",
+      "sink_id": "SINK_stm32_udp_echo_client_0003",
+      "root_role": "secondary",
+      "expr": "local_c->payload",
+      "root_kind": "dst_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_006_SINK_stm32_udp_echo_client_0003_secondary",
+      "sink_id": "SINK_stm32_udp_echo_client_0003",
+      "root_role": "secondary",
+      "expr": "(void *)((int)dataptr + (uint)local_12)",
+      "root_kind": "src_ptr",
+      "root_source": "call_args",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_007_SINK_stm32_udp_echo_client_0019_primary",
+      "sink_id": "SINK_stm32_udp_echo_client_0019",
+      "root_role": "primary",
+      "expr": "hi2c",
+      "root_kind": "dst_ptr",
+      "root_source": "param_name",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_008_SINK_stm32_udp_echo_client_0020_primary",
+      "sink_id": "SINK_stm32_udp_echo_client_0020",
+      "root_role": "primary",
+      "expr": "hi2c",
+      "root_kind": "dst_ptr",
+      "root_source": "param_name",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_009_SINK_stm32_udp_echo_client_0021_primary",
+      "sink_id": "SINK_stm32_udp_echo_client_0021",
+      "root_role": "primary",
+      "expr": "hi2c",
+      "root_kind": "dst_ptr",
+      "root_source": "param_name",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_010_SINK_stm32_udp_echo_client_0022_primary",
+      "sink_id": "SINK_stm32_udp_echo_client_0022",
+      "root_role": "primary",
+      "expr": "hi2c",
+      "root_kind": "dst_ptr",
+      "root_source": "param_name",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_011_SINK_stm32_udp_echo_client_0023_primary",
+      "sink_id": "SINK_stm32_udp_echo_client_0023",
+      "root_role": "primary",
+      "expr": "hi2c",
+      "root_kind": "dst_ptr",
+      "root_source": "param_name",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    },
+    {
+      "root_id": "SR_AUTO_012_SINK_stm32_udp_echo_client_0029_primary",
+      "sink_id": "SINK_stm32_udp_echo_client_0029",
+      "root_role": "primary",
+      "expr": "format_arg_variable",
+      "root_kind": "format_arg",
+      "root_source": "generic_fallback",
+      "status": "complete",
+      "notes": "Auto-promoted from sink_roots.json."
+    }
+  ],
+  "derive_checks": [
+    {
+      "derive_check_id": "D_AUTO_001_SINK_stm32_udp_echo_client_0000",
+      "sink_id": "SINK_stm32_udp_echo_client_0000",
+      "root_id": "SR_AUTO_001_SINK_stm32_udp_echo_client_0000_primary",
+      "derive_facts": [
+        {
+          "expr": "message_count",
+          "kind": "root_expr",
+          "site": "udp_echoclient_send"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "absent",
+          "site": "udp_echoclient_send"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_002_SINK_stm32_udp_echo_client_0000",
+      "sink_id": "SINK_stm32_udp_echo_client_0000",
+      "root_id": "SR_AUTO_003_SINK_stm32_udp_echo_client_0000_secondary",
+      "derive_facts": [
+        {
+          "expr": "\"sending udp client message %d\"",
+          "kind": "root_expr",
+          "site": "udp_echoclient_send"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "absent",
+          "site": "udp_echoclient_send"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_003_SINK_stm32_udp_echo_client_0003",
+      "sink_id": "SINK_stm32_udp_echo_client_0003",
+      "root_id": "SR_AUTO_004_SINK_stm32_udp_echo_client_0003_primary",
+      "derive_facts": [
+        {
+          "expr": "(uint)local_e",
+          "kind": "root_expr",
+          "site": "pbuf_take"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "bounds_guard",
+          "strength": "absent",
+          "site": "pbuf_take"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_004_SINK_stm32_udp_echo_client_0019",
+      "sink_id": "SINK_stm32_udp_echo_client_0019",
+      "root_id": "SR_AUTO_007_SINK_stm32_udp_echo_client_0019_primary",
+      "derive_facts": [
+        {
+          "expr": "hi2c",
+          "kind": "root_expr",
+          "site": "I2C_WaitOnTXEFlagUntilTimeout"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "param_store_without_explicit_guard",
+          "strength": "weak",
+          "site": "I2C_WaitOnTXEFlagUntilTimeout"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_005_SINK_stm32_udp_echo_client_0020",
+      "sink_id": "SINK_stm32_udp_echo_client_0020",
+      "root_id": "SR_AUTO_008_SINK_stm32_udp_echo_client_0020_primary",
+      "derive_facts": [
+        {
+          "expr": "hi2c",
+          "kind": "root_expr",
+          "site": "I2C_WaitOnBTFFlagUntilTimeout"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "param_store_without_explicit_guard",
+          "strength": "weak",
+          "site": "I2C_WaitOnBTFFlagUntilTimeout"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_006_SINK_stm32_udp_echo_client_0021",
+      "sink_id": "SINK_stm32_udp_echo_client_0021",
+      "root_id": "SR_AUTO_009_SINK_stm32_udp_echo_client_0021_primary",
+      "derive_facts": [
+        {
+          "expr": "hi2c",
+          "kind": "root_expr",
+          "site": "I2C_WaitOnRXNEFlagUntilTimeout"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "param_store_without_explicit_guard",
+          "strength": "weak",
+          "site": "I2C_WaitOnRXNEFlagUntilTimeout"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_007_SINK_stm32_udp_echo_client_0022",
+      "sink_id": "SINK_stm32_udp_echo_client_0022",
+      "root_id": "SR_AUTO_010_SINK_stm32_udp_echo_client_0022_primary",
+      "derive_facts": [
+        {
+          "expr": "hi2c",
+          "kind": "root_expr",
+          "site": "I2C_WaitOnMasterAddressFlagUntilTimeout"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "param_store_without_explicit_guard",
+          "strength": "weak",
+          "site": "I2C_WaitOnMasterAddressFlagUntilTimeout"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_008_SINK_stm32_udp_echo_client_0023",
+      "sink_id": "SINK_stm32_udp_echo_client_0023",
+      "root_id": "SR_AUTO_011_SINK_stm32_udp_echo_client_0023_primary",
+      "derive_facts": [
+        {
+          "expr": "hi2c",
+          "kind": "root_expr",
+          "site": "I2C_IsAcknowledgeFailed"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "param_store_without_explicit_guard",
+          "strength": "weak",
+          "site": "I2C_IsAcknowledgeFailed"
+        }
+      ],
+      "status": "complete"
+    },
+    {
+      "derive_check_id": "D_AUTO_009_SINK_stm32_udp_echo_client_0029",
+      "sink_id": "SINK_stm32_udp_echo_client_0029",
+      "root_id": "SR_AUTO_012_SINK_stm32_udp_echo_client_0029_primary",
+      "derive_facts": [
+        {
+          "expr": "format_arg_variable",
+          "kind": "root_expr",
+          "site": "udp_echoclient_send"
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "format_arg_non_literal",
+          "strength": "absent",
+          "site": "udp_echoclient_send"
+        }
+      ],
+      "status": "complete"
+    }
+  ],
+  "chains": [
+    {
+      "chain_id": "chain_stm32_udp_echo_client_SINK_stm32_udp_echo_client_0000_36599cff",
+      "sink_id": "SINK_stm32_udp_echo_client_0000",
+      "expected_verdict": "CONFIRMED",
+      "required_source_ids": [
+        "R_AUTO_001"
+      ],
+      "required_object_ids": [],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR_AUTO_001_SINK_stm32_udp_echo_client_0000_primary",
+        "SR_AUTO_002_SINK_stm32_udp_echo_client_0000_secondary",
+        "SR_AUTO_003_SINK_stm32_udp_echo_client_0000_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_001_SINK_stm32_udp_echo_client_0000"
+      ],
+      "must_use_channel": false,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: udp_echoclient_send"
+    },
+    {
+      "chain_id": "chain_stm32_udp_echo_client_SINK_stm32_udp_echo_client_0000_a6dd9e59",
+      "sink_id": "SINK_stm32_udp_echo_client_0000",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [
+        "R_AUTO_001"
+      ],
+      "required_object_ids": [],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR_AUTO_001_SINK_stm32_udp_echo_client_0000_primary",
+        "SR_AUTO_002_SINK_stm32_udp_echo_client_0000_secondary",
+        "SR_AUTO_003_SINK_stm32_udp_echo_client_0000_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_002_SINK_stm32_udp_echo_client_0000"
+      ],
+      "must_use_channel": false,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: udp_echoclient_send"
+    },
+    {
+      "chain_id": "chain_stm32_udp_echo_client_SINK_stm32_udp_echo_client_0003_a9103de5",
+      "sink_id": "SINK_stm32_udp_echo_client_0003",
+      "expected_verdict": "CONFIRMED",
+      "required_source_ids": [
+        "R_AUTO_001"
+      ],
+      "required_object_ids": [],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR_AUTO_004_SINK_stm32_udp_echo_client_0003_primary",
+        "SR_AUTO_005_SINK_stm32_udp_echo_client_0003_secondary",
+        "SR_AUTO_006_SINK_stm32_udp_echo_client_0003_secondary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_003_SINK_stm32_udp_echo_client_0003"
+      ],
+      "must_use_channel": false,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: pbuf_take"
+    },
+    {
+      "chain_id": "chain_stm32_udp_echo_client_SINK_stm32_udp_echo_client_0019_f72cb915",
+      "sink_id": "SINK_stm32_udp_echo_client_0019",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [
+        "R_AUTO_002"
+      ],
+      "required_object_ids": [],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR_AUTO_007_SINK_stm32_udp_echo_client_0019_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_004_SINK_stm32_udp_echo_client_0019"
+      ],
+      "must_use_channel": false,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: I2C_WaitOnTXEFlagUntilTimeout"
+    },
+    {
+      "chain_id": "chain_stm32_udp_echo_client_SINK_stm32_udp_echo_client_0020_17a945ec",
+      "sink_id": "SINK_stm32_udp_echo_client_0020",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [
+        "R_AUTO_002"
+      ],
+      "required_object_ids": [],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR_AUTO_008_SINK_stm32_udp_echo_client_0020_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_005_SINK_stm32_udp_echo_client_0020"
+      ],
+      "must_use_channel": false,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: I2C_WaitOnBTFFlagUntilTimeout"
+    },
+    {
+      "chain_id": "chain_stm32_udp_echo_client_SINK_stm32_udp_echo_client_0021_886e07f5",
+      "sink_id": "SINK_stm32_udp_echo_client_0021",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [
+        "R_AUTO_003"
+      ],
+      "required_object_ids": [],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR_AUTO_009_SINK_stm32_udp_echo_client_0021_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_006_SINK_stm32_udp_echo_client_0021"
+      ],
+      "must_use_channel": false,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: I2C_WaitOnRXNEFlagUntilTimeout"
+    },
+    {
+      "chain_id": "chain_stm32_udp_echo_client_SINK_stm32_udp_echo_client_0022_6297b4ec",
+      "sink_id": "SINK_stm32_udp_echo_client_0022",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [
+        "R_AUTO_004"
+      ],
+      "required_object_ids": [],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR_AUTO_010_SINK_stm32_udp_echo_client_0022_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_007_SINK_stm32_udp_echo_client_0022"
+      ],
+      "must_use_channel": false,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: I2C_WaitOnMasterAddressFlagUntilTimeout"
+    },
+    {
+      "chain_id": "chain_stm32_udp_echo_client_SINK_stm32_udp_echo_client_0023_90f3a57d",
+      "sink_id": "SINK_stm32_udp_echo_client_0023",
+      "expected_verdict": "SUSPICIOUS",
+      "required_source_ids": [
+        "R_AUTO_002"
+      ],
+      "required_object_ids": [],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR_AUTO_011_SINK_stm32_udp_echo_client_0023_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_008_SINK_stm32_udp_echo_client_0023"
+      ],
+      "must_use_channel": false,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: I2C_IsAcknowledgeFailed"
+    },
+    {
+      "chain_id": "chain_stm32_udp_echo_client_SINK_stm32_udp_echo_client_0029_c35333a1",
+      "sink_id": "SINK_stm32_udp_echo_client_0029",
+      "expected_verdict": "CONFIRMED",
+      "required_source_ids": [
+        "R_AUTO_001"
+      ],
+      "required_object_ids": [],
+      "required_channel_ids": [],
+      "required_root_ids": [
+        "SR_AUTO_012_SINK_stm32_udp_echo_client_0029_primary"
+      ],
+      "required_derive_check_ids": [
+        "D_AUTO_009_SINK_stm32_udp_echo_client_0029"
+      ],
+      "must_use_channel": false,
+      "required_source_mode": "any",
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: udp_echoclient_send"
+    }
+  ],
+  "negative_expectations": [],
+  "todo_items": [],
+  "notes": [
+    "Useful UDP-specific chain shape with pbuf-driven packet handling but less noise than the server variant.",
+    "Auto-promoted to full_gt from current pipeline eval outputs; exhaustive within declared pipeline_scope."
+  ],
+  "gt_provenance": {
+    "mode": "auto_promoted_from_eval",
+    "eval_dir": "/tmp/eval_mesobench_missing18_20260308_153906",
+    "scope": "pipeline_scope",
+    "warning": "This full GT is exhaustive within the current SourceAgent pipeline scope and source-backed focus region; manual semantic refinement may still improve subtype fidelity."
+  }
+}

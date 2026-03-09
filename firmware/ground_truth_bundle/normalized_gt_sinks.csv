@@ -1,0 +1,19 @@
+binary_stem,gt_sink_id,label,pipeline_label_hint,function_name,address,address_hex,address_status,notes,source_file,map_file
+cve_2018_16525_freertos_dns,S1,LENGTH_TRUST_SINK,STORE_SINK,prvProcessIPPacket,134218012,0x0800011c,resolved,trusted UDP length propagates unsafe size,cve_2018_16525_freertos_dns.c,cve_2018_16525_freertos_dns.map
+cve_2018_16525_freertos_dns,S2,UNBOUNDED_WALK_SINK,LOOP_WRITE_SINK,prvSkipNameField,134217856,0x08000080,resolved,DNS name walk without bounds,cve_2018_16525_freertos_dns.c,cve_2018_16525_freertos_dns.map
+cve_2018_16525_freertos_dns,S3,COPY_SINK,COPY_SINK,prvParseDNSReply,134217888,0x080000a0,resolved,memcpy with corrupted length,cve_2018_16525_freertos_dns.c,cve_2018_16525_freertos_dns.map
+cve_2020_10065_hci_spi,S1,COPY_SINK,COPY_SINK,bt_spi_rx_thread,134217864,0x08000088,resolved,HCI EVT path overflow,cve_2020_10065_hci_spi.c,cve_2020_10065_hci_spi.map
+cve_2020_10065_hci_spi,S2,COPY_SINK,COPY_SINK,bt_spi_rx_thread,134217864,0x08000088,resolved,HCI ACL path overflow,cve_2020_10065_hci_spi.c,cve_2020_10065_hci_spi.map
+cve_2021_34259_usb_host,S1,PARSING_OVERFLOW_SINK,STORE_SINK,USBH_ParseCfgDesc,134217912,0x080000b8,resolved,wTotalLength-driven overflow path,cve_2021_34259_usb_host.c,cve_2021_34259_usb_host.map
+cve_2021_34259_usb_host,S2,PARSING_OVERFLOW_SINK,STORE_SINK,USBH_ParseInterfaceDesc,134217874,0x08000092,resolved,bNumEndpoints not clamped,cve_2021_34259_usb_host.c,cve_2021_34259_usb_host.map
+cve_2021_34259_usb_host,S3,PARSING_OVERFLOW_SINK,STORE_SINK,USBH_ParseEPDesc,134217842,0x08000072,resolved,endpoint descriptor overflow path,cve_2021_34259_usb_host.c,cve_2021_34259_usb_host.map
+t0_copy_sink,S1,COPY_SINK,COPY_SINK,handler,134217820,0x0800005c,resolved,memcpy with DR-controlled length,t0_copy_sink.c,t0_copy_sink.map
+t0_copy_sink,S2,COPY_SINK,COPY_SINK,handle_name,134217876,0x08000094,resolved,strcpy unbounded copy,t0_copy_sink.c,t0_copy_sink.map
+t0_dma_length_overflow,S1,COPY_SINK,COPY_SINK,process_dma_data,134217852,0x0800007c,resolved,memcpy with DMA-controlled length,t0_dma_length_overflow.c,t0_dma_length_overflow.map
+t0_format_string,S1,FORMAT_STRING_SINK,,log_message,134217872,0x08000090,resolved,attacker-controlled format string in sprintf,t0_format_string.c,t0_format_string.map
+t0_func_ptr_dispatch,S1,FUNC_PTR_SINK,,dispatch_command,134217868,0x0800008c,resolved,unchecked function-pointer dispatch,t0_func_ptr_dispatch.c,t0_func_ptr_dispatch.map
+t0_indirect_memcpy,S1,COPY_SINK,COPY_SINK,do_copy,134217820,0x0800005c,resolved,2-hop taint to memcpy length,t0_indirect_memcpy.c,t0_indirect_memcpy.map
+t0_store_loop_sink,S1,STORE_SINK,STORE_SINK,write_register,134217820,0x0800005c,resolved,store through argument pointer,t0_store_loop_sink.c,t0_store_loop_sink.map
+t0_store_loop_sink,S2,LOOP_WRITE_SINK,LOOP_WRITE_SINK,fill_buffer,134217824,0x08000060,resolved,variable-bound loop write,t0_store_loop_sink.c,t0_store_loop_sink.map
+t0_store_loop_sink,S3,MEMSET_SINK,MEMSET_SINK,clear_buffer,134217850,0x0800007a,resolved,memset with variable length,t0_store_loop_sink.c,t0_store_loop_sink.map
+t0_uart_rx_overflow,S1,COPY_SINK,COPY_SINK,uart_receive,134217820,0x0800005c,resolved,DR-controlled loop writes to fixed buffer,t0_uart_rx_overflow.c,t0_uart_rx_overflow.map

@@ -1233,6 +1233,7 @@ async def build_memory_access_index(
             len(global_symbol_table),
             list(global_symbol_table.keys())[:5],
         )
+        mai.global_symbol_table = dict(global_symbol_table)
 
     # Step 2: Identify ISR handler functions
     isr_func_names = _identify_isr_functions(

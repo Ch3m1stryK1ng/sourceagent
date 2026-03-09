@@ -35,6 +35,55 @@ from sourceagent.pipeline.models import (
 # ── Fixtures ─────────────────────────────────────────────────────────────────
 
 
+def test_stem_counts_counts_duplicate_binary_stems(tmp_path):
+    from sourceagent.interface.main import _stem_counts
+
+    items = [
+        {"binary_path": tmp_path / "same.elf"},
+        {"binary_path": tmp_path / "same.bin"},
+        {"binary_path": tmp_path / "other.elf"},
+    ]
+
+    counts = _stem_counts(items)
+
+    assert counts == {"same": 2, "other": 1}
+
+
+def test_make_eval_project_override_creates_unique_project_dirs():
+    from sourceagent.interface.main import _make_eval_project_override
+
+    path1 = Path(_make_eval_project_override("dup_sample"))
+    path2 = Path(_make_eval_project_override("dup_sample"))
+
+    assert path1.exists()
+    assert path2.exists()
+    assert path1 != path2
+    assert path1.name.startswith("eval_dup_sample_")
+    assert path2.name.startswith("eval_dup_sample_")
+
+
+def test_needs_isolated_eval_project_for_duplicate_stem(tmp_path):
+    from sourceagent.interface.main import _needs_isolated_eval_project
+
+    binary = tmp_path / "same.elf"
+    counts = {"same": 2}
+
+    assert _needs_isolated_eval_project(binary, "same", counts) is True
+
+
+def test_needs_isolated_eval_project_for_variant_output_stem(tmp_path):
+    from sourceagent.interface.main import _needs_isolated_eval_project
+
+    binary = tmp_path / "STM32469I_EVAL_stm32_udp_echo_server.elf"
+    counts = {"STM32469I_EVAL_stm32_udp_echo_server": 1}
+
+    assert _needs_isolated_eval_project(
+        binary,
+        "usbs_test_printf_fw",
+        counts,
+    ) is True
+
+
 def _make_memory_map(binary_path="/tmp/test.bin"):
     return MemoryMap(
         binary_path=binary_path,
@@ -248,6 +297,27 @@ async def test_stage_gating_stops_at_4(tmp_binary):
     assert result.memory_map is not None
     assert len(result.evidence_packs) == 0
     assert len(result.proposals) == 0
+
+
+@pytest.mark.asyncio
+async def test_stage8_builds_phase_artifacts_cache(tmp_binary):
+    """--stage 8 should populate cached phase artifacts on PipelineResult."""
+    args = types.SimpleNamespace(
+        binary=str(tmp_binary), stage=8, model=None,
+        run_id="test-stage8", offline=True, output=None,
+    )
+    mm = _make_memory_map(str(tmp_binary))
+
+    with patch("sourceagent.agents.firmware_detect.detect_cortex_m_raw", return_value=None):
+        with patch("sourceagent.pipeline.loader.load_binary", return_value=mm):
+            from sourceagent.interface.main import _cmd_mine
+            result = await _cmd_mine(args)
+
+    artifacts = getattr(result, "_phase_a_artifacts", {})
+    assert artifacts
+    assert artifacts["channel_graph"]["status"] == "ok"
+    assert artifacts["sink_roots"]["status"] == "not_run"
+    assert artifacts["triage_queue"]["status"] == "not_run"
 
 
 # ── Tests: Offline mode ─────────────────────────────────────────────────

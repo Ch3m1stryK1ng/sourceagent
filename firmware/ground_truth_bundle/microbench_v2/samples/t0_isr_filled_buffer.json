@@ -1,0 +1,326 @@
+{
+  "schema_version": "2.0-seed",
+  "binary_stem": "t0_isr_filled_buffer",
+  "binary_paths": {
+    "source_file": "firmware/microbench/t0_isr_filled_buffer.c",
+    "map_file": "firmware/microbench/t0_isr_filled_buffer.map",
+    "elf_file": "firmware/microbench/t0_isr_filled_buffer.elf",
+    "bin_file": "firmware/microbench/t0_isr_filled_buffer.bin"
+  },
+  "sample_meta": {
+    "title": "ISR-filled ring buffer copied in main loop",
+    "mechanism_group": "isr_cross_context",
+    "runtime_style": "baremetal_interrupt",
+    "inspiration": "toy_ring_buffer",
+    "arch": "ARM_CORTEX_M",
+    "expected_channel_mode": "required",
+    "chain_shape": "source_object_channel_copy"
+  },
+  "annotation_status": {
+    "sources": "complete",
+    "objects": "complete",
+    "channels": "complete",
+    "sinks": "complete",
+    "sink_roots": "complete",
+    "derive_checks": "complete",
+    "chains": "complete",
+    "negative_expectations": "complete",
+    "overall": "complete"
+  },
+  "todo_items": [
+    "Split payload object g_rx_buf from control objects g_rx_head/g_rx_tail.",
+    "Annotate ISR->MAIN channel with guard next!=g_rx_tail and g_rx_tail!=g_rx_head.",
+    "Bind COPY_SINK root to count and note count<max_len check strength."
+  ],
+  "sources": [
+    {
+      "source_id": "R3",
+      "label": "ISR_FILLED_BUFFER",
+      "function_name": "USART1_IRQHandler",
+      "address": 536870912,
+      "address_hex": "0x20000000",
+      "site_kind": "shared_buffer",
+      "context": "MIXED",
+      "role": "channel_payload",
+      "notes": "Shared ring-buffer payload written in ISR and consumed in main context.",
+      "status": "complete",
+      "source_file": "t0_isr_filled_buffer.c",
+      "map_file": "t0_isr_filled_buffer.map"
+    },
+    {
+      "source_id": "R1",
+      "label": "ISR_MMIO_READ",
+      "function_name": "USART1_IRQHandler",
+      "address": 1073811456,
+      "address_hex": "0x40011000",
+      "site_kind": "mmio_read_in_isr",
+      "context": "ISR",
+      "role": "control",
+      "notes": "ISR status read gating UART RXNE.",
+      "status": "complete",
+      "source_file": "t0_isr_filled_buffer.c",
+      "map_file": "t0_isr_filled_buffer.map"
+    },
+    {
+      "source_id": "R2",
+      "label": "ISR_MMIO_READ",
+      "function_name": "USART1_IRQHandler",
+      "address": 1073811460,
+      "address_hex": "0x40011004",
+      "site_kind": "mmio_read_in_isr",
+      "context": "ISR",
+      "role": "data",
+      "notes": "ISR payload byte read from USART1_DR.",
+      "status": "complete",
+      "source_file": "t0_isr_filled_buffer.c",
+      "map_file": "t0_isr_filled_buffer.map"
+    }
+  ],
+  "objects": [
+    {
+      "object_id": "O1_g_rx_buf",
+      "region_kind": "SRAM_CLUSTER",
+      "addr_range": [
+        "0x20000008",
+        "0x20000087"
+      ],
+      "members": [
+        "g_rx_buf"
+      ],
+      "producer_contexts": [
+        "ISR"
+      ],
+      "consumer_contexts": [
+        "MAIN"
+      ],
+      "writer_sites": [
+        {
+          "function_name": "USART1_IRQHandler",
+          "address_hex": "0x080000c0",
+          "kind": "buffer_write"
+        }
+      ],
+      "reader_sites": [
+        {
+          "function_name": "process_packet",
+          "address_hex": "0x08000108",
+          "kind": "buffer_read"
+        },
+        {
+          "function_name": "main",
+          "address_hex": "0x08000168",
+          "kind": "availability_check"
+        }
+      ],
+      "evidence_refs": [
+        "c:t0_isr_filled_buffer:79",
+        "m:t0_isr_filled_buffer:112"
+      ],
+      "confidence": 1.0,
+      "notes": "ISR-filled ring-buffer payload object."
+    },
+    {
+      "object_id": "O2_ring_ctrl",
+      "region_kind": "FLAG",
+      "addr_range": [
+        "0x20000000",
+        "0x20000007"
+      ],
+      "members": [
+        "g_rx_tail",
+        "g_rx_head"
+      ],
+      "producer_contexts": [
+        "ISR",
+        "MAIN"
+      ],
+      "consumer_contexts": [
+        "ISR",
+        "MAIN"
+      ],
+      "writer_sites": [
+        {
+          "function_name": "USART1_IRQHandler",
+          "address_hex": "0x080000c0",
+          "kind": "head_update"
+        },
+        {
+          "function_name": "process_packet",
+          "address_hex": "0x08000108",
+          "kind": "tail_update"
+        }
+      ],
+      "reader_sites": [
+        {
+          "function_name": "USART1_IRQHandler",
+          "address_hex": "0x080000c0",
+          "kind": "space_check"
+        },
+        {
+          "function_name": "process_packet",
+          "address_hex": "0x08000108",
+          "kind": "loop_guard"
+        },
+        {
+          "function_name": "main",
+          "address_hex": "0x08000168",
+          "kind": "availability_check"
+        }
+      ],
+      "evidence_refs": [
+        "c:t0_isr_filled_buffer:80",
+        "c:t0_isr_filled_buffer:81"
+      ],
+      "confidence": 1.0,
+      "notes": "Control object for ring-buffer producer/consumer synchronization."
+    }
+  ],
+  "channels": [
+    {
+      "channel_id": "C1_isr_to_main_ring_payload",
+      "src_context": "ISR",
+      "object_id": "O1_g_rx_buf",
+      "dst_context": "MAIN",
+      "edge_kind": "DATA",
+      "constraints": [
+        {
+          "expr": "next != g_rx_tail",
+          "vars": [
+            "g_rx_head",
+            "g_rx_tail"
+          ],
+          "strength": "effective"
+        },
+        {
+          "expr": "g_rx_tail != g_rx_head",
+          "vars": [
+            "g_rx_tail",
+            "g_rx_head"
+          ],
+          "strength": "effective"
+        }
+      ],
+      "evidence_refs": [
+        "c:t0_isr_filled_buffer:88",
+        "c:t0_isr_filled_buffer:100",
+        "c:t0_isr_filled_buffer:113"
+      ],
+      "score": 1.0
+    }
+  ],
+  "sinks": [
+    {
+      "sink_id": "S_MANUAL_1",
+      "label": "COPY_SINK",
+      "pipeline_label_hint": "COPY_SINK",
+      "function_name": "process_packet",
+      "address": 134217992,
+      "address_hex": "0x08000108",
+      "site_kind": "copy_call_or_copy_idiom",
+      "notes": "memcpy(out, tmp, count) after draining ISR-filled ring buffer.",
+      "status": "complete",
+      "source_file": "t0_isr_filled_buffer.c",
+      "map_file": "t0_isr_filled_buffer.map"
+    }
+  ],
+  "sink_roots": [
+    {
+      "root_id": "SR1_count",
+      "sink_id": "S_MANUAL_1",
+      "root_role": "len",
+      "expr": "count",
+      "status": "complete",
+      "controllability": "source_derived_but_bounded",
+      "evidence_refs": [
+        "c:t0_isr_filled_buffer:97",
+        "c:t0_isr_filled_buffer:100"
+      ]
+    }
+  ],
+  "derive_checks": [
+    {
+      "derive_check_id": "D1",
+      "sink_id": "S_MANUAL_1",
+      "root_id": "SR1_count",
+      "derive_facts": [
+        {
+          "expr": "b = USART1_DR & 0xFF",
+          "site": "USART1_IRQHandler",
+          "evidence_refs": [
+            "c:t0_isr_filled_buffer:86"
+          ]
+        },
+        {
+          "expr": "g_rx_buf[g_rx_head] = b",
+          "site": "USART1_IRQHandler",
+          "evidence_refs": [
+            "c:t0_isr_filled_buffer:89"
+          ]
+        },
+        {
+          "expr": "tmp[count++] = g_rx_buf[g_rx_tail]",
+          "site": "process_packet",
+          "evidence_refs": [
+            "c:t0_isr_filled_buffer:101"
+          ]
+        }
+      ],
+      "check_facts": [
+        {
+          "expr": "count < max_len",
+          "strength": "effective",
+          "site": "process_packet",
+          "evidence_refs": [
+            "c:t0_isr_filled_buffer:100"
+          ]
+        }
+      ],
+      "status": "complete"
+    }
+  ],
+  "chains": [
+    {
+      "chain_id": "C1_isr_payload_to_copy_bounded",
+      "sink_id": "S_MANUAL_1",
+      "expected_verdict": "SAFE_OR_LOW_RISK",
+      "required_source_ids": [
+        "R2",
+        "R3"
+      ],
+      "required_object_ids": [
+        "O1_g_rx_buf"
+      ],
+      "required_channel_ids": [
+        "C1_isr_to_main_ring_payload"
+      ],
+      "required_root_ids": [
+        "SR1_count"
+      ],
+      "required_derive_check_ids": [
+        "D1"
+      ],
+      "must_use_channel": true,
+      "notes": "Cross-context payload chain exists, but count is effectively bounded by max_len.",
+      "required_source_mode": "any"
+    }
+  ],
+  "negative_expectations": [
+    {
+      "negative_id": "N1_status_read_not_payload",
+      "target_kind": "source",
+      "target_id": "R1",
+      "expected_verdict": "DROP",
+      "reason": "ISR status read should not be treated as the payload source for the memcpy sink."
+    },
+    {
+      "negative_id": "N2_ctrl_object_not_payload_channel",
+      "target_kind": "object",
+      "target_id": "O2_ring_ctrl",
+      "expected_verdict": "DROP",
+      "reason": "head/tail control state is not the payload object flowing into the copy sink."
+    }
+  ],
+  "notes": [
+    "Fully annotated ISR cross-context sample with one required channel edge."
+  ]
+}
