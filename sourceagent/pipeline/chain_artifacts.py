@@ -120,6 +120,9 @@ def build_phase_a_artifacts(
     verdict_audit_flags = _empty_verdict_audit_flags(binary_name, binary_sha256)
     verdict_soft_triage = _empty_verdict_soft_triage(binary_name, binary_sha256, calibration_mode=calibration_mode, verdict_output_mode=verdict_output_mode)
     verdict_review_plan = _empty_verdict_review_plan(binary_name, binary_sha256)
+    verdict_review_prompt = _empty_verdict_review_prompt(binary_name, binary_sha256)
+    verdict_review_raw_response = _empty_verdict_review_raw_response(binary_name, binary_sha256)
+    verdict_review_session = _empty_verdict_review_session(binary_name, binary_sha256)
     verdict_review_trace = _empty_verdict_review_trace(binary_name, binary_sha256)
 
     if max_stage >= 8:
@@ -264,6 +267,22 @@ def build_phase_a_artifacts(
             verdict_review_plan.setdefault("binary", binary_name)
             verdict_review_plan.setdefault("binary_sha256", binary_sha256)
             verdict_review_plan.setdefault("stage_required", 10)
+        if isinstance(review_plan, dict):
+            if isinstance(review_plan.get("review_prompt"), dict):
+                verdict_review_prompt = dict(review_plan.get("review_prompt") or {})
+                verdict_review_prompt.setdefault("binary", binary_name)
+                verdict_review_prompt.setdefault("binary_sha256", binary_sha256)
+                verdict_review_prompt.setdefault("stage_required", 10)
+            if isinstance(review_plan.get("review_raw_response"), dict):
+                verdict_review_raw_response = dict(review_plan.get("review_raw_response") or {})
+                verdict_review_raw_response.setdefault("binary", binary_name)
+                verdict_review_raw_response.setdefault("binary_sha256", binary_sha256)
+                verdict_review_raw_response.setdefault("stage_required", 10)
+            if isinstance(review_plan.get("review_session"), dict):
+                verdict_review_session = dict(review_plan.get("review_session") or {})
+                verdict_review_session.setdefault("binary", binary_name)
+                verdict_review_session.setdefault("binary_sha256", binary_sha256)
+                verdict_review_session.setdefault("stage_required", 10)
         if review_trace is not None:
             verdict_review_trace = dict(review_trace)
             verdict_review_trace.setdefault("binary", binary_name)
@@ -284,6 +303,9 @@ def build_phase_a_artifacts(
         "verdict_audit_flags": verdict_audit_flags,
         "verdict_soft_triage": verdict_soft_triage,
         "verdict_review_plan": verdict_review_plan,
+        "verdict_review_prompt": verdict_review_prompt,
+        "verdict_review_raw_response": verdict_review_raw_response,
+        "verdict_review_session": verdict_review_session,
         "verdict_review_trace": verdict_review_trace,
     }
 
@@ -349,6 +371,39 @@ def _empty_verdict_review_plan(binary_name: str, binary_sha256: str) -> Dict[str
         "stage_required": 10,
     }
 
+
+
+def _empty_verdict_review_prompt(binary_name: str, binary_sha256: str) -> Dict[str, Any]:
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "binary": binary_name,
+        "binary_sha256": binary_sha256,
+        "batches": [],
+        "status": "not_run",
+        "stage_required": 10,
+    }
+
+
+def _empty_verdict_review_raw_response(binary_name: str, binary_sha256: str) -> Dict[str, Any]:
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "binary": binary_name,
+        "binary_sha256": binary_sha256,
+        "batches": [],
+        "status": "not_run",
+        "stage_required": 10,
+    }
+
+
+def _empty_verdict_review_session(binary_name: str, binary_sha256: str) -> Dict[str, Any]:
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "binary": binary_name,
+        "binary_sha256": binary_sha256,
+        "batches": [],
+        "status": "not_run",
+        "stage_required": 10,
+    }
 
 def _empty_verdict_review_trace(binary_name: str, binary_sha256: str) -> Dict[str, Any]:
     return {

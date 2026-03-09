@@ -95,6 +95,9 @@ void process_packet(char *dst, unsigned int payload_len) {
         "verdict_audit_flags",
         "verdict_soft_triage",
         "verdict_review_plan",
+        "verdict_review_prompt",
+        "verdict_review_raw_response",
+        "verdict_review_session",
         "verdict_review_trace",
     }
 
@@ -116,6 +119,9 @@ void process_packet(char *dst, unsigned int payload_len) {
     assert artifacts["verdict_soft_triage"]["status"] == "ok"
     assert artifacts["verdict_calibration_queue"]["status"] == "ok"
     assert artifacts["verdict_review_plan"]["status"] == "not_run"
+    assert artifacts["verdict_review_prompt"]["status"] == "not_run"
+    assert artifacts["verdict_review_raw_response"]["status"] == "not_run"
+    assert artifacts["verdict_review_session"]["status"] == "not_run"
     assert artifacts["verdict_review_trace"]["status"] == "not_run"
 
 
@@ -206,4 +212,7 @@ def test_phase_a_stage9_produces_linking_but_not_triage():
     assert artifacts["verdict_audit_flags"]["status"] == "not_run"
     assert artifacts["verdict_soft_triage"]["status"] == "not_run"
     assert artifacts["verdict_review_plan"]["status"] == "not_run"
+    assert artifacts["verdict_review_prompt"]["status"] == "not_run"
+    assert artifacts["verdict_review_raw_response"]["status"] == "not_run"
+    assert artifacts["verdict_review_session"]["status"] == "not_run"
     assert artifacts["verdict_review_trace"]["status"] == "not_run"

@@ -1277,6 +1277,24 @@ async def _run_stage_8_10(result, *, max_stage: int, args=None):
             "status": "disabled" if not review_enabled else "not_run",
             "batches": [],
         }
+        review_prompt_artifact = {
+            "schema_version": "0.1",
+            "binary": str(result.binary_path or ""),
+            "status": "disabled" if not review_enabled else "not_run",
+            "batches": [],
+        }
+        review_raw_response_artifact = {
+            "schema_version": "0.1",
+            "binary": str(result.binary_path or ""),
+            "status": "disabled" if not review_enabled else "not_run",
+            "batches": [],
+        }
+        review_session_artifact = {
+            "schema_version": "0.1",
+            "binary": str(result.binary_path or ""),
+            "status": "disabled" if not review_enabled else "not_run",
+            "batches": [],
+        }
         internal_review_decisions = []
 
         if review_enabled:
@@ -1300,6 +1318,9 @@ async def _run_stage_8_10(result, *, max_stage: int, args=None):
                     timeout_sec=int(getattr(args, "review_timeout_sec", 120) or 120),
                 )
                 internal_review_decisions = list(review_run.get("review_decisions", []) or [])
+                review_prompt_artifact = dict(review_run.get("review_prompt", {}) or review_prompt_artifact)
+                review_raw_response_artifact = dict(review_run.get("review_raw_response", {}) or review_raw_response_artifact)
+                review_session_artifact = dict(review_run.get("review_session", {}) or review_session_artifact)
                 review_trace_artifact = dict(review_run.get("review_trace", {}) or review_trace_artifact)
             else:
                 review_trace_artifact = {
@@ -1313,7 +1334,12 @@ async def _run_stage_8_10(result, *, max_stage: int, args=None):
         merged_review_decisions = merge_review_decisions(internal_review_decisions, external_review_decisions)
         artifacts = _build_artifacts(
             review_decisions=merged_review_decisions,
-            review_plan=review_plan_artifact,
+            review_plan={
+                **review_plan_artifact,
+                "review_prompt": review_prompt_artifact,
+                "review_raw_response": review_raw_response_artifact,
+                "review_session": review_session_artifact,
+            },
             review_trace=review_trace_artifact,
         )
 
@@ -2365,6 +2391,9 @@ async def _cmd_eval(args):
                     "verdict_audit_flags",
                     "verdict_soft_triage",
                     "verdict_review_plan",
+                    "verdict_review_prompt",
+                    "verdict_review_raw_response",
+                    "verdict_review_session",
                     "verdict_review_trace",
                 ):
                     (output_dir / "raw_views" / f"{output_stem}.{artifact_name}.json").write_text(

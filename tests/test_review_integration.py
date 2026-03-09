@@ -114,8 +114,13 @@ def test_review_runner_uses_mock_llm(monkeypatch):
         def __init__(self, model=None):
             self.model = model
 
-        async def simple_completion(self, prompt, system=None):
-            return '{"decisions": [{"chain_id": "c1", "suggested_semantic_verdict": "SUSPICIOUS", "trigger_summary": "len can exceed dst", "preconditions": {"state_predicates": ["rx_ready != 0"], "root_constraints": ["len > cap"], "why_check_fails": ["guard missing"]}, "evidence_map": {"trigger_summary": ["sink_function"], "root_controllability": ["producer_function"]}, "audit_flags": ["CHECK_NOT_BINDING_ROOT"], "review_mode": "semantic_review"}]}'
+        async def generate(self, system_prompt, messages, tools=None, metadata=None, stream=False):
+            return SimpleNamespace(
+                content='{"decisions": [{"chain_id": "c1", "suggested_semantic_verdict": "SUSPICIOUS", "trigger_summary": "len can exceed dst", "preconditions": {"state_predicates": ["rx_ready != 0"], "root_constraints": ["len > cap"], "why_check_fails": ["guard missing"]}, "evidence_map": {"trigger_summary": ["sink_function"], "root_controllability": ["producer_function"]}, "audit_flags": ["CHECK_NOT_BINDING_ROOT"], "review_mode": "semantic_review"}]}',
+                usage={"prompt_tokens": 10, "completion_tokens": 20, "total_tokens": 30},
+                model=self.model,
+                finish_reason="stop",
+            )
 
     monkeypatch.setattr("sourceagent.agents.review_runner.LLM", _FakeLLM)
     plan = {
@@ -126,6 +131,11 @@ def test_review_runner_uses_mock_llm(monkeypatch):
     assert out["review_trace"]["status"] == "ok"
     assert len(out["review_decisions"]) == 1
     assert out["review_decisions"][0]["chain_id"] == "c1"
+    assert out["review_prompt"]["status"] == "ok"
+    assert out["review_raw_response"]["status"] == "ok"
+    assert out["review_session"]["status"] == "ok"
+    assert out["review_raw_response"]["batches"][0]["finish_reason"] == "stop"
+    assert out["review_prompt"]["batches"][0]["system_prompt"]
 
 
 def test_run_stage_8_10_runs_internal_review(monkeypatch):
@@ -143,6 +153,9 @@ def test_run_stage_8_10_runs_internal_review(monkeypatch):
                 "audit_flags": ["CHECK_NOT_BINDING_ROOT"],
                 "review_mode": "semantic_review",
             }],
+            "review_prompt": {"schema_version": "0.1", "status": "ok", "batches": [{"batch_id": "b0", "user_prompt": "prompt"}]},
+            "review_raw_response": {"schema_version": "0.1", "status": "ok", "batches": [{"batch_id": "b0", "raw_text": "{}"}]},
+            "review_session": {"schema_version": "0.1", "status": "ok", "batches": [{"batch_id": "b0", "decision_count": 1}]},
             "review_trace": {"schema_version": "0.1", "status": "ok", "batches": [{"batch_id": "b0", "ok": True}]},
         }
 
@@ -173,6 +186,9 @@ def test_run_stage_8_10_runs_internal_review(monkeypatch):
     asyncio.run(_run_stage_8_10(result, max_stage=10, args=args))
     artifacts = result._phase_a_artifacts
     assert artifacts["verdict_review_plan"]["status"] == "ok"
+    assert artifacts["verdict_review_prompt"]["status"] == "ok"
+    assert artifacts["verdict_review_raw_response"]["status"] == "ok"
+    assert artifacts["verdict_review_session"]["status"] == "ok"
     assert artifacts["verdict_review_trace"]["status"] == "ok"
     assert artifacts["verdict_calibration_decisions"]["items"]
     assert any(row.get("llm_reviewed") for row in artifacts["verdict_soft_triage"]["items"])
