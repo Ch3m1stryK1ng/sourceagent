@@ -1,5 +1,5 @@
 {
-  "name": "mesobench_v1_unstripped_elf",
+  "name": "mesobench_unstripped_elf",
   "created_at": "2026-03-08T21:54:18+00:00",
   "description": "Mesobench v1: 30 source-backed or source-mappable firmware samples selected to extend chain-centric optimization beyond microbench.",
   "samples": [
@@ -10,7 +10,7 @@
       "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-2020-12140/hello-world.elf",
       "has_gt": false,
       "artifact_gt_seed": true,
-      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench_v1/samples/contiki_cve_2020_12140_hello_world.json",
+      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench/samples/contiki_cve_2020_12140_hello_world.json",
       "notes": "priority=high; role=primary_chain_driver"
     },
     {
@@ -20,7 +20,7 @@
       "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-2020-12141/snmp-server.elf",
       "has_gt": false,
       "artifact_gt_seed": true,
-      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench_v1/samples/contiki_cve_2020_12141_snmp_server.json",
+      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench/samples/contiki_cve_2020_12141_snmp_server.json",
       "notes": "priority=high; role=primary_chain_driver"
     },
     {
@@ -30,7 +30,7 @@
       "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-HALucinator-CVE-2019-9183/hello-world.elf",
       "has_gt": false,
       "artifact_gt_seed": true,
-      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench_v1/samples/contiki_halucinator_cve_2019_9183_hello_world.json",
+      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench/samples/contiki_halucinator_cve_2019_9183_hello_world.json",
       "notes": "priority=high; role=primary_chain_driver"
     },
     {
@@ -40,7 +40,7 @@
       "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10064/zephyr-CVE-2020-10064.elf",
       "has_gt": false,
       "artifact_gt_seed": true,
-      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench_v1/samples/zephyr_cve_2020_10064.json",
+      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench/samples/zephyr_cve_2020_10064.json",
       "notes": "priority=high; role=primary_chain_driver"
     },
     {
@@ -50,7 +50,7 @@
       "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10065/zephyr-CVE-2020-10065.elf",
       "has_gt": false,
       "artifact_gt_seed": true,
-      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench_v1/samples/zephyr_cve_2020_10065.json",
+      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench/samples/zephyr_cve_2020_10065.json",
       "notes": "priority=high; role=primary_chain_driver"
     },
     {
@@ -60,7 +60,7 @@
       "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10066/zephyr-CVE-2020-10066.elf",
       "has_gt": false,
       "artifact_gt_seed": true,
-      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench_v1/samples/zephyr_cve_2020_10066.json",
+      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench/samples/zephyr_cve_2020_10066.json",
       "notes": "priority=high; role=primary_chain_driver"
     },
     {
@@ -70,7 +70,7 @@
       "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3319/zephyr-CVE-2021-3319.elf",
       "has_gt": false,
       "artifact_gt_seed": true,
-      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench_v1/samples/zephyr_cve_2021_3319.json",
+      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench/samples/zephyr_cve_2021_3319.json",
       "notes": "priority=high; role=primary_chain_driver"
     },
     {
@@ -80,7 +80,7 @@
       "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3320/zephyr-CVE-2021-3320.elf",
       "has_gt": false,
       "artifact_gt_seed": true,
-      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench_v1/samples/zephyr_cve_2021_3320.json",
+      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench/samples/zephyr_cve_2021_3320.json",
       "notes": "priority=high; role=primary_chain_driver"
     },
     {
@@ -90,7 +90,7 @@
       "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3321/zephyr-CVE-2021-3321.elf",
       "has_gt": false,
       "artifact_gt_seed": true,
-      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench_v1/samples/zephyr_cve_2021_3321.json",
+      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench/samples/zephyr_cve_2021_3321.json",
       "notes": "priority=high; role=primary_chain_driver"
     },
     {
@@ -100,7 +100,7 @@
       "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3322/zephyr-CVE-2021-3322.elf",
       "has_gt": false,
       "artifact_gt_seed": true,
-      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench_v1/samples/zephyr_cve_2021_3322.json",
+      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench/samples/zephyr_cve_2021_3322.json",
       "notes": "priority=high; role=primary_chain_driver"
     },
     {
@@ -110,7 +110,7 @@
       "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3323/zephyr-CVE-2021-3323.elf",
       "has_gt": false,
       "artifact_gt_seed": true,
-      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench_v1/samples/zephyr_cve_2021_3323.json",
+      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench/samples/zephyr_cve_2021_3323.json",
       "notes": "priority=high; role=primary_chain_driver"
     },
     {
@@ -120,7 +120,7 @@
       "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3329/zephyr-CVE-2021-3329.elf",
       "has_gt": false,
       "artifact_gt_seed": true,
-      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench_v1/samples/zephyr_cve_2021_3329.json",
+      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench/samples/zephyr_cve_2021_3329.json",
       "notes": "priority=high; role=primary_chain_driver"
     },
     {
@@ -130,7 +130,7 @@
       "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3330/zephyr-CVE-2021-3330.elf",
       "has_gt": false,
       "artifact_gt_seed": true,
-      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench_v1/samples/zephyr_cve_2021_3330.json",
+      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench/samples/zephyr_cve_2021_3330.json",
       "notes": "priority=high; role=primary_chain_driver"
     },
     {
@@ -140,7 +140,7 @@
       "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-no-CVE-false-positive-rf-size-check/zephyr-CVE-no-CVE-false-positive-rf-size-check.elf",
       "has_gt": false,
       "artifact_gt_seed": true,
-      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench_v1/samples/zephyr_false_positive_rf_size_check.json",
+      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench/samples/zephyr_false_positive_rf_size_check.json",
       "notes": "priority=high; role=negative_control"
     },
     {
@@ -150,7 +150,7 @@
       "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-no-CVE-false-positive-watchdog-callback/zephyr-CVE-no-CVE-false-positive-watchdog-callback.elf",
       "has_gt": false,
       "artifact_gt_seed": true,
-      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench_v1/samples/zephyr_false_positive_watchdog_callback.json",
+      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench/samples/zephyr_false_positive_watchdog_callback.json",
       "notes": "priority=high; role=negative_control"
     },
     {
@@ -160,7 +160,7 @@
       "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/stm32_tcp_echo_client/stm32_tcp_echo_client.elf",
       "has_gt": false,
       "artifact_gt_seed": true,
-      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench_v1/samples/stm32cube_lwip_tcp_echo_client.json",
+      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench/samples/stm32cube_lwip_tcp_echo_client.json",
       "notes": "priority=high; role=primary_chain_driver"
     },
     {
@@ -170,7 +170,7 @@
       "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/stm32_tcp_echo_server/stm32_tcp_echo_server.elf",
       "has_gt": false,
       "artifact_gt_seed": true,
-      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench_v1/samples/stm32cube_lwip_tcp_echo_server.json",
+      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench/samples/stm32cube_lwip_tcp_echo_server.json",
       "notes": "priority=high; role=primary_chain_driver"
     },
     {
@@ -180,7 +180,7 @@
       "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/stm32_udp_echo_client/stm32_udp_echo_client.elf",
       "has_gt": false,
       "artifact_gt_seed": true,
-      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench_v1/samples/stm32cube_lwip_udp_echo_client.json",
+      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench/samples/stm32cube_lwip_udp_echo_client.json",
       "notes": "priority=high; role=primary_chain_driver"
     },
     {
@@ -190,7 +190,7 @@
       "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/stm32_udp_echo_server/stm32_udp_echo_server.elf",
       "has_gt": false,
       "artifact_gt_seed": true,
-      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench_v1/samples/stm32cube_lwip_udp_echo_server.json",
+      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench/samples/stm32cube_lwip_udp_echo_server.json",
       "notes": "priority=high; role=primary_chain_driver"
     },
     {
@@ -200,7 +200,7 @@
       "binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_bof/STM32469I_EVAL_tcp_echo_base.elf",
       "has_gt": false,
       "artifact_gt_seed": true,
-      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench_v1/samples/usbs_tcp_echo_client_vuln_bof.json",
+      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench/samples/usbs_tcp_echo_client_vuln_bof.json",
       "notes": "priority=high; role=primary_chain_driver"
     },
     {
@@ -210,7 +210,7 @@
       "binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_bof/STM32469I_EVAL_tcp_echo_base_DHCP/STM32469I_EVAL_tcp_echo_base.elf",
       "has_gt": false,
       "artifact_gt_seed": true,
-      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench_v1/samples/usbs_tcp_echo_client_vuln_bof_dhcp.json",
+      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench/samples/usbs_tcp_echo_client_vuln_bof_dhcp.json",
       "notes": "priority=high; role=primary_chain_driver"
     },
     {
@@ -220,7 +220,7 @@
       "binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one/STM32469I_EVAL_tcp_echo_base.elf",
       "has_gt": false,
       "artifact_gt_seed": true,
-      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench_v1/samples/usbs_tcp_echo_client_vuln_off_by_one.json",
+      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench/samples/usbs_tcp_echo_client_vuln_off_by_one.json",
       "notes": "priority=high; role=primary_chain_driver"
     },
     {
@@ -230,7 +230,7 @@
       "binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one_test_payload_len/STM32469I_EVAL_tcp_echo_base.elf",
       "has_gt": false,
       "artifact_gt_seed": true,
-      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench_v1/samples/usbs_tcp_echo_client_payload_len_variant.json",
+      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench/samples/usbs_tcp_echo_client_payload_len_variant.json",
       "notes": "priority=high; role=primary_chain_driver"
     },
     {
@@ -240,7 +240,7 @@
       "binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/test_printf_fw/STM32469I_EVAL_stm32_udp_echo_server.elf",
       "has_gt": false,
       "artifact_gt_seed": true,
-      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench_v1/samples/usbs_test_printf_fw.json",
+      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench/samples/usbs_test_printf_fw.json",
       "notes": "priority=high; role=primary_chain_driver"
     },
     {
@@ -250,7 +250,7 @@
       "binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof/STM32469I_EVAL_stm32_udp_echo_server.elf",
       "has_gt": false,
       "artifact_gt_seed": true,
-      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench_v1/samples/usbs_udp_echo_server_bof.json",
+      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench/samples/usbs_udp_echo_server_bof.json",
       "notes": "priority=high; role=primary_chain_driver"
     },
     {
@@ -260,7 +260,7 @@
       "binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_expl/STM32469I_EVAL_stm32_udp_echo_server.elf",
       "has_gt": false,
       "artifact_gt_seed": true,
-      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench_v1/samples/usbs_udp_echo_server_bof_expl.json",
+      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench/samples/usbs_udp_echo_server_bof_expl.json",
       "notes": "priority=high; role=primary_chain_driver"
     },
     {
@@ -270,7 +270,7 @@
       "binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one/STM32469I_EVAL_tcp_echo_base_DHCP/STM32469I_EVAL_tcp_echo_base.elf",
       "has_gt": false,
       "artifact_gt_seed": true,
-      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench_v1/samples/usbs_tcp_echo_client_vuln_off_by_one_dhcp.json",
+      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench/samples/usbs_tcp_echo_client_vuln_off_by_one_dhcp.json",
       "notes": "priority=high; role=primary_chain_driver"
     },
     {
@@ -280,7 +280,7 @@
       "binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_off_by_one/STM32469I_EVAL_stm32_udp_echo_server.elf",
       "has_gt": false,
       "artifact_gt_seed": true,
-      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench_v1/samples/usbs_udp_echo_server_off_by_one.json",
+      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench/samples/usbs_udp_echo_server_off_by_one.json",
       "notes": "priority=high; role=primary_chain_driver"
     },
     {
@@ -290,7 +290,7 @@
       "binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_instrumented_patched/STM32469I_EVAL_stm32_udp_echo_server.elf",
       "has_gt": false,
       "artifact_gt_seed": true,
-      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench_v1/samples/usbs_udp_echo_server_bof_instrumented_patched.json",
+      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench/samples/usbs_udp_echo_server_bof_instrumented_patched.json",
       "notes": "priority=high; role=hard_mode_chain_driver"
     },
     {
@@ -300,7 +300,7 @@
       "binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_instrumented/STM32469I_EVAL_stm32_udp_echo_server.elf",
       "has_gt": false,
       "artifact_gt_seed": true,
-      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench_v1/samples/usbs_udp_echo_server_bof_instrumented.json",
+      "artifact_gt_path": "/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench/samples/usbs_udp_echo_server_bof_instrumented.json",
       "notes": "priority=high; role=hard_mode_chain_driver"
     }
   ]

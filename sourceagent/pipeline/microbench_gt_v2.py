@@ -9,7 +9,7 @@ from typing import Any, Dict, Iterable, List, Tuple
 
 
 SCHEMA_VERSION = "2.0-seed"
-DEFAULT_REL_DIR = Path("firmware/ground_truth_bundle/microbench_v2")
+DEFAULT_REL_DIR = Path("firmware/ground_truth_bundle/microbench")
 SAMPLE_REL_DIR = DEFAULT_REL_DIR / "samples"
 
 

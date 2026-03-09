@@ -1,6 +1,6 @@
 # Mesobench GT v1
 
-This directory extends `microbench_v2` with a larger, more realistic set for
+This directory extends `microbench` with a larger, more realistic set for
 chain-centric optimization.
 
 Design goals:
@@ -38,13 +38,13 @@ Notes:
 Build:
 
 ```bash
-python3 -m sourceagent.pipeline.mesobench_v1 build
+python3 -m sourceagent.pipeline.mesobench build
 ```
 
 Validate:
 
 ```bash
-python3 -m sourceagent.pipeline.mesobench_v1 validate
+python3 -m sourceagent.pipeline.mesobench validate
 ```
 
 Related outputs:
@@ -52,4 +52,4 @@ Related outputs:
 - `index.json`: mesobench manifest and source-repo registry
 - `mesobench_inventory.json/csv`: operator-facing sample inventory
 - `global_inventory_patch.json`: entries injected into the global inventory
-- `firmware/eval_suite/mesobench_v1_unstripped_elf_manifest.json`: batch-eval manifest
+- `firmware/eval_suite/mesobench_unstripped_elf_manifest.json`: batch-eval manifest

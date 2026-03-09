@@ -10,12 +10,12 @@ from typing import Any, Dict, Iterable, List
 
 
 SCHEMA_VERSION = "1.0-seed"
-DEFAULT_REL_DIR = Path("firmware/ground_truth_bundle/mesobench_v1")
+DEFAULT_REL_DIR = Path("firmware/ground_truth_bundle/mesobench")
 SAMPLE_REL_DIR = DEFAULT_REL_DIR / "samples"
 REFERENCE_REL_DIR = Path("firmware/ground_truth_bundle/references/mesobench")
 GLOBAL_INVENTORY_REL = Path("firmware/ground_truth_bundle/ground_truth_inventory.json")
 GLOBAL_INVENTORY_CSV_REL = Path("firmware/ground_truth_bundle/ground_truth_inventory.csv")
-EVAL_MANIFEST_REL = Path("firmware/eval_suite/mesobench_v1_unstripped_elf_manifest.json")
+EVAL_MANIFEST_REL = Path("firmware/eval_suite/mesobench_unstripped_elf_manifest.json")
 
 
 @dataclass(frozen=True)
@@ -1059,15 +1059,15 @@ def _mesobench_inventory_entries(repo_root: Path, sample_docs: List[dict], exist
         old = old_by_elf.get(elf_path, {})
         source_code = sample["source_code"]
         entry = {
-            "dataset": "mesobench-v1",
+            "dataset": "mesobench",
             "subset": sample["subset"],
             "sample_id": sample["sample_id"],
             "elf_path": elf_path,
             "bin_path": sample["binary_artifacts"]["bin_path"] or "",
             "gt_type": "artifact_gt_seed",
             "gt_ref_files": [
-                "ground_truth_bundle/mesobench_v1/README.md",
-                f"ground_truth_bundle/mesobench_v1/samples/{sample['sample_id']}.json",
+                "ground_truth_bundle/mesobench/README.md",
+                f"ground_truth_bundle/mesobench/samples/{sample['sample_id']}.json",
                 "ground_truth_bundle/references/mesobench/README.md",
             ],
             "trigger_inputs_count": int(old.get("trigger_inputs_count", 0) or 0),
@@ -1168,7 +1168,7 @@ def _write_summary_md(out_dir: Path, sample_docs: List[dict]) -> None:
 
 def _write_eval_manifest(repo_root: Path, sample_docs: List[dict]) -> None:
     manifest = {
-        "name": "mesobench_v1_unstripped_elf",
+        "name": "mesobench_unstripped_elf",
         "created_at": _now_iso(),
         "description": (
             "Mesobench v1: 30 source-backed or source-mappable firmware samples "
@@ -1271,7 +1271,7 @@ def build_mesobench_v1(repo_root: Path | None = None, out_dir: Path | None = Non
     combined_inventory = [
         entry
         for entry in existing_inventory
-        if not (entry.get("dataset") == "mesobench-v1")
+        if not (entry.get("dataset") == "mesobench")
     ] + mesobench_entries
     _write_json(repo_root / GLOBAL_INVENTORY_REL, combined_inventory)
     _write_inventory_csv(repo_root / GLOBAL_INVENTORY_CSV_REL, combined_inventory)

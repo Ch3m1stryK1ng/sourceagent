@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "sample_count": 44,
   "components": {
-    "microbench_v2": 14,
-    "mesobench_v1": 30
+    "microbench": 14,
+    "mesobench": 30
   },
   "samples": [
     {

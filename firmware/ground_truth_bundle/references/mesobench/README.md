@@ -1,6 +1,6 @@
 # Mesobench Source Anchors
 
-This directory documents the source-code anchors used by `mesobench_v1`.
+This directory documents the source-code anchors used by `mesobench`.
 
 Primary anchors:
 - `firmware/source_repos/contiki-ng`

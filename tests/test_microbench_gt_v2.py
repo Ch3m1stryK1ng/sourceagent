@@ -54,13 +54,13 @@ def test_build_microbench_gt_v2_preserves_existing_annotations(tmp_path):
 
 
 def test_validate_microbench_gt_v2_repo_tree():
-    root = Path("/home/a347908610/sourceagent/firmware/ground_truth_bundle/microbench_v2")
+    root = Path("/home/a347908610/sourceagent/firmware/ground_truth_bundle/microbench")
     report = validate_microbench_gt_v2_tree(root)
     assert report["ok"], report["errors"]
 
 
 def test_repo_contains_completed_archetype_annotations():
-    root = Path("/home/a347908610/sourceagent/firmware/ground_truth_bundle/microbench_v2/samples")
+    root = Path("/home/a347908610/sourceagent/firmware/ground_truth_bundle/microbench/samples")
 
     isr = json.loads((root / "t0_isr_filled_buffer.json").read_text())
     assert isr["annotation_status"]["overall"] == "complete"
@@ -84,18 +84,18 @@ def test_repo_contains_completed_archetype_annotations():
 
 def test_all_microbench_samples_are_now_artifact_complete():
     manifest = json.loads(
-        Path("/home/a347908610/sourceagent/firmware/ground_truth_bundle/microbench_v2/index.json").read_text()
+        Path("/home/a347908610/sourceagent/firmware/ground_truth_bundle/microbench/index.json").read_text()
     )
     complete = [item["binary_stem"] for item in manifest["samples"] if item["annotation_level"] == "complete"]
     assert len(complete) == len(MICROBENCH_SAMPLES)
 
     usb = json.loads(
-        Path("/home/a347908610/sourceagent/firmware/ground_truth_bundle/microbench_v2/samples/cve_2021_34259_usb_host.json").read_text()
+        Path("/home/a347908610/sourceagent/firmware/ground_truth_bundle/microbench/samples/cve_2021_34259_usb_host.json").read_text()
     )
     assert [chain["expected_verdict"] for chain in usb["chains"]] == ["CONFIRMED", "CONFIRMED", "SUSPICIOUS"]
 
     dns = json.loads(
-        Path("/home/a347908610/sourceagent/firmware/ground_truth_bundle/microbench_v2/samples/cve_2018_16525_freertos_dns.json").read_text()
+        Path("/home/a347908610/sourceagent/firmware/ground_truth_bundle/microbench/samples/cve_2018_16525_freertos_dns.json").read_text()
     )
     assert [chain["expected_verdict"] for chain in dns["chains"]] == ["SUSPICIOUS", "CONFIRMED", "CONFIRMED"]
 

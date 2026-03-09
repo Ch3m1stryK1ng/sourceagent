@@ -1,22 +1,22 @@
 import json
 from pathlib import Path
 
-from sourceagent.pipeline.mesobench_v1 import SCHEMA_VERSION, validate_mesobench_v1_tree
+from sourceagent.pipeline.mesobench import SCHEMA_VERSION, validate_mesobench_tree
 
 
-def test_validate_mesobench_v1_repo_tree():
-    root = Path("/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench_v1")
-    report = validate_mesobench_v1_tree(root)
+def test_validate_mesobench_repo_tree():
+    root = Path("/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench")
+    report = validate_mesobench_tree(root)
     assert report["ok"], report["errors"]
     assert report["sample_count"] == 30
 
 
 def test_mesobench_index_and_manifest_counts():
     idx = json.loads(
-        Path("/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench_v1/index.json").read_text()
+        Path("/home/a347908610/sourceagent/firmware/ground_truth_bundle/mesobench/index.json").read_text()
     )
     manifest = json.loads(
-        Path("/home/a347908610/sourceagent/firmware/eval_suite/mesobench_v1_unstripped_elf_manifest.json").read_text()
+        Path("/home/a347908610/sourceagent/firmware/eval_suite/mesobench_unstripped_elf_manifest.json").read_text()
     )
     assert idx["schema_version"] == SCHEMA_VERSION
     assert idx["sample_count"] == 30
@@ -34,7 +34,7 @@ def test_global_inventory_contains_mesobench_entries():
     inv = json.loads(
         Path("/home/a347908610/sourceagent/firmware/ground_truth_bundle/ground_truth_inventory.json").read_text()
     )
-    meso = [e for e in inv if e.get("dataset") == "mesobench-v1"]
+    meso = [e for e in inv if e.get("dataset") == "mesobench"]
     assert len(meso) == 30
     assert any(e["sample_id"] == "zephyr_cve_2020_10065" for e in meso)
     assert any(e["sample_id"] == "usbs_tcp_echo_client_vuln_off_by_one_dhcp" for e in meso)

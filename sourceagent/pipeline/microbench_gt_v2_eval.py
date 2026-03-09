@@ -1111,7 +1111,16 @@ def evaluate_microbench_v2_run(
     gt_root: Optional[Path] = None,
     output_dir: Optional[Path] = None,
 ) -> Dict[str, Any]:
-    gt_root = gt_root or (_repo_root() / "firmware" / "ground_truth_bundle" / "microbench_v2")
+    return evaluate_microbench_run(eval_dir, gt_root=gt_root, output_dir=output_dir)
+
+
+def evaluate_microbench_run(
+    eval_dir: Path,
+    *,
+    gt_root: Optional[Path] = None,
+    output_dir: Optional[Path] = None,
+) -> Dict[str, Any]:
+    gt_root = gt_root or (_repo_root() / "firmware" / "ground_truth_bundle" / "microbench")
     output_dir = output_dir or (eval_dir / "summary")
 
     gt_samples = _load_gt_samples(gt_root)
@@ -1176,7 +1185,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     parser.add_argument("--output-dir", type=Path, default=None, help="Output directory (default: <eval_dir>/summary)")
     args = parser.parse_args(argv)
 
-    report = evaluate_microbench_v2_run(
+    report = evaluate_microbench_run(
         args.eval_dir,
         gt_root=args.gt_root,
         output_dir=args.output_dir,

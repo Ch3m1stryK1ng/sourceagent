@@ -1,14 +1,14 @@
 [
   {
-    "dataset": "mesobench-v1",
+    "dataset": "mesobench",
     "subset": "D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples",
     "sample_id": "contiki_cve_2020_12140_hello_world",
     "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-2020-12140/hello-world.elf",
     "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-2020-12140/hello-world.bin",
     "gt_type": "artifact_gt_seed",
     "gt_ref_files": [
-      "ground_truth_bundle/mesobench_v1/README.md",
-      "ground_truth_bundle/mesobench_v1/samples/contiki_cve_2020_12140_hello_world.json",
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/contiki_cve_2020_12140_hello_world.json",
       "ground_truth_bundle/references/mesobench/README.md"
     ],
     "trigger_inputs_count": 0,
@@ -16,15 +16,15 @@
     "notes": "priority=high; role=primary_chain_driver; source=contiki-ng(full_upstream_repo)"
   },
   {
-    "dataset": "mesobench-v1",
+    "dataset": "mesobench",
     "subset": "D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples",
     "sample_id": "contiki_cve_2020_12141_snmp_server",
     "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-2020-12141/snmp-server.elf",
     "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-2020-12141/snmp-server.bin",
     "gt_type": "artifact_gt_seed",
     "gt_ref_files": [
-      "ground_truth_bundle/mesobench_v1/README.md",
-      "ground_truth_bundle/mesobench_v1/samples/contiki_cve_2020_12141_snmp_server.json",
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/contiki_cve_2020_12141_snmp_server.json",
       "ground_truth_bundle/references/mesobench/README.md"
     ],
     "trigger_inputs_count": 0,
@@ -32,15 +32,15 @@
     "notes": "priority=high; role=primary_chain_driver; source=contiki-ng(full_upstream_repo)"
   },
   {
-    "dataset": "mesobench-v1",
+    "dataset": "mesobench",
     "subset": "D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples",
     "sample_id": "contiki_halucinator_cve_2019_9183_hello_world",
     "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-HALucinator-CVE-2019-9183/hello-world.elf",
     "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-HALucinator-CVE-2019-9183/hello-world.bin",
     "gt_type": "artifact_gt_seed",
     "gt_ref_files": [
-      "ground_truth_bundle/mesobench_v1/README.md",
-      "ground_truth_bundle/mesobench_v1/samples/contiki_halucinator_cve_2019_9183_hello_world.json",
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/contiki_halucinator_cve_2019_9183_hello_world.json",
       "ground_truth_bundle/references/mesobench/README.md"
     ],
     "trigger_inputs_count": 0,
@@ -48,15 +48,15 @@
     "notes": "priority=high; role=primary_chain_driver; source=contiki-ng(full_upstream_repo)"
   },
   {
-    "dataset": "mesobench-v1",
+    "dataset": "mesobench",
     "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
     "sample_id": "zephyr_cve_2020_10064",
     "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10064/zephyr-CVE-2020-10064.elf",
     "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10064/zephyr-CVE-2020-10064.bin",
     "gt_type": "artifact_gt_seed",
     "gt_ref_files": [
-      "ground_truth_bundle/mesobench_v1/README.md",
-      "ground_truth_bundle/mesobench_v1/samples/zephyr_cve_2020_10064.json",
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/zephyr_cve_2020_10064.json",
       "ground_truth_bundle/references/mesobench/README.md"
     ],
     "trigger_inputs_count": 0,
@@ -64,15 +64,15 @@
     "notes": "priority=high; role=primary_chain_driver; source=zephyr(full_upstream_repo)"
   },
   {
-    "dataset": "mesobench-v1",
+    "dataset": "mesobench",
     "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
     "sample_id": "zephyr_cve_2020_10065",
     "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10065/zephyr-CVE-2020-10065.elf",
     "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10065/zephyr-CVE-2020-10065.bin",
     "gt_type": "artifact_gt_seed",
     "gt_ref_files": [
-      "ground_truth_bundle/mesobench_v1/README.md",
-      "ground_truth_bundle/mesobench_v1/samples/zephyr_cve_2020_10065.json",
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/zephyr_cve_2020_10065.json",
       "ground_truth_bundle/references/mesobench/README.md"
     ],
     "trigger_inputs_count": 0,
@@ -80,15 +80,15 @@
     "notes": "priority=high; role=primary_chain_driver; source=zephyr(full_upstream_repo)"
   },
   {
-    "dataset": "mesobench-v1",
+    "dataset": "mesobench",
     "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
     "sample_id": "zephyr_cve_2020_10066",
     "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10066/zephyr-CVE-2020-10066.elf",
     "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10066/zephyr-CVE-2020-10066.bin",
     "gt_type": "artifact_gt_seed",
     "gt_ref_files": [
-      "ground_truth_bundle/mesobench_v1/README.md",
-      "ground_truth_bundle/mesobench_v1/samples/zephyr_cve_2020_10066.json",
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/zephyr_cve_2020_10066.json",
       "ground_truth_bundle/references/mesobench/README.md"
     ],
     "trigger_inputs_count": 0,
@@ -96,15 +96,15 @@
     "notes": "priority=high; role=primary_chain_driver; source=zephyr(full_upstream_repo)"
   },
   {
-    "dataset": "mesobench-v1",
+    "dataset": "mesobench",
     "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
     "sample_id": "zephyr_cve_2021_3319",
     "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3319/zephyr-CVE-2021-3319.elf",
     "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3319/zephyr-CVE-2021-3319.bin",
     "gt_type": "artifact_gt_seed",
     "gt_ref_files": [
-      "ground_truth_bundle/mesobench_v1/README.md",
-      "ground_truth_bundle/mesobench_v1/samples/zephyr_cve_2021_3319.json",
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/zephyr_cve_2021_3319.json",
       "ground_truth_bundle/references/mesobench/README.md"
     ],
     "trigger_inputs_count": 0,
@@ -112,15 +112,15 @@
     "notes": "priority=high; role=primary_chain_driver; source=zephyr(full_upstream_repo)"
   },
   {
-    "dataset": "mesobench-v1",
+    "dataset": "mesobench",
     "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
     "sample_id": "zephyr_cve_2021_3320",
     "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3320/zephyr-CVE-2021-3320.elf",
     "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3320/zephyr-CVE-2021-3320.bin",
     "gt_type": "artifact_gt_seed",
     "gt_ref_files": [
-      "ground_truth_bundle/mesobench_v1/README.md",
-      "ground_truth_bundle/mesobench_v1/samples/zephyr_cve_2021_3320.json",
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/zephyr_cve_2021_3320.json",
       "ground_truth_bundle/references/mesobench/README.md"
     ],
     "trigger_inputs_count": 0,
@@ -128,15 +128,15 @@
     "notes": "priority=high; role=primary_chain_driver; source=zephyr(full_upstream_repo)"
   },
   {
-    "dataset": "mesobench-v1",
+    "dataset": "mesobench",
     "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
     "sample_id": "zephyr_cve_2021_3321",
     "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3321/zephyr-CVE-2021-3321.elf",
     "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3321/zephyr-CVE-2021-3321.bin",
     "gt_type": "artifact_gt_seed",
     "gt_ref_files": [
-      "ground_truth_bundle/mesobench_v1/README.md",
-      "ground_truth_bundle/mesobench_v1/samples/zephyr_cve_2021_3321.json",
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/zephyr_cve_2021_3321.json",
       "ground_truth_bundle/references/mesobench/README.md"
     ],
     "trigger_inputs_count": 0,
@@ -144,15 +144,15 @@
     "notes": "priority=high; role=primary_chain_driver; source=zephyr(full_upstream_repo)"
   },
   {
-    "dataset": "mesobench-v1",
+    "dataset": "mesobench",
     "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
     "sample_id": "zephyr_cve_2021_3322",
     "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3322/zephyr-CVE-2021-3322.elf",
     "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3322/zephyr-CVE-2021-3322.bin",
     "gt_type": "artifact_gt_seed",
     "gt_ref_files": [
-      "ground_truth_bundle/mesobench_v1/README.md",
-      "ground_truth_bundle/mesobench_v1/samples/zephyr_cve_2021_3322.json",
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/zephyr_cve_2021_3322.json",
       "ground_truth_bundle/references/mesobench/README.md"
     ],
     "trigger_inputs_count": 0,
@@ -160,15 +160,15 @@
     "notes": "priority=high; role=primary_chain_driver; source=zephyr(full_upstream_repo)"
   },
   {
-    "dataset": "mesobench-v1",
+    "dataset": "mesobench",
     "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
     "sample_id": "zephyr_cve_2021_3323",
     "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3323/zephyr-CVE-2021-3323.elf",
     "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3323/zephyr-CVE-2021-3323.bin",
     "gt_type": "artifact_gt_seed",
     "gt_ref_files": [
-      "ground_truth_bundle/mesobench_v1/README.md",
-      "ground_truth_bundle/mesobench_v1/samples/zephyr_cve_2021_3323.json",
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/zephyr_cve_2021_3323.json",
       "ground_truth_bundle/references/mesobench/README.md"
     ],
     "trigger_inputs_count": 0,
@@ -176,15 +176,15 @@
     "notes": "priority=high; role=primary_chain_driver; source=zephyr(full_upstream_repo)"
   },
   {
-    "dataset": "mesobench-v1",
+    "dataset": "mesobench",
     "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
     "sample_id": "zephyr_cve_2021_3329",
     "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3329/zephyr-CVE-2021-3329.elf",
     "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3329/zephyr-CVE-2021-3329.bin",
     "gt_type": "artifact_gt_seed",
     "gt_ref_files": [
-      "ground_truth_bundle/mesobench_v1/README.md",
-      "ground_truth_bundle/mesobench_v1/samples/zephyr_cve_2021_3329.json",
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/zephyr_cve_2021_3329.json",
       "ground_truth_bundle/references/mesobench/README.md"
     ],
     "trigger_inputs_count": 0,
@@ -192,15 +192,15 @@
     "notes": "priority=high; role=primary_chain_driver; source=zephyr(full_upstream_repo)"
   },
   {
-    "dataset": "mesobench-v1",
+    "dataset": "mesobench",
     "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
     "sample_id": "zephyr_cve_2021_3330",
     "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3330/zephyr-CVE-2021-3330.elf",
     "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3330/zephyr-CVE-2021-3330.bin",
     "gt_type": "artifact_gt_seed",
     "gt_ref_files": [
-      "ground_truth_bundle/mesobench_v1/README.md",
-      "ground_truth_bundle/mesobench_v1/samples/zephyr_cve_2021_3330.json",
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/zephyr_cve_2021_3330.json",
       "ground_truth_bundle/references/mesobench/README.md"
     ],
     "trigger_inputs_count": 0,
@@ -208,15 +208,15 @@
     "notes": "priority=high; role=primary_chain_driver; source=zephyr(full_upstream_repo)"
   },
   {
-    "dataset": "mesobench-v1",
+    "dataset": "mesobench",
     "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
     "sample_id": "zephyr_false_positive_rf_size_check",
     "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-no-CVE-false-positive-rf-size-check/zephyr-CVE-no-CVE-false-positive-rf-size-check.elf",
     "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-no-CVE-false-positive-rf-size-check/zephyr-CVE-no-CVE-false-positive-rf-size-check.bin",
     "gt_type": "artifact_gt_seed",
     "gt_ref_files": [
-      "ground_truth_bundle/mesobench_v1/README.md",
-      "ground_truth_bundle/mesobench_v1/samples/zephyr_false_positive_rf_size_check.json",
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/zephyr_false_positive_rf_size_check.json",
       "ground_truth_bundle/references/mesobench/README.md"
     ],
     "trigger_inputs_count": 0,
@@ -224,15 +224,15 @@
     "notes": "priority=high; role=negative_control; source=zephyr(full_upstream_repo)"
   },
   {
-    "dataset": "mesobench-v1",
+    "dataset": "mesobench",
     "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
     "sample_id": "zephyr_false_positive_watchdog_callback",
     "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-no-CVE-false-positive-watchdog-callback/zephyr-CVE-no-CVE-false-positive-watchdog-callback.elf",
     "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-no-CVE-false-positive-watchdog-callback/zephyr-CVE-no-CVE-false-positive-watchdog-callback.bin",
     "gt_type": "artifact_gt_seed",
     "gt_ref_files": [
-      "ground_truth_bundle/mesobench_v1/README.md",
-      "ground_truth_bundle/mesobench_v1/samples/zephyr_false_positive_watchdog_callback.json",
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/zephyr_false_positive_watchdog_callback.json",
       "ground_truth_bundle/references/mesobench/README.md"
     ],
     "trigger_inputs_count": 0,
@@ -240,15 +240,15 @@
     "notes": "priority=high; role=negative_control; source=zephyr(full_upstream_repo)"
   },
   {
-    "dataset": "mesobench-v1",
+    "dataset": "mesobench",
     "subset": "ARMCortex-M",
     "sample_id": "stm32cube_lwip_tcp_echo_client",
     "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/stm32_tcp_echo_client/stm32_tcp_echo_client.elf",
     "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/stm32_tcp_echo_client/stm32_tcp_echo_client.bin",
     "gt_type": "artifact_gt_seed",
     "gt_ref_files": [
-      "ground_truth_bundle/mesobench_v1/README.md",
-      "ground_truth_bundle/mesobench_v1/samples/stm32cube_lwip_tcp_echo_client.json",
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/stm32cube_lwip_tcp_echo_client.json",
       "ground_truth_bundle/references/mesobench/README.md"
     ],
     "trigger_inputs_count": 0,
@@ -256,15 +256,15 @@
     "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(full_upstream_repo)"
   },
   {
-    "dataset": "mesobench-v1",
+    "dataset": "mesobench",
     "subset": "ARMCortex-M",
     "sample_id": "stm32cube_lwip_tcp_echo_server",
     "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/stm32_tcp_echo_server/stm32_tcp_echo_server.elf",
     "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/stm32_tcp_echo_server/stm32_tcp_echo_server.bin",
     "gt_type": "artifact_gt_seed",
     "gt_ref_files": [
-      "ground_truth_bundle/mesobench_v1/README.md",
-      "ground_truth_bundle/mesobench_v1/samples/stm32cube_lwip_tcp_echo_server.json",
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/stm32cube_lwip_tcp_echo_server.json",
       "ground_truth_bundle/references/mesobench/README.md"
     ],
     "trigger_inputs_count": 0,
@@ -272,15 +272,15 @@
     "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(full_upstream_repo)"
   },
   {
-    "dataset": "mesobench-v1",
+    "dataset": "mesobench",
     "subset": "ARMCortex-M",
     "sample_id": "stm32cube_lwip_udp_echo_client",
     "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/stm32_udp_echo_client/stm32_udp_echo_client.elf",
     "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/stm32_udp_echo_client/stm32_udp_echo_client.bin",
     "gt_type": "artifact_gt_seed",
     "gt_ref_files": [
-      "ground_truth_bundle/mesobench_v1/README.md",
-      "ground_truth_bundle/mesobench_v1/samples/stm32cube_lwip_udp_echo_client.json",
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/stm32cube_lwip_udp_echo_client.json",
       "ground_truth_bundle/references/mesobench/README.md"
     ],
     "trigger_inputs_count": 0,
@@ -288,15 +288,15 @@
     "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(full_upstream_repo)"
   },
   {
-    "dataset": "mesobench-v1",
+    "dataset": "mesobench",
     "subset": "ARMCortex-M",
     "sample_id": "stm32cube_lwip_udp_echo_server",
     "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/stm32_udp_echo_server/stm32_udp_echo_server.elf",
     "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/stm32_udp_echo_server/stm32_udp_echo_server.bin",
     "gt_type": "artifact_gt_seed",
     "gt_ref_files": [
-      "ground_truth_bundle/mesobench_v1/README.md",
-      "ground_truth_bundle/mesobench_v1/samples/stm32cube_lwip_udp_echo_server.json",
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/stm32cube_lwip_udp_echo_server.json",
       "ground_truth_bundle/references/mesobench/README.md"
     ],
     "trigger_inputs_count": 0,
@@ -304,15 +304,15 @@
     "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(full_upstream_repo)"
   },
   {
-    "dataset": "mesobench-v1",
+    "dataset": "mesobench",
     "subset": "Ground-truth Benchmark/fw",
     "sample_id": "usbs_tcp_echo_client_vuln_bof",
     "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_bof/STM32469I_EVAL_tcp_echo_base.elf",
     "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_bof/STM32469I_EVAL_tcp_echo_base.bin",
     "gt_type": "artifact_gt_seed",
     "gt_ref_files": [
-      "ground_truth_bundle/mesobench_v1/README.md",
-      "ground_truth_bundle/mesobench_v1/samples/usbs_tcp_echo_client_vuln_bof.json",
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/usbs_tcp_echo_client_vuln_bof.json",
       "ground_truth_bundle/references/mesobench/README.md"
     ],
     "trigger_inputs_count": 0,
@@ -320,15 +320,15 @@
     "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(upstream_base_plus_overlay)"
   },
   {
-    "dataset": "mesobench-v1",
+    "dataset": "mesobench",
     "subset": "Ground-truth Benchmark/fw",
     "sample_id": "usbs_tcp_echo_client_vuln_bof_dhcp",
     "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_bof/STM32469I_EVAL_tcp_echo_base_DHCP/STM32469I_EVAL_tcp_echo_base.elf",
     "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_bof/STM32469I_EVAL_tcp_echo_base_DHCP/STM32469I_EVAL_tcp_echo_base.bin",
     "gt_type": "artifact_gt_seed",
     "gt_ref_files": [
-      "ground_truth_bundle/mesobench_v1/README.md",
-      "ground_truth_bundle/mesobench_v1/samples/usbs_tcp_echo_client_vuln_bof_dhcp.json",
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/usbs_tcp_echo_client_vuln_bof_dhcp.json",
       "ground_truth_bundle/references/mesobench/README.md"
     ],
     "trigger_inputs_count": 0,
@@ -336,15 +336,15 @@
     "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(upstream_base_plus_overlay)"
   },
   {
-    "dataset": "mesobench-v1",
+    "dataset": "mesobench",
     "subset": "Ground-truth Benchmark/fw",
     "sample_id": "usbs_tcp_echo_client_vuln_off_by_one",
     "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one/STM32469I_EVAL_tcp_echo_base.elf",
     "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one/STM32469I_EVAL_tcp_echo_base.bin",
     "gt_type": "artifact_gt_seed",
     "gt_ref_files": [
-      "ground_truth_bundle/mesobench_v1/README.md",
-      "ground_truth_bundle/mesobench_v1/samples/usbs_tcp_echo_client_vuln_off_by_one.json",
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/usbs_tcp_echo_client_vuln_off_by_one.json",
       "ground_truth_bundle/references/mesobench/README.md"
     ],
     "trigger_inputs_count": 0,
@@ -352,15 +352,15 @@
     "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(upstream_base_plus_overlay)"
   },
   {
-    "dataset": "mesobench-v1",
+    "dataset": "mesobench",
     "subset": "Ground-truth Benchmark/fw",
     "sample_id": "usbs_tcp_echo_client_payload_len_variant",
     "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one_test_payload_len/STM32469I_EVAL_tcp_echo_base.elf",
     "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one_test_payload_len/STM32469I_EVAL_tcp_echo_base.bin",
     "gt_type": "artifact_gt_seed",
     "gt_ref_files": [
-      "ground_truth_bundle/mesobench_v1/README.md",
-      "ground_truth_bundle/mesobench_v1/samples/usbs_tcp_echo_client_payload_len_variant.json",
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/usbs_tcp_echo_client_payload_len_variant.json",
       "ground_truth_bundle/references/mesobench/README.md"
     ],
     "trigger_inputs_count": 0,
@@ -368,15 +368,15 @@
     "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(upstream_base_plus_overlay)"
   },
   {
-    "dataset": "mesobench-v1",
+    "dataset": "mesobench",
     "subset": "Ground-truth Benchmark/fw",
     "sample_id": "usbs_test_printf_fw",
     "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/test_printf_fw/STM32469I_EVAL_stm32_udp_echo_server.elf",
     "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/test_printf_fw/STM32469I_EVAL_stm32_udp_echo_server.bin",
     "gt_type": "artifact_gt_seed",
     "gt_ref_files": [
-      "ground_truth_bundle/mesobench_v1/README.md",
-      "ground_truth_bundle/mesobench_v1/samples/usbs_test_printf_fw.json",
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/usbs_test_printf_fw.json",
       "ground_truth_bundle/references/mesobench/README.md"
     ],
     "trigger_inputs_count": 0,
@@ -384,15 +384,15 @@
     "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(upstream_base_plus_overlay)"
   },
   {
-    "dataset": "mesobench-v1",
+    "dataset": "mesobench",
     "subset": "Ground-truth Benchmark/fw",
     "sample_id": "usbs_udp_echo_server_bof",
     "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof/STM32469I_EVAL_stm32_udp_echo_server.elf",
     "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof/STM32469I_EVAL_stm32_udp_echo_server.bin",
     "gt_type": "artifact_gt_seed",
     "gt_ref_files": [
-      "ground_truth_bundle/mesobench_v1/README.md",
-      "ground_truth_bundle/mesobench_v1/samples/usbs_udp_echo_server_bof.json",
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/usbs_udp_echo_server_bof.json",
       "ground_truth_bundle/references/mesobench/README.md"
     ],
     "trigger_inputs_count": 0,
@@ -400,15 +400,15 @@
     "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(upstream_base_plus_overlay)"
   },
   {
-    "dataset": "mesobench-v1",
+    "dataset": "mesobench",
     "subset": "Ground-truth Benchmark/fw",
     "sample_id": "usbs_udp_echo_server_bof_expl",
     "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_expl/STM32469I_EVAL_stm32_udp_echo_server.elf",
     "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_expl/STM32469I_EVAL_stm32_udp_echo_server.bin",
     "gt_type": "artifact_gt_seed",
     "gt_ref_files": [
-      "ground_truth_bundle/mesobench_v1/README.md",
-      "ground_truth_bundle/mesobench_v1/samples/usbs_udp_echo_server_bof_expl.json",
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/usbs_udp_echo_server_bof_expl.json",
       "ground_truth_bundle/references/mesobench/README.md"
     ],
     "trigger_inputs_count": 0,
@@ -416,15 +416,15 @@
     "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(upstream_base_plus_overlay)"
   },
   {
-    "dataset": "mesobench-v1",
+    "dataset": "mesobench",
     "subset": "Ground-truth Benchmark/fw",
     "sample_id": "usbs_tcp_echo_client_vuln_off_by_one_dhcp",
     "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one/STM32469I_EVAL_tcp_echo_base_DHCP/STM32469I_EVAL_tcp_echo_base.elf",
     "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one/STM32469I_EVAL_tcp_echo_base_DHCP/STM32469I_EVAL_tcp_echo_base.bin",
     "gt_type": "artifact_gt_seed",
     "gt_ref_files": [
-      "ground_truth_bundle/mesobench_v1/README.md",
-      "ground_truth_bundle/mesobench_v1/samples/usbs_tcp_echo_client_vuln_off_by_one_dhcp.json",
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/usbs_tcp_echo_client_vuln_off_by_one_dhcp.json",
       "ground_truth_bundle/references/mesobench/README.md"
     ],
     "trigger_inputs_count": 0,
@@ -432,15 +432,15 @@
     "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(upstream_base_plus_overlay)"
   },
   {
-    "dataset": "mesobench-v1",
+    "dataset": "mesobench",
     "subset": "Ground-truth Benchmark/fw",
     "sample_id": "usbs_udp_echo_server_off_by_one",
     "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_off_by_one/STM32469I_EVAL_stm32_udp_echo_server.elf",
     "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_off_by_one/STM32469I_EVAL_stm32_udp_echo_server.bin",
     "gt_type": "artifact_gt_seed",
     "gt_ref_files": [
-      "ground_truth_bundle/mesobench_v1/README.md",
-      "ground_truth_bundle/mesobench_v1/samples/usbs_udp_echo_server_off_by_one.json",
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/usbs_udp_echo_server_off_by_one.json",
       "ground_truth_bundle/references/mesobench/README.md"
     ],
     "trigger_inputs_count": 0,
@@ -448,15 +448,15 @@
     "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(upstream_base_plus_overlay)"
   },
   {
-    "dataset": "mesobench-v1",
+    "dataset": "mesobench",
     "subset": "Ground-truth Benchmark/fw",
     "sample_id": "usbs_udp_echo_server_bof_instrumented_patched",
     "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_instrumented_patched/STM32469I_EVAL_stm32_udp_echo_server.elf",
     "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_instrumented_patched/STM32469I_EVAL_stm32_udp_echo_server.bin",
     "gt_type": "artifact_gt_seed",
     "gt_ref_files": [
-      "ground_truth_bundle/mesobench_v1/README.md",
-      "ground_truth_bundle/mesobench_v1/samples/usbs_udp_echo_server_bof_instrumented_patched.json",
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/usbs_udp_echo_server_bof_instrumented_patched.json",
       "ground_truth_bundle/references/mesobench/README.md"
     ],
     "trigger_inputs_count": 0,
@@ -464,15 +464,15 @@
     "notes": "priority=high; role=hard_mode_chain_driver; source=stm32cubef4(upstream_base_plus_overlay)"
   },
   {
-    "dataset": "mesobench-v1",
+    "dataset": "mesobench",
     "subset": "Ground-truth Benchmark/fw",
     "sample_id": "usbs_udp_echo_server_bof_instrumented",
     "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_instrumented/STM32469I_EVAL_stm32_udp_echo_server.elf",
     "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_instrumented/STM32469I_EVAL_stm32_udp_echo_server.bin",
     "gt_type": "artifact_gt_seed",
     "gt_ref_files": [
-      "ground_truth_bundle/mesobench_v1/README.md",
-      "ground_truth_bundle/mesobench_v1/samples/usbs_udp_echo_server_bof_instrumented.json",
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/usbs_udp_echo_server_bof_instrumented.json",
       "ground_truth_bundle/references/mesobench/README.md"
     ],
     "trigger_inputs_count": 0,

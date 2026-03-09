@@ -5,7 +5,7 @@
   "samples": [
     {
       "binary_stem": "t0_mmio_read",
-      "sample_path": "firmware/ground_truth_bundle/microbench_v2/samples/t0_mmio_read.json",
+      "sample_path": "firmware/ground_truth_bundle/microbench/samples/t0_mmio_read.json",
       "mechanism_group": "same_context_direct",
       "expected_channel_mode": "none",
       "source_count_seed": 3,
@@ -14,7 +14,7 @@
     },
     {
       "binary_stem": "t0_isr_mmio_read",
-      "sample_path": "firmware/ground_truth_bundle/microbench_v2/samples/t0_isr_mmio_read.json",
+      "sample_path": "firmware/ground_truth_bundle/microbench/samples/t0_isr_mmio_read.json",
       "mechanism_group": "isr_source_only",
       "expected_channel_mode": "optional",
       "source_count_seed": 2,
@@ -23,7 +23,7 @@
     },
     {
       "binary_stem": "t0_isr_filled_buffer",
-      "sample_path": "firmware/ground_truth_bundle/microbench_v2/samples/t0_isr_filled_buffer.json",
+      "sample_path": "firmware/ground_truth_bundle/microbench/samples/t0_isr_filled_buffer.json",
       "mechanism_group": "isr_cross_context",
       "expected_channel_mode": "required",
       "source_count_seed": 3,
@@ -32,7 +32,7 @@
     },
     {
       "binary_stem": "t0_dma_backed_buffer",
-      "sample_path": "firmware/ground_truth_bundle/microbench_v2/samples/t0_dma_backed_buffer.json",
+      "sample_path": "firmware/ground_truth_bundle/microbench/samples/t0_dma_backed_buffer.json",
       "mechanism_group": "dma_cross_context",
       "expected_channel_mode": "required",
       "source_count_seed": 1,
@@ -41,7 +41,7 @@
     },
     {
       "binary_stem": "t0_copy_sink",
-      "sample_path": "firmware/ground_truth_bundle/microbench_v2/samples/t0_copy_sink.json",
+      "sample_path": "firmware/ground_truth_bundle/microbench/samples/t0_copy_sink.json",
       "mechanism_group": "same_context_direct",
       "expected_channel_mode": "none",
       "source_count_seed": 2,
@@ -50,7 +50,7 @@
     },
     {
       "binary_stem": "t0_store_loop_sink",
-      "sample_path": "firmware/ground_truth_bundle/microbench_v2/samples/t0_store_loop_sink.json",
+      "sample_path": "firmware/ground_truth_bundle/microbench/samples/t0_store_loop_sink.json",
       "mechanism_group": "sink_archetype",
       "expected_channel_mode": "none",
       "source_count_seed": 2,
@@ -59,7 +59,7 @@
     },
     {
       "binary_stem": "t0_uart_rx_overflow",
-      "sample_path": "firmware/ground_truth_bundle/microbench_v2/samples/t0_uart_rx_overflow.json",
+      "sample_path": "firmware/ground_truth_bundle/microbench/samples/t0_uart_rx_overflow.json",
       "mechanism_group": "same_context_direct",
       "expected_channel_mode": "none",
       "source_count_seed": 2,
@@ -68,7 +68,7 @@
     },
     {
       "binary_stem": "t0_dma_length_overflow",
-      "sample_path": "firmware/ground_truth_bundle/microbench_v2/samples/t0_dma_length_overflow.json",
+      "sample_path": "firmware/ground_truth_bundle/microbench/samples/t0_dma_length_overflow.json",
       "mechanism_group": "dma_cross_context",
       "expected_channel_mode": "required",
       "source_count_seed": 5,
@@ -77,7 +77,7 @@
     },
     {
       "binary_stem": "t0_indirect_memcpy",
-      "sample_path": "firmware/ground_truth_bundle/microbench_v2/samples/t0_indirect_memcpy.json",
+      "sample_path": "firmware/ground_truth_bundle/microbench/samples/t0_indirect_memcpy.json",
       "mechanism_group": "same_context_bridge",
       "expected_channel_mode": "none",
       "source_count_seed": 2,
@@ -86,7 +86,7 @@
     },
     {
       "binary_stem": "t0_format_string",
-      "sample_path": "firmware/ground_truth_bundle/microbench_v2/samples/t0_format_string.json",
+      "sample_path": "firmware/ground_truth_bundle/microbench/samples/t0_format_string.json",
       "mechanism_group": "sink_archetype",
       "expected_channel_mode": "none",
       "source_count_seed": 2,
@@ -95,7 +95,7 @@
     },
     {
       "binary_stem": "t0_func_ptr_dispatch",
-      "sample_path": "firmware/ground_truth_bundle/microbench_v2/samples/t0_func_ptr_dispatch.json",
+      "sample_path": "firmware/ground_truth_bundle/microbench/samples/t0_func_ptr_dispatch.json",
       "mechanism_group": "sink_archetype",
       "expected_channel_mode": "none",
       "source_count_seed": 2,
@@ -104,7 +104,7 @@
     },
     {
       "binary_stem": "cve_2020_10065_hci_spi",
-      "sample_path": "firmware/ground_truth_bundle/microbench_v2/samples/cve_2020_10065_hci_spi.json",
+      "sample_path": "firmware/ground_truth_bundle/microbench/samples/cve_2020_10065_hci_spi.json",
       "mechanism_group": "real_cve_semantic",
       "expected_channel_mode": "none",
       "source_count_seed": 1,
@@ -113,7 +113,7 @@
     },
     {
       "binary_stem": "cve_2021_34259_usb_host",
-      "sample_path": "firmware/ground_truth_bundle/microbench_v2/samples/cve_2021_34259_usb_host.json",
+      "sample_path": "firmware/ground_truth_bundle/microbench/samples/cve_2021_34259_usb_host.json",
       "mechanism_group": "real_cve_semantic",
       "expected_channel_mode": "none",
       "source_count_seed": 1,
@@ -122,7 +122,7 @@
     },
     {
       "binary_stem": "cve_2018_16525_freertos_dns",
-      "sample_path": "firmware/ground_truth_bundle/microbench_v2/samples/cve_2018_16525_freertos_dns.json",
+      "sample_path": "firmware/ground_truth_bundle/microbench/samples/cve_2018_16525_freertos_dns.json",
       "mechanism_group": "real_cve_semantic",
       "expected_channel_mode": "none",
       "source_count_seed": 1,
