@@ -1,0 +1,86 @@
+{
+  "schema_version": "0.1",
+  "gt_backed": {
+    "sample_count": 44,
+    "positive_total": 386,
+    "matched": 386,
+    "missed": 0,
+    "hit_rate": 1.0,
+    "spurious_non_drop": 0,
+    "must_use_channel_total": 253,
+    "must_use_channel_ok": 253,
+    "negative_expectations": {
+      "total": 27,
+      "satisfied": 27,
+      "violated": 0
+    }
+  },
+  "no_gt": {
+    "sample_count": 94,
+    "totals": {
+      "sources": 7640,
+      "sinks": 2135,
+      "labels": 9775,
+      "review_queue": 658,
+      "soft_triage": 752,
+      "chains": 1937,
+      "with_source": 655,
+      "with_channel": 546,
+      "confirmed": 118,
+      "suspicious": 194,
+      "safe_or_low_risk": 88,
+      "dropped": 1537
+    },
+    "by_dataset": {
+      "monolithic-firmware-collection": {
+        "sources": 4979,
+        "sinks": 1079,
+        "labels": 6058,
+        "review_queue": 259,
+        "soft_triage": 296,
+        "chains": 945,
+        "with_source": 326,
+        "with_channel": 237,
+        "confirmed": 80,
+        "suspicious": 105,
+        "safe_or_low_risk": 72,
+        "dropped": 688
+      },
+      "p2im-unit_tests": {
+        "sources": 2159,
+        "sinks": 893,
+        "labels": 3052,
+        "review_queue": 329,
+        "soft_triage": 376,
+        "chains": 830,
+        "with_source": 278,
+        "with_channel": 279,
+        "confirmed": 37,
+        "suspicious": 40,
+        "safe_or_low_risk": 15,
+        "dropped": 738
+      },
+      "uSBS": {
+        "sources": 502,
+        "sinks": 163,
+        "labels": 665,
+        "review_queue": 70,
+        "soft_triage": 80,
+        "chains": 162,
+        "with_source": 51,
+        "with_channel": 30,
+        "confirmed": 1,
+        "suspicious": 49,
+        "safe_or_low_risk": 1,
+        "dropped": 111
+      }
+    }
+  },
+  "references": {
+    "gt_backed_eval_dir": "/tmp/eval_gt_backed_suite_v2_p35plus_rerun2_merged",
+    "no_gt_eval_dirs": [
+      "/tmp/eval_extra_no_gt_shard1_20260309_010532",
+      "/tmp/eval_extra_no_gt_shard2_20260309_010532"
+    ]
+  }
+}
