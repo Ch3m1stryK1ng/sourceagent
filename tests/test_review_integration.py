@@ -185,7 +185,7 @@ def test_review_runner_uses_mock_llm(monkeypatch):
 def test_run_stage_8_10_runs_internal_review(monkeypatch):
     from sourceagent.interface.main import _run_stage_8_10
 
-    async def _fake_run_review_plan(review_plan, *, model=None, review_mode="semantic", timeout_sec=120):
+    async def _fake_run_review_plan(review_plan, *, model=None, review_mode="semantic", review_tool_mode="prompt_only", timeout_sec=120, mcp_manager=None, ghidra_binary_name=None):
         chain_id = review_plan["items"][0]["chain_id"]
         return {
             "review_decisions": [{
@@ -236,3 +236,124 @@ def test_run_stage_8_10_runs_internal_review(monkeypatch):
     assert artifacts["verdict_review_trace"]["status"] == "ok"
     assert artifacts["verdict_calibration_decisions"]["items"]
     assert any(row.get("llm_reviewed") for row in artifacts["verdict_soft_triage"]["items"])
+
+
+def test_parse_review_response_normalizes_reason_codes_v2():
+    text = """{
+  "decisions": [
+    {
+      "chain_id": "c4",
+      "suggested_semantic_verdict": "SUSPICIOUS",
+      "trigger_summary": "review summary",
+      "preconditions": {},
+      "segment_assessment": [
+        {
+          "segment_id": "sink_triggerability",
+          "status": "possible",
+          "reason_codes": ["weak_check", "bogus_reason"],
+          "summary": "summary",
+          "evidence_map": {"summary": ["sink_function"]}
+        }
+      ],
+      "reason_codes": ["check_not_bound_to_root", "unknown_reason"],
+      "evidence_map": {"trigger_summary": ["sink_function"]}
+    }
+  ]
+}"""
+    decisions, meta = parse_review_response(text, default_review_mode="semantic_review", allowed_chain_ids=["c4"])
+    assert meta["ok"] is True
+    assert decisions[0]["reason_codes"] == ["CHECK_NOT_BINDING_ROOT"]
+    assert decisions[0]["segment_assessment"][0]["reason_codes"] == ["WEAK_GUARDING"]
+
+
+def test_build_review_plan_includes_available_snippet_keys():
+    feature_pack = {
+        "items": [
+            {
+                "chain_id": "c1",
+                "risk_score": 0.8,
+                "sink": {},
+                "root": {},
+                "derive_facts": [],
+                "check_facts": [],
+                "object_path": [],
+                "channel_path": [],
+                "sink_semantics_hints": {},
+                "guard_context": [],
+                "capacity_evidence": [],
+                "chain_segments": [],
+                "deterministic_constraints": {},
+                "decision_basis": {},
+                "decompiled_snippets": {"sink_function": "memcpy(...)", "check_context": "if (len < n)"},
+                "snippet_index": {"sink_function": ["copy_fn"], "check_context": ["copy_fn"]},
+            }
+        ]
+    }
+    queue = {"items": [{"chain_id": "c1", "queue_score": 0.8, "queue_reasons": ["needs_review"]}]}
+    plan = build_review_plan(feature_pack, queue, review_tool_mode="tool_assisted", max_items=1, batch_size=1)
+    assert plan["review_tool_mode"] == "tool_assisted"
+    assert set(plan["items"][0]["available_snippet_keys"]) == {"sink_function", "check_context"}
+    assert plan["items"][0]["snippet_index"]["sink_function"] == ["copy_fn"]
+
+
+def test_review_runner_tool_assisted_augments_snippets(monkeypatch):
+    class _FakeLLM:
+        def __init__(self, model=None):
+            self.model = model
+
+        async def generate(self, system_prompt, messages, tools=None, metadata=None, stream=False):
+            prompt = messages[0]["content"]
+            assert "check_context" in prompt
+            return SimpleNamespace(
+                content='{"decisions": [{"chain_id": "c1", "suggested_semantic_verdict": "SUSPICIOUS", "trigger_summary": "len can exceed dst", "preconditions": {"state_predicates": ["rx_ready != 0"], "root_constraints": ["len > cap"], "why_check_fails": ["guard weak"]}, "segment_assessment": [{"segment_id": "check_binding", "status": "weak", "reason_codes": ["CHECK_NOT_BINDING_ROOT"], "summary": "weak guard", "evidence_map": {"summary": ["check_context"]}}], "reason_codes": ["CHECK_NOT_BINDING_ROOT"], "evidence_map": {"trigger_summary": ["sink_function"], "root_controllability": ["check_context"]}, "audit_flags": ["CHECK_NOT_BINDING_ROOT"], "review_mode": "semantic_review"}]}',
+                usage={"prompt_tokens": 10, "completion_tokens": 20, "total_tokens": 30},
+                model=self.model,
+                finish_reason="stop",
+            )
+
+    class _FakeMCP:
+        async def call_tool(self, server_name, tool_name, arguments):
+            assert server_name == "ghidra"
+            assert tool_name == "decompile_function"
+            fn = arguments["name_or_address"]
+            return [{"type": "text", "text": '{"decompiled_code": "void %s(void) { /* body */ }"}' % fn}]
+
+    monkeypatch.setattr("sourceagent.agents.review_runner.LLM", _FakeLLM)
+    plan = {
+        "items": [{"chain_id": "c1"}],
+        "batches": [{
+            "batch_id": "b0",
+            "chain_ids": ["c1"],
+            "items": [{
+                "chain_id": "c1",
+                "current_verdict": "SUSPICIOUS",
+                "sink": {"function": "copy_fn"},
+                "root": {"family": "length", "expr": "payload_len"},
+                "derive_facts": [{"site": "parse_packet"}],
+                "check_facts": [{"site": "guard_fn"}],
+                "object_path": [],
+                "channel_path": [],
+                "chain_segments": [{"segment_id": "check_binding", "src": {}, "dst": {}, "snippet_keys": ["check_context"]}],
+                "sink_semantics_hints": {},
+                "guard_context": [{"site": "guard_fn"}],
+                "capacity_evidence": [],
+                "deterministic_constraints": {},
+                "decision_basis": {},
+                "decompiled_snippets": {"sink_function": "void copy_fn(void) {}", "caller_bridge": "", "producer_function": "", "check_context": ""},
+                "snippet_index": {"sink_function": ["copy_fn"], "caller_bridge": ["parse_packet"], "producer_function": ["uart_receive"]},
+                "available_snippet_keys": ["sink_function"],
+            }],
+        }],
+    }
+    out = asyncio.run(
+        run_review_plan(
+            plan,
+            model="mock-model",
+            review_tool_mode="tool_assisted",
+            mcp_manager=_FakeMCP(),
+            ghidra_binary_name="fw.elf-deadbeef",
+        )
+    )
+    assert out["review_trace"]["status"] == "ok"
+    assert out["review_trace"]["tool_logs"][0]["decompiled_function_count"] >= 1
+    assert out["review_prompt"]["batches"][0]["tool_context"]["summary"][0]["available_snippet_keys"]

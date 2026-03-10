@@ -2,15 +2,16 @@
 
 ## Scope
 
-This report answers three questions before wiring SourceAgent into BinAgent:
+This report answers four pre-integration questions:
 
-1. How does SourceAgent perform on the current GT-backed benchmark set?
-2. What volume and shape of artifacts does SourceAgent generate on additional unstripped no-GT firmware samples?
-3. Which parts of BinAgent should be retained, and which parts should be bypassed because SourceAgent already covers them?
+1. How stable is the current GT-backed baseline?
+2. What deterministic artifacts does SourceAgent produce on larger no-GT unstripped firmware samples?
+3. Why do no-GT chain counts differ from sink counts, and why are many chains dropped?
+4. Which parts are ready for semantic review, and which gaps still belong to deterministic extraction?
 
 ## Evaluation Layout
 
-The evaluation was split into two parts on purpose.
+The evaluation is intentionally split into two parts.
 
 ### Part A: GT-backed quality baseline
 
@@ -20,37 +21,36 @@ Dataset:
 - `14` `microbench`
 - `30` `mesobench`
 
-Reference result directory:
+Reference directory:
 
 - `/tmp/eval_gt_backed_suite_v2_p35plus_rerun2_merged`
 
-This part is used to measure structural correctness, because these samples have chain-level GT.
+This part measures structural correctness, because these samples have artifact-level and chain-level GT.
 
 ### Part B: no-GT scale / artifact generation scan
 
 Dataset:
 
 - `94` additional unstripped firmware binaries without GT
-- family breakdown:
-  - `47` `p2im-unit_tests`
-  - `37` `monolithic-firmware-collection`
-  - `10` `uSBS`
+- `47` `p2im-unit_tests`
+- `37` `monolithic-firmware-collection`
+- `10` `uSBS`
 
-Reference result directories:
+Reference directories:
 
 - `/tmp/eval_extra_no_gt_shard1_20260309_010532`
 - `/tmp/eval_extra_no_gt_shard2_20260309_010532`
 
-This part is used to measure how much deterministic review material SourceAgent produces for BinAgent.
+This part measures discovery volume, intermediate artifact volume, queue pressure, and review-readiness. It does **not** claim precision/recall on no-GT binaries.
 
 ## Why the split is correct
 
 A single mixed metric across GT-backed and no-GT samples would be misleading.
 
-- GT-backed samples are for correctness and hit-rate
-- no-GT samples are for discovery volume, queue pressure, and artifact distribution
+- GT-backed samples are for correctness and hit-rate.
+- no-GT samples are for discovery volume, intermediate artifact shape, and review load.
 
-That split is the correct pre-integration view for BinAgent.
+That split is the correct pre-integration view for semantic review / BinAgent-style auditing.
 
 ## Part A: GT-backed Baseline
 
@@ -92,7 +92,7 @@ Interpretation:
 
 ## Part B: no-GT Scale Scan
 
-Source:
+Sources:
 
 - `/tmp/eval_extra_no_gt_shard1_20260309_010532`
 - `/tmp/eval_extra_no_gt_shard2_20260309_010532`
@@ -104,7 +104,11 @@ Across `94` no-GT samples, SourceAgent produced:
 - verified source labels: `7640`
 - verified sink labels: `2135`
 - total verified labels: `9775`
-- chains: `1937`
+- object nodes: `903`
+- refined objects: `954`
+- channel edges: `369`
+- sink roots extracted: `2058`
+- chains materialized: `1937`
 - chains with source: `655`
 - chains with channel: `546`
 - confirmed: `118`
@@ -121,6 +125,9 @@ Across `94` no-GT samples, SourceAgent produced:
 - labels: `6058`
 - sources: `4979`
 - sinks: `1079`
+- object nodes: `402`
+- refined objects: `437`
+- channel edges: `191`
 - chains: `945`
 - with_source: `326`
 - with_channel: `237`
@@ -136,6 +143,9 @@ Across `94` no-GT samples, SourceAgent produced:
 - labels: `3052`
 - sources: `2159`
 - sinks: `893`
+- object nodes: `374`
+- refined objects: `383`
+- channel edges: `167`
 - chains: `830`
 - with_source: `278`
 - with_channel: `279`
@@ -151,6 +161,9 @@ Across `94` no-GT samples, SourceAgent produced:
 - labels: `665`
 - sources: `502`
 - sinks: `163`
+- object nodes: `127`
+- refined objects: `134`
+- channel edges: `11`
 - chains: `162`
 - with_source: `51`
 - with_channel: `30`
@@ -163,178 +176,189 @@ Across `94` no-GT samples, SourceAgent produced:
 
 ## What the no-GT scan shows
 
-### 1. SourceAgent now produces enough review material for BinAgent
+### 1. SourceAgent produces substantial intermediate artifacts, not just labels
 
-This is no longer a toy output surface.
+The no-GT scan is not merely a list of sources and sinks.
 
-Even without GT, the current pipeline yields at scale:
+It already emits a large pre-review surface:
 
-- thousands of verified labels
-- nearly two thousand chains
-- hundreds of review candidates
-- hundreds of soft triage entries
+- `903` coarse object nodes
+- `954` refined objects
+- `369` inferred channel edges
+- `2058` sink roots
+- `1937` assembled chains
 
-That is enough material for a review-stage consumer.
+This is enough material for a semantic reviewer. The remaining problem is quality and prioritization, not lack of evidence.
 
-### 2. The main review load will not come from microbench
+### 2. Why `chains < sinks`
 
-The dominant review pressure comes from:
+A sink label is **not** equivalent to a chain.
 
-- `monolithic-firmware-collection`
-- `p2im-unit_tests`
+The current pipeline is root-aware and bounded:
 
-not from `microbench`.
+- a verified sink only becomes chain-ready if at least one usable root is extracted
+- some verified sinks never yield a usable root
+- some roots are intentionally pruned before chain emission
+- some roots are merged/deduplicated because they are secondary or redundant
+- chain counts are bounded by per-sink / per-binary limits
 
-That matters for BinAgent planning: review batching and queue limits should be tuned for these larger families, not for the toy set.
+In the no-GT scan:
 
-### 3. `uSBS` remains review-heavy despite smaller size
+- verified sink labels: `2135`
+- sink roots extracted: `2058`
+- chains materialized: `1937`
 
-`uSBS` contributes fewer samples but a relatively high suspicious count compared with its size.
+So there are **two separate reductions**:
 
-That makes it useful for semantic review stress testing.
+1. `2135 -> 2058`
+- `77` sink labels did not produce a usable root bundle
+- typical reasons: root parse failure, weak fallback only, non-capacity-relevant secondary site
 
-## Largest review-queue samples
+2. `2058 -> 1937`
+- `121` root candidates were not materialized as final chains
+- typical reasons: chain pruning, root-family dedup, bridge-only copy suppression, secondary-pointer suppression, per-sink cap
 
-Representative high-pressure examples from the no-GT scan:
+This is expected behavior. A healthy chain layer is **not** one-chain-per-sink. It is a filtered subset of sink candidates that still have actionable root semantics.
 
-- `monolithic_firmware_collection_armcortex_m_st_plc_st_plc` — `96` chains, `7` review queue, `8` soft triage
-- `monolithic_firmware_collection_armcortex_m_atmel_6lowpan_udp_tx_atmel_6lowpan_udp_tx` — `73` chains, `7` review queue, `8` soft triage
-- `monolithic_firmware_collection_armcortex_m_atmel_6lowpan_udp_rx_atmel_6lowpan_udp_rx` — `73` chains, `7` review queue, `8` soft triage
-- `monolithic_firmware_collection_armcortex_m_samr21_http_samr21_http` — `49` chains, `7` review queue, `8` soft triage
-- `monolithic_firmware_collection_armcortex_m_expat_panda_expat_panda` — `47` chains, `7` review queue, `8` soft triage
-- `p2im_unit_tests_nuttx_gpio_int_f103_nuttx_gpio_int` — `37` chains, `7` review queue, `8` soft triage
-- `p2im_unit_tests_nuttx_usart_f103_nuttx_usart` — `37` chains, `7` review queue, `8` soft triage
+The main deterministic pruning code is in:
+
+- [tunnel_linker.py](/home/a347908610/sourceagent/sourceagent/pipeline/linker/tunnel_linker.py)
+
+Relevant mechanisms there include:
+
+- `max_chains_per_sink`
+- `max_chains_per_binary`
+- `_prune_redundant_chains(...)`
+- `_pointer_companion_redundant(...)`
+- `_should_drop_bridge_only_copy_group(...)`
+- `_should_skip_store_chain(...)`
+
+### 3. Why `dropped` is large
+
+`DROP` is currently the dominant no-GT verdict because the pipeline is intentionally fail-closed.
+
+This is not a bug by itself. It reflects the current rule:
+
+- if the chain cannot preserve enough deterministic structure, it should not survive as a non-drop result
+
+Top drop failure buckets in the no-GT scan:
+
+- `OBJECT_HIT_NONE = 646`
+- `MAX_DEPTH_REACHED = 211`
+- `OBJECT_HIT_NO_EDGE = 192`
+- `ROOT_PARSE_FAILED = 97`
+- `ROOT_WEAK_FALLBACK = 87`
+- `CHECK_UNCERTAIN = 55`
 
 Interpretation:
 
-- BinAgent should expect queue saturation on large monolithic networked samples
-- BinAgent should not expect review pressure to be evenly distributed across samples
+- the largest bucket is still object anchoring
+- the next large bucket is bounded search depth
+- cross-context chains also fail when object hits exist but no usable edge is found
+- some sink families still produce weak root recovery
 
-## What SourceAgent Should Pass To BinAgent
+So `DROP = 1537` is high because the no-GT corpus is deliberately large and noisy, while the chain layer is designed to reject weakly justified paths rather than over-claiming exploitability.
 
-SourceAgent should pass deterministic pre-flight artifacts only once.
+### 4. Did we record reasons for `CONFIRMED / SUSPICIOUS` chains in that older no-GT run?
 
-The minimum useful handoff is:
+Not fully.
 
-- `verdict_feature_pack.json`
-- `verdict_calibration_queue.json`
+This matters.
 
-Helpful optional context:
+That two-shard no-GT scan predates the later reviewer upgrades (`P0`, `P1`, `P2`, `P3`, `P4`) that now preserve:
 
-- `chains.json`
-- `chain_eval.json`
-- `channel_graph.json`
-- `sink_roots.json`
-- `verdict_soft_triage.json`
-- `verdict_audit_flags.json`
+- review transcript
+- typed semantic reason codes
+- segment assessment
+- rejected semantic rationale
+- semantic-only soft application
 
-## BinAgent Overlap Check
+So for that older no-GT run:
 
-The current BinAgent repo still duplicates deterministic recovery work.
+- `CONFIRMED / SUSPICIOUS / SAFE_OR_LOW_RISK` are mostly deterministic chain verdicts
+- they do **not** yet carry the full semantic reviewer rationale we now preserve in later runs
+- therefore those counts are useful as workload signals, but not yet a rich explanation ledger
 
-### Duplicated modules
+This is exactly why the reviewer work was added afterward.
 
-`/home/a347908610/binagent/pentestagent/agents/preflight.py`
+### 5. What do `calibration queue = 658` and `soft triage = 752` mean?
 
-- builds sink/source hints
-- builds ranked sink callsite queue
+They are related, but not the same.
 
-`/home/a347908610/binagent/pentestagent/agents/stage2.py`
+`calibration queue`
 
-- decompiles caller functions
-- extracts tracked bindings
-- builds slice closures
-- assembles evidence packs
+- chains selected for possible semantic review
+- filtered by calibration policy (`calibration_mode`, risk, suspicious ratio, max queue size)
+- intended to be the reviewer worklist
 
-`/home/a347908610/binagent/pentestagent/agents/general_agent.py`
+`soft triage`
 
-- stage3 classifies findings into `confirmed / suspicious / dropped`
-- creates review plans for suspicious findings
+- the broader stage-10 soft-view ledger
+- includes all chains that survive into `soft` / `dual` bookkeeping
+- includes both reviewer-eligible chains and deterministic soft-widened chains
+- therefore it can be larger than the review queue
 
-These stages overlap with SourceAgent's current deterministic pipeline.
+So in the no-GT scan:
 
-## Recommendation
+- `658` chains were selected as reviewer candidates
+- `752` chains appeared in the broader soft triage surface
 
-### Do not keep two deterministic pipelines
+This difference is expected.
 
-Recommended split:
+The relevant code is in:
 
-- SourceAgent = deterministic firmware pre-flight owner
-- BinAgent = semantic review / audit layer only
+- [verdict_calibration.py](/home/a347908610/sourceagent/sourceagent/pipeline/verdict_calibration.py)
 
-### What SourceAgent should continue owning
+Specifically:
 
-- source detection
-- object recovery
-- channel graph
-- sink detection
-- root recovery
-- derive/check extraction
-- deterministic chain construction
-- deterministic verdict basis
-- calibration queue generation
+- `_select_calibration_queue(...)`
+- `_soft_candidate(...)`
+- `_derive_soft_verdict(...)`
+- `_summarize_soft_triage(...)`
 
-### What BinAgent should keep
+## What this means for SourceAgent vs reviewer/BinAgent
 
-- review planning
-- review batching / budget handling
-- LLM prompt orchestration
-- semantic trigger summarization
-- audit-only review mode
-- review decision persistence
+### What is already solved
 
-### What BinAgent should stop doing when SourceAgent artifacts are available
+- SourceAgent is already a stable deterministic pre-flight owner
+- it can mine labels at scale
+- it can build intermediate artifacts at scale
+- it can assemble and aggressively filter chains
+- it can prepare a bounded semantic review queue
 
-- preflight ranking as authoritative recovery
-- stage2 closure building as authoritative recovery
-- stage3 deterministic verdicting as authoritative recovery
+### What is not solved by the no-GT scan
 
-## Practical Integration Path
+The no-GT scan does **not** prove exploitability.
 
-### Near-term
+It only proves that SourceAgent can produce enough structured material for semantic review.
 
-Keep BinAgent external and consume SourceAgent artifacts.
+That is the correct role split:
 
-Flow:
+- SourceAgent: deterministic facts and bounded chain candidates
+- reviewer / BinAgent-style semantic phase: trigger validation, check effectiveness, exploitability semantics
 
-1. SourceAgent runs stages 1-10
-2. SourceAgent writes feature packs and review queue
-3. BinAgent reads queued chains only
-4. BinAgent writes `review_decisions.json`
-5. SourceAgent applies those decisions via fail-closed post-check
+## Practical interpretation
 
-### Later
+The no-GT scan answers the pre-integration question positively:
 
-If the review contract stabilizes, move only the review shell into SourceAgent.
+- SourceAgent now produces enough structured material to feed a reviewer at scale.
 
-Do not migrate BinAgent's old deterministic preflight/stage2/stage3 logic into SourceAgent.
+But it also shows where deterministic work is still expensive:
 
-## Progress Against Planning
+- object anchoring
+- channel completion
+- root extraction quality
+- search depth
 
-Already done:
+And it confirms that the remaining “is this really a vuln candidate?” question should be answered in the semantic review stage, not by over-expanding deterministic heuristics.
 
-- deterministic source/sink detection
-- channel graph and refined objects
-- sink root extraction
-- tunnel-aware chain recovery
-- derive/check extraction
-- chain evaluation
-- verdict feature pack
-- calibration queue
-- audit flags and soft triage
-- GT-backed suite (`microbench + mesobench`)
-- no-GT scale scan on additional unstripped firmware
+## Next steps
 
-Not done yet:
-
-- BinAgent adapter that directly consumes SourceAgent review queue
-- LLM semantic review execution loop on top of `verdict_calibration_queue`
-- verdict exactness improvement after external review
-
-## Bottom Line
-
-SourceAgent is already producing enough deterministic pre-flight material to become the single upstream provider for BinAgent.
-
-The engineering decision now is not whether SourceAgent can feed BinAgent. It can.
-
-The real decision is to stop duplicating deterministic recovery inside BinAgent and reduce BinAgent to review-only semantics.
+1. Improve reviewer snippet coverage and tool-assisted review.
+2. Re-run focused reviewer-heavy samples:
+   - `usb_host`
+   - `dns`
+   - `contiki`
+   - `zephyr`
+3. Keep deterministic baseline metrics separate from no-GT discovery metrics.
+4. Continue treating SourceAgent as the single pre-flight authority; do not revive BinAgent deterministic stages.

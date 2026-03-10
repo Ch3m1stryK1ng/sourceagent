@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import hashlib
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Sequence, Tuple
 
 from .channel_graph import build_channel_graph
 from .linker.sink_roots import extract_sink_roots
@@ -28,6 +28,10 @@ from .verdict_calibration import (
     DEFAULT_LLM_SOFT_BUDGET,
     DEFAULT_MAX_CALIBRATION_CHAINS,
     DEFAULT_MIN_RISK_SCORE,
+    DEFAULT_REVIEW_ALLOW_SOFT_ON_STRUCTURAL_GAP,
+    DEFAULT_REVIEW_PRESERVE_REJECTED_RATIONALE,
+    DEFAULT_REVIEW_SOFT_GATES,
+    DEFAULT_REVIEW_STRICT_GATES,
     DEFAULT_REVIEW_NEEDS_THRESHOLD,
     DEFAULT_SAMPLE_SUSPICIOUS_RATIO_THRESHOLD,
     DEFAULT_VERDICT_OUTPUT_MODE,
@@ -41,11 +45,11 @@ SCHEMA_VERSION = "0.1"
 
 DEFAULT_T_LOW = 0.45
 DEFAULT_TOP_K = 3
-DEFAULT_BUDGET = 160
-DEFAULT_TUNNEL_K = 2
-DEFAULT_MAX_DEPTH = 2
-DEFAULT_MAX_CHAINS_PER_SINK = 4
-DEFAULT_MAX_CHAINS_PER_BINARY = 200
+DEFAULT_BUDGET = 320
+DEFAULT_TUNNEL_K = 3
+DEFAULT_MAX_DEPTH = 3
+DEFAULT_MAX_CHAINS_PER_SINK = 6
+DEFAULT_MAX_CHAINS_PER_BINARY = 400
 DEFAULT_CALIBRATION_MAX_CHAINS = DEFAULT_MAX_CALIBRATION_CHAINS
 
 SINK_LABELS = {
@@ -86,6 +90,11 @@ def build_phase_a_artifacts(
     llm_promote_budget: int = DEFAULT_LLM_PROMOTE_BUDGET,
     llm_demote_budget: int = DEFAULT_LLM_DEMOTE_BUDGET,
     llm_soft_budget: int = DEFAULT_LLM_SOFT_BUDGET,
+    review_strict_gates: Sequence[str] = DEFAULT_REVIEW_STRICT_GATES,
+    review_soft_gates: Sequence[str] = DEFAULT_REVIEW_SOFT_GATES,
+    review_allow_soft_on_structural_gap: bool = DEFAULT_REVIEW_ALLOW_SOFT_ON_STRUCTURAL_GAP,
+    review_preserve_rejected_rationale: bool = DEFAULT_REVIEW_PRESERVE_REJECTED_RATIONALE,
+    has_ground_truth: bool | None = None,
     review_decisions: List[Dict[str, Any]] | None = None,
     review_plan: Dict[str, Any] | None = None,
     review_trace: Dict[str, Any] | None = None,
@@ -96,6 +105,8 @@ def build_phase_a_artifacts(
     binary_name = Path(binary_path).name or binary_path
     binary_stem = Path(binary_path).stem
     binary_sha256 = _file_sha256(binary_path)
+    if has_ground_truth is None:
+        has_ground_truth = bool(getattr(result, "_has_ground_truth", False))
 
     verified_sources, verified_sinks = _collect_verified_labels(result)
 
@@ -253,6 +264,11 @@ def build_phase_a_artifacts(
             llm_promote_budget=llm_promote_budget,
             llm_demote_budget=llm_demote_budget,
             llm_soft_budget=llm_soft_budget,
+            review_strict_gates=review_strict_gates,
+            review_soft_gates=review_soft_gates,
+            review_allow_soft_on_structural_gap=review_allow_soft_on_structural_gap,
+            review_preserve_rejected_rationale=review_preserve_rejected_rationale,
+            has_ground_truth=bool(has_ground_truth),
             review_decisions=review_decisions or [],
         )
         verdict_feature_pack = verdict_artifacts.get("verdict_feature_pack", verdict_feature_pack)

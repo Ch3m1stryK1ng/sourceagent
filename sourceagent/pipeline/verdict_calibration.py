@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
+from sourceagent.pipeline.review_reason_codes import normalize_review_reason_codes
 
 SCHEMA_VERSION = "0.1"
 DEFAULT_CALIBRATION_MODE = "suspicious_only"
@@ -18,6 +20,10 @@ DEFAULT_ALLOW_MANUAL_LLM_SUPERVISION = False
 DEFAULT_LLM_PROMOTE_BUDGET = 24
 DEFAULT_LLM_DEMOTE_BUDGET = 24
 DEFAULT_LLM_SOFT_BUDGET = 48
+DEFAULT_REVIEW_STRICT_GATES = ("source_reached", "root_bound", "object_bound")
+DEFAULT_REVIEW_SOFT_GATES = ("source_reached", "root_bound")
+DEFAULT_REVIEW_ALLOW_SOFT_ON_STRUCTURAL_GAP = True
+DEFAULT_REVIEW_PRESERVE_REJECTED_RATIONALE = True
 
 _ALLOWED_CALIBRATION_MODES = {
     "exact_mismatch",
@@ -30,8 +36,6 @@ _ALLOWED_OUTPUT_MODES = {"strict", "soft", "dual"}
 _ALLOWED_VERDICTS = {"SAFE_OR_LOW_RISK", "SUSPICIOUS", "CONFIRMED"}
 _HARD_BLOCK_REASON_CODES = {
     "HARD_CONTRADICTION",
-    "CONTROL_PATH_ONLY",
-    "SECONDARY_ROOT_ONLY",
     "CHANNEL_REQUIRED_MISSING",
 }
 _SNIPPET_KEYS = {"sink_function", "caller_bridge", "producer_function"}
@@ -56,6 +60,11 @@ def build_verdict_calibration_artifacts(
     llm_promote_budget: int = DEFAULT_LLM_PROMOTE_BUDGET,
     llm_demote_budget: int = DEFAULT_LLM_DEMOTE_BUDGET,
     llm_soft_budget: int = DEFAULT_LLM_SOFT_BUDGET,
+    review_strict_gates: Sequence[str] = DEFAULT_REVIEW_STRICT_GATES,
+    review_soft_gates: Sequence[str] = DEFAULT_REVIEW_SOFT_GATES,
+    review_allow_soft_on_structural_gap: bool = DEFAULT_REVIEW_ALLOW_SOFT_ON_STRUCTURAL_GAP,
+    review_preserve_rejected_rationale: bool = DEFAULT_REVIEW_PRESERVE_REJECTED_RATIONALE,
+    has_ground_truth: bool = False,
     review_decisions: Optional[Sequence[Dict[str, Any]]] = None,
 ) -> Dict[str, Any]:
     """Build deterministic feature packs, queue, soft triage, and applied decisions."""
@@ -82,6 +91,7 @@ def build_verdict_calibration_artifacts(
                 decompiled_cache=decompiled_cache,
                 min_risk_score=min_risk_score,
                 review_needs_threshold=review_needs_threshold,
+                has_ground_truth=bool(has_ground_truth),
             )
         )
 
@@ -102,6 +112,10 @@ def build_verdict_calibration_artifacts(
         llm_promote_budget=int(llm_promote_budget),
         llm_demote_budget=int(llm_demote_budget),
         llm_soft_budget=int(llm_soft_budget),
+        review_strict_gates=tuple(review_strict_gates or DEFAULT_REVIEW_STRICT_GATES),
+        review_soft_gates=tuple(review_soft_gates or DEFAULT_REVIEW_SOFT_GATES),
+        review_allow_soft_on_structural_gap=bool(review_allow_soft_on_structural_gap),
+        review_preserve_rejected_rationale=bool(review_preserve_rejected_rationale),
         min_risk_score=float(min_risk_score),
     )
 
@@ -132,6 +146,10 @@ def build_verdict_calibration_artifacts(
             "llm_promote_budget": int(llm_promote_budget),
             "llm_demote_budget": int(llm_demote_budget),
             "llm_soft_budget": int(llm_soft_budget),
+            "review_strict_gates": list(review_strict_gates or DEFAULT_REVIEW_STRICT_GATES),
+            "review_soft_gates": list(review_soft_gates or DEFAULT_REVIEW_SOFT_GATES),
+            "review_allow_soft_on_structural_gap": bool(review_allow_soft_on_structural_gap),
+            "review_preserve_rejected_rationale": bool(review_preserve_rejected_rationale),
         },
         "items": queue_items,
         "status": "ok",
@@ -216,6 +234,7 @@ def _build_feature_item(
     decompiled_cache: Mapping[str, str],
     min_risk_score: float,
     review_needs_threshold: float,
+    has_ground_truth: bool,
 ) -> Dict[str, Any]:
     sink = dict(chain.get("sink", {}) or {})
     raw_root_bundle = chain.get("root_bundle", []) or []
@@ -254,9 +273,36 @@ def _build_feature_item(
     confidence = float(chain.get("score", 0.0) or 0.0)
     current_verdict_reason = reason_code
     audit_flags = _deterministic_audit_flags(chain, sink_facts=sink_facts, checks=checks)
-    snippets = _collect_snippets(chain, sink_function=sink_fn, decompiled_cache=decompiled_cache)
+    sink_semantics_hints = _sink_semantics_hints(sink_label, sink_facts, active_root, derive_facts, checks)
+    object_path = _build_object_path(chain, object_nodes=object_nodes)
+    snippet_bundle = _collect_snippets(
+        chain,
+        sink_function=sink_fn,
+        checks=checks,
+        derive_facts=derive_facts,
+        object_path=object_path,
+        decompiled_cache=decompiled_cache,
+    )
+    snippets = dict(snippet_bundle.get("snippets", {}) or {})
+    snippet_index = dict(snippet_bundle.get("snippet_index", {}) or {})
     strict_verdict = current_verdict
-    soft_candidate = _soft_candidate(chain, decision_basis, risk_score, min_risk_score=min_risk_score)
+    channel_path = _build_channel_path(chain)
+    deterministic_constraints = _deterministic_constraints(chain, decision_basis)
+    source_proxy_ok = _soft_source_proxy_ok(
+        {
+            "channel_path": channel_path,
+            "object_path": object_path,
+            "decompiled_snippets": snippets,
+        },
+        deterministic_constraints,
+    )
+    soft_candidate = _soft_candidate(
+        chain,
+        decision_basis,
+        risk_score,
+        min_risk_score=min_risk_score,
+        source_proxy_ok=source_proxy_ok,
+    )
     soft_verdict = _derive_soft_verdict(strict_verdict, soft_candidate)
     needs_review = _needs_review(
         current_verdict=current_verdict,
@@ -265,6 +311,7 @@ def _build_feature_item(
         audit_flags=audit_flags,
         review_needs_threshold=review_needs_threshold,
         soft_candidate=soft_candidate,
+        require_review_for_confirmed=(not bool(has_ground_truth)),
     )
 
     return {
@@ -272,12 +319,18 @@ def _build_feature_item(
         "sample_id": sample_id,
         "current_verdict": current_verdict,
         "current_verdict_reason": current_verdict_reason,
+        "has_ground_truth": bool(has_ground_truth),
+        "require_review_for_confirmed": bool(not has_ground_truth),
         "strict_verdict": strict_verdict,
         "soft_verdict": soft_verdict,
         "risk_score": round(risk_score, 4),
         "confidence": round(confidence, 4),
         "needs_review": bool(needs_review),
-        "review_state": _review_state(current_verdict, needs_review),
+        "review_state": _review_state(
+            current_verdict,
+            needs_review,
+            require_review_for_confirmed=(not bool(has_ground_truth)),
+        ),
         "sink": {
             "label": sink_label,
             "function": sink_fn,
@@ -291,13 +344,21 @@ def _build_feature_item(
             "role": str(active_root.get("role", "") or ""),
             "kind": str(active_root.get("kind", "") or ""),
         },
-        "object_path": _build_object_path(chain, object_nodes=object_nodes),
-        "channel_path": _build_channel_path(chain),
+        "object_path": object_path,
+        "channel_path": channel_path,
         "derive_facts": derive_facts,
         "check_facts": checks,
-        "sink_semantics_hints": _sink_semantics_hints(sink_label, sink_facts, active_root, derive_facts, checks),
+        "sink_semantics_hints": sink_semantics_hints,
         "guard_context": _guard_context(sink_facts, checks),
-        "capacity_evidence": _capacity_evidence(sink_label, sink_facts, checks, active_root),
+        "capacity_evidence": _capacity_evidence(
+            sink_label,
+            sink_facts,
+            checks,
+            active_root,
+            object_path=object_path,
+            sink_semantics_hints=sink_semantics_hints,
+            sink_function=sink_fn,
+        ),
         "chain_segments": _build_chain_segments(
             chain,
             sink_label=sink_label,
@@ -309,7 +370,11 @@ def _build_feature_item(
         ),
         "evidence_refs": list(chain.get("evidence_refs", []) or []),
         "decompiled_snippets": snippets,
-        "deterministic_constraints": _deterministic_constraints(chain, decision_basis),
+        "snippet_index": snippet_index,
+        "deterministic_constraints": {
+            **deterministic_constraints,
+            "source_proxy_ok": bool(source_proxy_ok),
+        },
         "decision_basis": decision_basis,
         "audit_flags": audit_flags,
         "soft_candidate": bool(soft_candidate),
@@ -355,6 +420,7 @@ def _select_calibration_queue(
             "risk_score": item.get("risk_score"),
             "needs_review": item.get("needs_review"),
             "review_state": item.get("review_state"),
+            "soft_candidate": item.get("soft_candidate"),
             "queue_reasons": reasons,
             "sample_suspicious_ratio": round(suspicious_ratio, 4),
             "sink": item.get("sink", {}),
@@ -363,6 +429,8 @@ def _select_calibration_queue(
         selected.append(row)
 
     selected.sort(key=lambda row: (
+        not bool(row.get("soft_candidate", False)),
+        row.get("current_verdict") != "DROP",
         -float(row.get("risk_score", 0.0) or 0.0),
         row.get("current_verdict") != "SUSPICIOUS",
         str(row.get("chain_id", "")),
@@ -381,6 +449,10 @@ def _apply_review_decisions(
     llm_promote_budget: int,
     llm_demote_budget: int,
     llm_soft_budget: int,
+    review_strict_gates: Sequence[str],
+    review_soft_gates: Sequence[str],
+    review_allow_soft_on_structural_gap: bool,
+    review_preserve_rejected_rationale: bool,
     min_risk_score: float,
 ) -> Dict[str, Any]:
     queued = {str(item.get("chain_id", "")): dict(item) for item in queue_items}
@@ -399,9 +471,13 @@ def _apply_review_decisions(
     audit_rows: List[Dict[str, Any]] = []
     soft_rows: List[Dict[str, Any]] = []
 
+    strict_gate_names = _normalize_gate_names(review_strict_gates, DEFAULT_REVIEW_STRICT_GATES)
+    soft_gate_names = _normalize_gate_names(review_soft_gates, DEFAULT_REVIEW_SOFT_GATES)
+
     for item in feature_items:
         chain_id = str(item.get("chain_id", "") or "")
         raw_decision = decisions_by_chain.get(chain_id)
+        require_review_for_confirmed = bool(item.get("require_review_for_confirmed", False))
         strict_verdict = str(item.get("strict_verdict", item.get("current_verdict", "DROP")) or "DROP")
         soft_verdict = str(item.get("soft_verdict", strict_verdict) or strict_verdict)
         final_verdict = strict_verdict if verdict_output_mode == "strict" else soft_verdict
@@ -418,6 +494,9 @@ def _apply_review_decisions(
         review_quality_flags = []
         review_confidence = None
         review_notes = ""
+        blocked_by: List[str] = []
+        reject_reason_codes: List[str] = []
+        soft_accept_state = "not_reviewed"
 
         if raw_decision is not None:
             verdict_candidate, decision_record = _validate_and_apply_decision(
@@ -425,6 +504,10 @@ def _apply_review_decisions(
                 raw_decision,
                 calibration_mode=calibration_mode,
                 allow_manual_llm_supervision=allow_manual_llm_supervision,
+                review_strict_gates=strict_gate_names,
+                review_soft_gates=soft_gate_names,
+                review_allow_soft_on_structural_gap=review_allow_soft_on_structural_gap,
+                review_preserve_rejected_rationale=review_preserve_rejected_rationale,
             )
             accepted = bool(decision_record.get("accepted", False))
             accept_reason = str(decision_record.get("accept_reason", "REJECTED_REVIEW") or "REJECTED_REVIEW")
@@ -433,12 +516,16 @@ def _apply_review_decisions(
             trigger_summary = str(decision_record.get("trigger_summary", "") or "")
             preconditions = dict(decision_record.get("preconditions", {}) or {})
             segment_assessment = list(decision_record.get("segment_assessment", []) or [])
-            reason_codes = list(decision_record.get("reason_codes", []) or [])
+            reason_codes = normalize_review_reason_codes(decision_record.get("reason_codes", []) or [])
             evidence_map = dict(decision_record.get("evidence_map", {}) or {})
             review_quality_flags = list(decision_record.get("review_quality_flags", []) or [])
             review_confidence = decision_record.get("confidence")
             review_notes = str(decision_record.get("review_notes", "") or "")
+            blocked_by = [str(v) for v in (decision_record.get("blocked_by", []) or []) if str(v)]
+            reject_reason_codes = normalize_review_reason_codes(decision_record.get("reject_reason_codes", []) or [])
+            soft_accept_state = str(decision_record.get("soft_accept_state", "not_applied") or "not_applied")
             audit_flags.extend(str(flag) for flag in (decision_record.get("audit_flags", []) or []) if str(flag))
+
             if accepted and calibration_mode != "audit_only":
                 if strict_verdict != verdict_candidate:
                     if _verdict_rank(verdict_candidate) > _verdict_rank(strict_verdict):
@@ -457,8 +544,18 @@ def _apply_review_decisions(
                             accepted = False
                 else:
                     soft_verdict = verdict_candidate
+                if accepted:
+                    soft_accept_state = "strictly_applied"
             elif accepted and calibration_mode == "audit_only":
                 accept_reason = "AUDIT_ONLY_NO_VERDICT_CHANGE"
+                soft_accept_state = "audit_only"
+            elif bool(decision_record.get("soft_eligible", False)) and verdict_output_mode in {"soft", "dual"}:
+                if soft_left > 0 and calibration_mode != "audit_only":
+                    soft_verdict = verdict_candidate
+                    soft_left -= 1
+                    soft_accept_state = "semantic_only_applied"
+                else:
+                    soft_accept_state = "semantic_only_not_applied"
 
             decision_rows.append({
                 "chain_id": chain_id,
@@ -468,6 +565,9 @@ def _apply_review_decisions(
                 "strict_verdict": strict_verdict,
                 "suggested_verdict": str(raw_decision.get("suggested_semantic_verdict", "") or ""),
                 "soft_verdict": soft_verdict,
+                "soft_accept_state": soft_accept_state,
+                "blocked_by": blocked_by,
+                "reject_reason_codes": reject_reason_codes,
                 "trigger_summary": trigger_summary,
                 "preconditions": preconditions,
                 "segment_assessment": segment_assessment,
@@ -487,6 +587,9 @@ def _apply_review_decisions(
                 "strict_verdict": strict_verdict,
                 "suggested_verdict": "",
                 "soft_verdict": soft_verdict,
+                "soft_accept_state": "not_reviewed",
+                "blocked_by": [],
+                "reject_reason_codes": [],
                 "trigger_summary": "",
                 "preconditions": {},
                 "segment_assessment": [],
@@ -499,11 +602,31 @@ def _apply_review_decisions(
             })
 
         if not raw_decision and item.get("soft_candidate") and soft_left > 0 and verdict_output_mode in {"soft", "dual"}:
-            # Deterministic soft widening for richer BinAgent review material.
+            # Deterministic soft widening for richer review material.
             if strict_verdict == "DROP" and float(item.get("risk_score", 0.0) or 0.0) >= float(min_risk_score):
                 soft_verdict = "SUSPICIOUS"
                 soft_left -= 1
                 accept_reason = "DETERMINISTIC_SOFT_WIDEN"
+
+        if require_review_for_confirmed and strict_verdict == "CONFIRMED":
+            review_satisfied = bool(
+                llm_reviewed
+                and (
+                    accepted
+                    or soft_accept_state in {"strictly_applied", "semantic_only_applied"}
+                )
+            )
+            if not review_satisfied:
+                if _verdict_rank(soft_verdict) >= _verdict_rank("CONFIRMED"):
+                    soft_verdict = "SUSPICIOUS"
+                if not raw_decision:
+                    accept_reason = "REVIEW_REQUIRED_NOT_RUN"
+                    soft_accept_state = "review_required_not_run"
+                else:
+                    accept_reason = "REVIEW_REQUIRED_NOT_SATISFIED"
+                    soft_accept_state = "review_required_not_satisfied"
+                if "review_required" not in blocked_by:
+                    blocked_by.append("review_required")
 
         if verdict_output_mode == "strict":
             final_verdict = strict_verdict
@@ -530,6 +653,9 @@ def _apply_review_decisions(
             "llm_reviewed": llm_reviewed,
             "review_mode": applied_review_mode,
             "accept_reason": accept_reason,
+            "soft_accept_state": soft_accept_state,
+            "blocked_by": blocked_by,
+            "reject_reason_codes": reject_reason_codes,
             "queue_eligible": chain_id in queued,
             "sink": item.get("sink", {}),
             "root": item.get("root", {}),
@@ -556,6 +682,10 @@ def _validate_and_apply_decision(
     *,
     calibration_mode: str,
     allow_manual_llm_supervision: bool,
+    review_strict_gates: Sequence[str],
+    review_soft_gates: Sequence[str],
+    review_allow_soft_on_structural_gap: bool,
+    review_preserve_rejected_rationale: bool,
 ) -> Tuple[str, Dict[str, Any]]:
     suggested = str(raw_decision.get("suggested_semantic_verdict", "") or "")
     base_record = {
@@ -563,107 +693,204 @@ def _validate_and_apply_decision(
         "trigger_summary": str(raw_decision.get("trigger_summary", "") or ""),
         "preconditions": dict(raw_decision.get("preconditions", {}) or {}),
         "segment_assessment": list(raw_decision.get("segment_assessment", []) or []),
-        "reason_codes": list(raw_decision.get("reason_codes", []) or []),
+        "reason_codes": normalize_review_reason_codes(raw_decision.get("reason_codes", []) or []),
         "evidence_map": dict(raw_decision.get("evidence_map", {}) or {}),
         "review_quality_flags": list(raw_decision.get("review_quality_flags", []) or []),
         "confidence": raw_decision.get("confidence"),
         "review_notes": str(raw_decision.get("review_notes", "") or ""),
     }
 
-    if suggested not in _ALLOWED_VERDICTS:
-        return feature_item.get("strict_verdict", "DROP"), {
+    def _reject(
+        reason: str,
+        *,
+        audit_flags: Sequence[str] = (),
+        blocked_by: Sequence[str] = (),
+        reject_reason_codes: Sequence[str] = (),
+        soft_eligible: bool = False,
+        soft_accept_state: str = "not_applied",
+    ) -> Tuple[str, Dict[str, Any]]:
+        record = {
             **base_record,
             "accepted": False,
-            "accept_reason": "INVALID_SUGGESTED_VERDICT",
-            "audit_flags": ["invalid_suggested_verdict"],
+            "accept_reason": reason,
+            "audit_flags": list(audit_flags),
+            "blocked_by": [str(v) for v in blocked_by if str(v)],
+            "reject_reason_codes": normalize_review_reason_codes(reject_reason_codes),
+            "soft_eligible": bool(soft_eligible),
+            "soft_accept_state": soft_accept_state,
         }
+        if not review_preserve_rejected_rationale:
+            record.update({
+                "trigger_summary": "",
+                "preconditions": {},
+                "segment_assessment": [],
+                "reason_codes": [],
+                "evidence_map": {},
+                "review_quality_flags": [],
+                "confidence": None,
+                "review_notes": "",
+            })
+        return feature_item.get("strict_verdict", "DROP"), record
+
+    if suggested not in _ALLOWED_VERDICTS:
+        return _reject(
+            "INVALID_SUGGESTED_VERDICT",
+            audit_flags=["invalid_suggested_verdict"],
+        )
+
     evidence_map = raw_decision.get("evidence_map")
     if not isinstance(evidence_map, dict) or not evidence_map:
-        return feature_item.get("strict_verdict", "DROP"), {
-            **base_record,
-            "accepted": False,
-            "accept_reason": "MISSING_EVIDENCE_MAP",
-            "audit_flags": ["missing_evidence_map"],
-        }
+        return _reject(
+            "MISSING_EVIDENCE_MAP",
+            audit_flags=["missing_evidence_map"],
+        )
     snippets = dict(feature_item.get("decompiled_snippets", {}) or {})
-    for refs in evidence_map.values():
-        if not isinstance(refs, list) or not refs:
-            return feature_item.get("strict_verdict", "DROP"), {
-                **base_record,
-                "accepted": False,
-                "accept_reason": "INVALID_EVIDENCE_MAP_ENTRY",
-                "audit_flags": ["invalid_evidence_map_entry"],
-            }
-        for key in refs:
-            if str(key) not in _SNIPPET_KEYS:
-                return feature_item.get("strict_verdict", "DROP"), {
-                    **base_record,
-                    "accepted": False,
-                    "accept_reason": "UNKNOWN_SNIPPET_KEY",
-                    "audit_flags": ["unknown_snippet_key"],
-                }
-            if not str(snippets.get(str(key), "") or "").strip():
-                return feature_item.get("strict_verdict", "DROP"), {
-                    **base_record,
-                    "accepted": False,
-                    "accept_reason": "SNIPPET_MISSING",
-                    "audit_flags": ["snippet_missing"],
-                }
+    available_snippet_keys = {key for key, val in snippets.items() if str(val or "").strip()}
+    evidence_maps = [dict(evidence_map)]
+    for segment in list(raw_decision.get("segment_assessment", []) or []):
+        seg_map = segment.get("evidence_map")
+        if isinstance(seg_map, dict) and seg_map:
+            evidence_maps.append(dict(seg_map))
+    for mapping in evidence_maps:
+        for refs in mapping.values():
+            if not isinstance(refs, list) or not refs:
+                return _reject(
+                    "INVALID_EVIDENCE_MAP_ENTRY",
+                    audit_flags=["invalid_evidence_map_entry"],
+                )
+            for key in refs:
+                skey = str(key)
+                if skey not in available_snippet_keys:
+                    return _reject(
+                        "SNIPPET_MISSING",
+                        audit_flags=["snippet_missing"],
+                    )
 
     if bool(raw_decision.get("manual_supervision", False)) and not allow_manual_llm_supervision:
-        return feature_item.get("strict_verdict", "DROP"), {
-            **base_record,
-            "accepted": False,
-            "accept_reason": "MANUAL_SUPERVISION_DISABLED",
-            "audit_flags": ["manual_supervision_disabled"],
-        }
+        return _reject(
+            "MANUAL_SUPERVISION_DISABLED",
+            audit_flags=["manual_supervision_disabled"],
+        )
 
     constraints = dict(feature_item.get("deterministic_constraints", {}) or {})
-    if not (constraints.get("source_reached") and constraints.get("root_bound") and constraints.get("object_bound")):
-        return feature_item.get("strict_verdict", "DROP"), {
-            **base_record,
-            "accepted": False,
-            "accept_reason": "STRUCTURAL_CONSTRAINT_NOT_MET",
-            "audit_flags": ["structural_constraint_not_met"],
-        }
-    if constraints.get("channel_required") and not constraints.get("channel_satisfied"):
-        return feature_item.get("strict_verdict", "DROP"), {
-            **base_record,
-            "accepted": False,
-            "accept_reason": "CHANNEL_REQUIRED_NOT_SATISFIED",
-            "audit_flags": ["channel_required_not_satisfied"],
-        }
+    strict_ok, strict_missing = _evaluate_gate_set(constraints, review_strict_gates)
+    soft_ok, soft_missing = _evaluate_soft_gate_set(feature_item, constraints, review_soft_gates)
 
     reason_code = str((feature_item.get("decision_basis", {}) or {}).get("reason_code", "") or "")
     if reason_code in _HARD_BLOCK_REASON_CODES:
-        return feature_item.get("strict_verdict", "DROP"), {
-            **base_record,
-            "accepted": False,
-            "accept_reason": "HARD_BLOCK_REASON_CODE",
-            "audit_flags": ["hard_block_reason_code"],
-        }
-
-    accepted = True
-    final_suggested = suggested
-    if calibration_mode == "audit_only":
-        final_suggested = str(
-            feature_item.get("strict_verdict", feature_item.get("current_verdict", "DROP")) or "DROP"
+        return _reject(
+            "HARD_BLOCK_REASON_CODE",
+            audit_flags=["hard_block_reason_code"],
+            blocked_by=["hard_block_reason_code"],
+            reject_reason_codes=["HARD_BLOCK_REASON_CODE"],
         )
 
-    return final_suggested, {
-        **base_record,
-        "accepted": accepted,
-        "accept_reason": "ACCEPTED_REVIEW",
-        "audit_flags": list(raw_decision.get("audit_flags", []) or []),
-    }
+    if strict_ok:
+        final_suggested = suggested
+        if calibration_mode == "audit_only":
+            final_suggested = str(feature_item.get("strict_verdict", feature_item.get("current_verdict", "DROP")) or "DROP")
+        return final_suggested, {
+            **base_record,
+            "accepted": True,
+            "accept_reason": "ACCEPTED_REVIEW",
+            "audit_flags": list(raw_decision.get("audit_flags", []) or []),
+            "blocked_by": [],
+            "reject_reason_codes": [],
+            "soft_eligible": False,
+            "soft_accept_state": "not_needed",
+        }
+
+    if soft_ok and review_allow_soft_on_structural_gap:
+        soft_reason = "CHANNEL_REQUIRED_NOT_SATISFIED" if constraints.get("channel_required") and not constraints.get("channel_satisfied") else "STRUCTURAL_CONSTRAINT_NOT_MET"
+        return suggested, {
+            **base_record,
+            "accepted": False,
+            "accept_reason": soft_reason,
+            "audit_flags": list(raw_decision.get("audit_flags", []) or []) + ["structural_constraint_not_met"],
+            "blocked_by": list(strict_missing),
+            "reject_reason_codes": normalize_review_reason_codes(["STRUCTURAL_CONSTRAINT_NOT_MET"]),
+            "soft_eligible": True,
+            "soft_accept_state": "semantic_only_candidate",
+        }
+
+    reject_reason = "CHANNEL_REQUIRED_NOT_SATISFIED" if constraints.get("channel_required") and not constraints.get("channel_satisfied") else "STRUCTURAL_CONSTRAINT_NOT_MET"
+    return _reject(
+        reject_reason,
+        audit_flags=["structural_constraint_not_met"],
+        blocked_by=list(strict_missing or soft_missing),
+        reject_reason_codes=["STRUCTURAL_CONSTRAINT_NOT_MET"],
+    )
+
+
+def _normalize_gate_names(values: Sequence[str], defaults: Sequence[str]) -> Tuple[str, ...]:
+    out = []
+    seen = set()
+    source = values or defaults
+    for raw in source:
+        name = str(raw or "").strip()
+        if not name or name in seen:
+            continue
+        seen.add(name)
+        out.append(name)
+    return tuple(out or defaults)
+
+
+def _evaluate_gate_set(constraints: Mapping[str, Any], gate_names: Sequence[str]) -> Tuple[bool, List[str]]:
+    missing = [str(name) for name in gate_names if not bool(constraints.get(str(name), False))]
+    return not missing, missing
+
+def _evaluate_soft_gate_set(
+    feature_item: Mapping[str, Any],
+    constraints: Mapping[str, Any],
+    gate_names: Sequence[str],
+) -> Tuple[bool, List[str]]:
+    missing: List[str] = []
+    source_proxy_ok = _soft_source_proxy_ok(feature_item, constraints)
+
+    for raw_name in gate_names:
+        name = str(raw_name)
+        if bool(constraints.get(name, False)):
+            continue
+        if name == "source_reached":
+            if source_proxy_ok:
+                continue
+        missing.append(name)
+    return not missing, missing
+
+
+def _soft_source_proxy_ok(
+    feature_item: Mapping[str, Any],
+    constraints: Mapping[str, Any],
+) -> bool:
+    channel_path = list(feature_item.get("channel_path", []) or [])
+    object_path = list(feature_item.get("object_path", []) or [])
+    snippets = dict(feature_item.get("decompiled_snippets", {}) or {})
+    has_source_context = bool(str(snippets.get("source_context", "") or "").strip())
+    return bool(
+        bool(constraints.get("channel_satisfied", False))
+        and bool(constraints.get("object_bound", False))
+        and bool(constraints.get("root_bound", False))
+        and bool(channel_path or object_path)
+        and has_source_context
+    )
 
 
 def _build_object_path(chain: Mapping[str, Any], *, object_nodes: Mapping[str, Dict[str, Any]]) -> List[Dict[str, Any]]:
     debug = dict(chain.get("link_debug", {}) or {})
     out: List[Dict[str, Any]] = []
     seen = set()
+    active_root_expr = str(debug.get("active_root_expr", "") or "")
+    active_root_kind = str(debug.get("active_root_kind", "") or "")
+    sink_function = str(chain.get("sink", {}).get("function", "") or "")
     for obj_id in list(debug.get("object_hits", []) or []):
         obj = dict(object_nodes.get(str(obj_id), {}) or {})
+        if not obj:
+            obj = _synthetic_object_row(
+                obj_id=str(obj_id),
+                sink_function=sink_function,
+                active_root_expr=active_root_expr,
+                active_root_kind=active_root_kind,
+            )
         if not obj or obj_id in seen:
             continue
         seen.add(obj_id)
@@ -673,9 +900,38 @@ def _build_object_path(chain: Mapping[str, Any], *, object_nodes: Mapping[str, D
             "addr_range": list(obj.get("addr_range", []) or []),
             "producer_contexts": list(obj.get("producer_contexts", []) or []),
             "consumer_contexts": list(obj.get("consumer_contexts", []) or []),
+            "writers": list(obj.get("writers", []) or []),
+            "readers": list(obj.get("readers", []) or []),
             "type_facts": dict(obj.get("type_facts", {}) or {}),
         })
     return out
+
+
+def _synthetic_object_row(
+    *,
+    obj_id: str,
+    sink_function: str,
+    active_root_expr: str,
+    active_root_kind: str,
+) -> Dict[str, Any]:
+    if not str(obj_id).startswith("obj_param_"):
+        return {}
+    member = str(active_root_expr or "").strip() or str(obj_id).split("_")[-1]
+    return {
+        "object_id": str(obj_id),
+        "members": [member] if member else [],
+        "addr_range": ["0x0", "0x0"],
+        "producer_contexts": ["UNKNOWN"],
+        "consumer_contexts": ["MAIN"],
+        "type_facts": {
+            "kind_hint": "param_object",
+            "synthetic": True,
+            "capacity_unknown": True,
+            "param_name": member,
+            "root_kind": str(active_root_kind or ""),
+            "sink_function": str(sink_function or ""),
+        },
+    }
 
 
 def _build_chain_segments(
@@ -707,7 +963,7 @@ def _build_chain_segments(
                 "members": list(object_path[0].get("members", []) or []),
             },
             "facts": ["source_reached", "object_candidate"],
-            "snippet_keys": ["producer_function"],
+            "snippet_keys": ["producer_function", "source_context", "object_context"],
         })
     elif source_steps:
         segments.append({
@@ -723,7 +979,7 @@ def _build_chain_segments(
                 "sink_label": sink_label,
             },
             "facts": ["source_reached"],
-            "snippet_keys": ["producer_function", "sink_function"],
+            "snippet_keys": ["producer_function", "source_context", "sink_function"],
         })
 
     if object_path and channel_path:
@@ -738,7 +994,7 @@ def _build_chain_segments(
                 "object_id": str(channel_path[0].get("object_id", "") or ""),
             },
             "facts": ["channel_candidate"],
-            "snippet_keys": ["producer_function", "caller_bridge"],
+            "snippet_keys": ["object_context", "channel_context", "producer_function", "caller_bridge"],
         })
 
     if channel_path:
@@ -754,7 +1010,7 @@ def _build_chain_segments(
                 "sink_label": sink_label,
             },
             "facts": ["channel_satisfied"],
-            "snippet_keys": ["caller_bridge", "sink_function"],
+            "snippet_keys": ["channel_context", "caller_bridge", "sink_function"],
         })
 
     if derive_facts:
@@ -769,7 +1025,7 @@ def _build_chain_segments(
                 "root_kind": str(active_root.get("kind", "") or ""),
             },
             "facts": ["root_bound"],
-            "snippet_keys": ["sink_function", "caller_bridge"],
+            "snippet_keys": ["derive_context", "caller_bridge", "sink_function"],
         })
 
     segments.append({
@@ -783,7 +1039,7 @@ def _build_chain_segments(
             "root_kind": str(active_root.get("kind", "") or ""),
         },
         "facts": [str(row.get("strength", "unknown") or "unknown") for row in checks] or ["unknown"],
-        "snippet_keys": ["sink_function", "caller_bridge"],
+        "snippet_keys": ["check_context", "caller_bridge", "sink_function"],
     })
 
     segments.append({
@@ -798,7 +1054,7 @@ def _build_chain_segments(
             "root_kind": str(active_root.get("kind", "") or ""),
         },
         "facts": ["verdict_target"],
-        "snippet_keys": ["sink_function", "caller_bridge", "producer_function"],
+        "snippet_keys": ["sink_function", "caller_bridge", "producer_function", "derive_context", "check_context"],
     })
 
     return segments
@@ -874,16 +1130,47 @@ def _capacity_evidence(
     sink_facts: Mapping[str, Any],
     checks: Sequence[Mapping[str, Any]],
     active_root: Mapping[str, Any],
+    *,
+    object_path: Sequence[Mapping[str, Any]],
+    sink_semantics_hints: Mapping[str, Any],
+    sink_function: str,
 ) -> List[Dict[str, Any]]:
     out: List[Dict[str, Any]] = []
     for key in ("dst_capacity", "buffer_size", "capacity_expr"):
         val = sink_facts.get(key)
         if val not in (None, ""):
             out.append({"expr": str(val), "site": "sink_facts", "kind": key})
+
+    for expr in list(sink_semantics_hints.get("dst_capacity_candidates", []) or []):
+        if str(expr or "").strip():
+            out.append({"expr": str(expr), "site": sink_function or "sink_function", "kind": "dst_capacity_candidate"})
+
     for chk in checks:
         expr = str(chk.get("expr", "") or "")
-        if any(tok in expr.lower() for tok in ("sizeof", "max_", "bound", "limit", "capacity", "tailroom")):
+        if any(tok in expr.lower() for tok in ("sizeof", "max_", "bound", "limit", "capacity", "tailroom", "space", "avail")):
             out.append({"expr": expr, "site": str(chk.get("site", "") or ""), "kind": "check_expr"})
+
+    for obj in list(object_path or []):
+        obj_id = str(obj.get("object_id", "") or "")
+        tf = dict(obj.get("type_facts", {}) or {})
+        members = [str(m) for m in (obj.get("members", []) or []) if str(m).strip()]
+        writers = [str(w) for w in (obj.get("writers", []) or []) if str(w).strip()]
+        readers = [str(r) for r in (obj.get("readers", []) or []) if str(r).strip()]
+        if members:
+            out.append({"expr": ", ".join(members[:4]), "site": obj_id or "object_path", "kind": "object_members"})
+        rng = list(obj.get("addr_range", []) or [])
+        if len(rng) == 2 and any(str(x) not in {"0x0", "0"} for x in rng):
+            out.append({"expr": f"{rng[0]}..{rng[1]}", "site": obj_id or "object_path", "kind": "object_addr_range"})
+        if tf.get("capacity_unknown"):
+            out.append({"expr": obj_id or "param_object", "site": obj_id or "object_path", "kind": "capacity_unknown"})
+        kind_hint = str(tf.get("kind_hint", "") or "")
+        if kind_hint:
+            out.append({"expr": kind_hint, "site": obj_id or "object_path", "kind": "object_kind"})
+        if writers:
+            out.append({"expr": writers[0], "site": obj_id or "object_path", "kind": "object_writer"})
+        if readers:
+            out.append({"expr": readers[0], "site": obj_id or "object_path", "kind": "object_reader"})
+
     if not out and sink_label in {"COPY_SINK", "LOOP_WRITE_SINK", "STORE_SINK"}:
         root_expr = str(active_root.get("expr", "") or "")
         if root_expr:
@@ -891,33 +1178,177 @@ def _capacity_evidence(
     return _dedup_dict_rows(out, key_fields=("expr", "site", "kind"))
 
 
+def _looks_like_function_name(value: Any) -> bool:
+    s = str(value or "").strip()
+    if not s:
+        return False
+    lowered = s.lower()
+    if lowered in {"unknown", "sink_function", "caller_bridge", "producer_function", "root", "check_expr", "derive_expr"}:
+        return False
+    if s.startswith("0x"):
+        return False
+    if any(ch.isspace() for ch in s):
+        return False
+    if any(ch in s for ch in "(){}[];,"):
+        return False
+    return True
+
+
+def _dedup_names(names: Sequence[str]) -> List[str]:
+    seen = set()
+    out: List[str] = []
+    for raw in names:
+        s = str(raw or "").strip()
+        if not s or s in seen:
+            continue
+        seen.add(s)
+        out.append(s)
+    return out
+
+
+def _local_expr_tokens(expr: str) -> List[str]:
+    text = str(expr or "")
+    text = re.sub(r"([a-z0-9])([A-Z])", r"\1 \2", text)
+    text = text.replace("->", ".").replace("[", " ").replace("]", " ").replace(".", " ")
+    toks = re.findall(r"[A-Za-z_]\w*", text)
+    out: List[str] = []
+    for tok in toks:
+        for part in re.split(r"_+", tok):
+            low = part.lower()
+            if low and low not in out:
+                out.append(low)
+    return out
+
+
+def _rank_object_context_functions(
+    functions: Sequence[str],
+    *,
+    sink_function: str,
+    root_expr: str,
+    preferred_functions: Sequence[str],
+    max_items: int = 12,
+) -> List[str]:
+    preferred = {str(fn).strip() for fn in preferred_functions if _looks_like_function_name(fn)}
+    sink_tokens = set(_local_expr_tokens(sink_function))
+    root_tokens = set(_local_expr_tokens(root_expr))
+    scored: List[Tuple[float, str]] = []
+    for idx, raw in enumerate(functions):
+        fn = str(raw or "").strip()
+        if not _looks_like_function_name(fn):
+            continue
+        low = fn.lower()
+        tokens = set(_local_expr_tokens(fn))
+        score = 0.0
+        if fn in preferred:
+            score += 3.0
+        overlap = len(tokens & (sink_tokens | root_tokens))
+        if overlap:
+            score += 1.5 + 0.4 * overlap
+        if any(tok in low for tok in ("rx", "read", "recv", "input", "parse", "copy", "notify", "indicate", "att", "gatt", "spi", "uart", "usb", "hci")):
+            score += 0.8
+        if any(tok in low for tok in ("init", "config", "clock", "enable", "set_", "register")):
+            score -= 0.7
+        score += max(0.0, 0.25 - (0.01 * idx))
+        scored.append((score, fn))
+    scored.sort(key=lambda item: (-item[0], item[1]))
+    out: List[str] = []
+    seen = set()
+    for _, fn in scored:
+        if fn in seen:
+            continue
+        seen.add(fn)
+        out.append(fn)
+        if len(out) >= max_items:
+            break
+    return out
+
+
+def _render_snippet_blob(functions: Sequence[str], decompiled_cache: Mapping[str, str]) -> Tuple[str, List[str]]:
+    names: List[str] = []
+    parts: List[str] = []
+    for fn in _dedup_names(functions):
+        code = str(decompiled_cache.get(fn, "") or "")
+        if not code:
+            continue
+        names.append(fn)
+        parts.append(f"/* {fn} */\n{code}")
+    return "\n\n".join(parts), names
+
+
 def _collect_snippets(
     chain: Mapping[str, Any],
     *,
     sink_function: str,
+    checks: Sequence[Mapping[str, Any]],
+    derive_facts: Sequence[Mapping[str, Any]],
+    object_path: Sequence[Mapping[str, Any]],
     decompiled_cache: Mapping[str, str],
-) -> Dict[str, str]:
+) -> Dict[str, Any]:
     debug = dict(chain.get("link_debug", {}) or {})
     source_steps = [dict(step) for step in (chain.get("steps", []) or []) if str(step.get("kind", "")) == "SOURCE"]
+    channel_steps = [dict(step) for step in (chain.get("steps", []) or []) if str(step.get("kind", "")) == "CHANNEL"]
     producer_candidates = [str(fn) for fn in (debug.get("producer_candidates", []) or []) if str(fn)]
     bridge_functions = [str(fn) for fn in (debug.get("bridge_functions", []) or []) if str(fn)]
+    source_functions = [
+        str(step.get("function", "") or "")
+        for step in source_steps
+        if _looks_like_function_name(step.get("function", ""))
+    ]
+    derive_functions = [
+        str(row.get("site", "") or "")
+        for row in derive_facts
+        if _looks_like_function_name(row.get("site", ""))
+    ]
+    check_functions = [
+        str(row.get("site", "") or "")
+        for row in checks
+        if _looks_like_function_name(row.get("site", ""))
+    ]
+    object_functions = _rank_object_context_functions(
+        [
+            str(fn)
+            for obj in (object_path or [])
+            for fn in (list(obj.get("writers", []) or []) + list(obj.get("readers", []) or []))
+            if _looks_like_function_name(fn)
+        ],
+        sink_function=sink_function,
+        root_expr=str(debug.get("active_root_expr", "") or ""),
+        preferred_functions=producer_candidates + source_functions + bridge_functions + derive_functions + check_functions,
+        max_items=12,
+    )
 
-    sink_code = str(decompiled_cache.get(sink_function, "") or "")
-    caller_blobs = []
-    for fn in bridge_functions:
-        code = str(decompiled_cache.get(fn, "") or "")
-        if code:
-            caller_blobs.append(f"/* {fn} */\n{code}")
-    producer_blobs = []
-    for fn in producer_candidates + [str(step.get("function", "") or "") for step in source_steps]:
-        code = str(decompiled_cache.get(fn, "") or "")
-        if code and fn not in sink_function:
-            producer_blobs.append(f"/* {fn} */\n{code}")
+    producer_functions = _dedup_names(producer_candidates + source_functions + object_functions[:6])
+    bridge_functions = _dedup_names(bridge_functions)
+    derive_functions = _dedup_names(derive_functions)
+    check_functions = _dedup_names(check_functions)
+    related_functions = _dedup_names([
+        fn for fn in ([sink_function] + producer_functions + bridge_functions + derive_functions + check_functions + object_functions)
+        if _looks_like_function_name(fn)
+    ])
+    channel_functions = _dedup_names(producer_functions + bridge_functions + object_functions) if channel_steps else []
+
+    snippet_targets = {
+        "sink_function": [sink_function] if _looks_like_function_name(sink_function) else [],
+        "caller_bridge": bridge_functions,
+        "producer_function": producer_functions,
+        "source_context": source_functions or producer_functions or object_functions,
+        "channel_context": channel_functions,
+        "derive_context": derive_functions or bridge_functions or object_functions or ([sink_function] if _looks_like_function_name(sink_function) else []),
+        "check_context": check_functions or bridge_functions or object_functions or ([sink_function] if _looks_like_function_name(sink_function) else []),
+        "object_context": object_functions or [fn for fn in related_functions if fn != sink_function],
+        "related_functions": [fn for fn in related_functions if fn != sink_function],
+    }
+
+    snippets: Dict[str, str] = {}
+    snippet_index: Dict[str, List[str]] = {}
+    for key, functions in snippet_targets.items():
+        blob, names = _render_snippet_blob(functions, decompiled_cache)
+        snippets[key] = blob
+        snippet_index[key] = names
 
     return {
-        "sink_function": sink_code,
-        "caller_bridge": "\n\n".join(dict.fromkeys(caller_blobs)),
-        "producer_function": "\n\n".join(dict.fromkeys(producer_blobs)),
+        "snippets": snippets,
+        "snippet_index": snippet_index,
     }
 
 
@@ -977,7 +1408,10 @@ def _needs_review(
     audit_flags: Sequence[str],
     review_needs_threshold: float,
     soft_candidate: bool,
+    require_review_for_confirmed: bool,
 ) -> bool:
+    if current_verdict == "CONFIRMED" and require_review_for_confirmed:
+        return True
     if audit_flags:
         return True
     if current_verdict == "SUSPICIOUS":
@@ -989,12 +1423,19 @@ def _needs_review(
     return False
 
 
-def _soft_candidate(chain: Mapping[str, Any], decision_basis: Mapping[str, Any], risk_score: float, *, min_risk_score: float) -> bool:
+def _soft_candidate(
+    chain: Mapping[str, Any],
+    decision_basis: Mapping[str, Any],
+    risk_score: float,
+    *,
+    min_risk_score: float,
+    source_proxy_ok: bool = False,
+) -> bool:
     if str(chain.get("verdict", "")) != "DROP":
         return False
     if str(decision_basis.get("reason_code", "")) in _HARD_BLOCK_REASON_CODES:
         return False
-    if not bool(decision_basis.get("source_reached", False)):
+    if not (bool(decision_basis.get("source_reached", False)) or bool(source_proxy_ok)):
         return False
     if not bool(decision_basis.get("chain_complete", False)):
         return False
@@ -1009,8 +1450,10 @@ def _derive_soft_verdict(strict_verdict: str, soft_candidate: bool) -> str:
     return strict_verdict
 
 
-def _review_state(current_verdict: str, needs_review: bool) -> str:
+def _review_state(current_verdict: str, needs_review: bool, *, require_review_for_confirmed: bool) -> str:
     if current_verdict == "CONFIRMED":
+        if require_review_for_confirmed and needs_review:
+            return "review_required"
         return "exact"
     if current_verdict == "DROP" and not needs_review:
         return "closed"
@@ -1076,6 +1519,8 @@ def _summarize_soft_triage(rows: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
         "needs_review": 0,
         "llm_reviewed": 0,
         "queue_eligible": 0,
+        "semantic_only_applied": 0,
+        "semantic_only_not_applied": 0,
     }
     for row in rows:
         stats_key = f"strict_{str(row.get('strict_verdict', '')).lower()}"
@@ -1093,6 +1538,11 @@ def _summarize_soft_triage(rows: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
             stats["llm_reviewed"] += 1
         if row.get("queue_eligible"):
             stats["queue_eligible"] += 1
+        state = str(row.get("soft_accept_state", "") or "")
+        if state == "semantic_only_applied":
+            stats["semantic_only_applied"] += 1
+        elif state == "semantic_only_not_applied":
+            stats["semantic_only_not_applied"] += 1
     return stats
 
 

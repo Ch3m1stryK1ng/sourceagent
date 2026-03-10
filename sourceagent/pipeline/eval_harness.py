@@ -792,6 +792,7 @@ async def run_eval(
     output_path: Optional[str] = None,
     run_id: Optional[str] = None,
     return_pipeline_result: bool = False,
+    review_kwargs: Optional[Dict[str, Any]] = None,
 ) -> Any:
     """Run the full pipeline on a binary and compare against ground truth.
 
@@ -801,6 +802,8 @@ async def run_eval(
     Returns per-label-class EvalResult with precision/recall/F1.
     """
     if pipeline_result is None:
+        merged_review_kwargs = dict(review_kwargs or {})
+        merged_review_kwargs.setdefault("has_ground_truth", bool(ground_truth))
         pipeline_result = await _run_pipeline(
             binary_path,
             stage=stage,
@@ -810,6 +813,7 @@ async def run_eval(
             mcp_connect_timeout_sec=mcp_connect_timeout_sec,
             output_path=output_path,
             run_id=run_id,
+            review_kwargs=merged_review_kwargs,
         )
 
     eval_results = compare_labels(
@@ -829,11 +833,13 @@ async def _run_pipeline(
     mcp_connect_timeout_sec: int = 30,
     output_path: Optional[str] = None,
     run_id: Optional[str] = None,
+    review_kwargs: Optional[Dict[str, Any]] = None,
 ) -> PipelineResult:
     """Run the mining pipeline and return PipelineResult."""
     import types
     from sourceagent.interface.main import _cmd_mine
 
+    review_kwargs = dict(review_kwargs or {})
     args = types.SimpleNamespace(
         binary=binary_path,
         stage=stage,
@@ -843,6 +849,7 @@ async def _run_pipeline(
         analysis_wait_sec=analysis_wait_sec,
         mcp_connect_timeout_sec=mcp_connect_timeout_sec,
         output=output_path,
+        **review_kwargs,
     )
     result = await _cmd_mine(args)
     return result

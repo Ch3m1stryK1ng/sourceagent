@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
 from sourceagent.config.constants import APP_NAME, APP_VERSION
+from sourceagent.agents.review_plan import DEFAULT_MAX_REVIEW_ITEMS
 from sourceagent.pipeline.verdict_calibration import (
     DEFAULT_ALLOW_MANUAL_LLM_SUPERVISION,
     DEFAULT_CALIBRATION_MODE,
@@ -29,6 +30,10 @@ from sourceagent.pipeline.verdict_calibration import (
     DEFAULT_LLM_SOFT_BUDGET,
     DEFAULT_MAX_CALIBRATION_CHAINS,
     DEFAULT_MIN_RISK_SCORE,
+    DEFAULT_REVIEW_ALLOW_SOFT_ON_STRUCTURAL_GAP,
+    DEFAULT_REVIEW_PRESERVE_REJECTED_RATIONALE,
+    DEFAULT_REVIEW_SOFT_GATES,
+    DEFAULT_REVIEW_STRICT_GATES,
     DEFAULT_REVIEW_NEEDS_THRESHOLD,
     DEFAULT_SAMPLE_SUSPICIOUS_RATIO_THRESHOLD,
     DEFAULT_VERDICT_OUTPUT_MODE,
@@ -107,6 +112,28 @@ def _add_verdict_calibration_args(parser):
         help="Per-binary deterministic soft-widen budget for DROP -> SUSPICIOUS triage (default: %(default)s)",
     )
     parser.add_argument(
+        "--review-strict-gates",
+        default=",".join(DEFAULT_REVIEW_STRICT_GATES),
+        help="Comma-separated deterministic gates required before review may affect strict verdicts (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--review-soft-gates",
+        default=",".join(DEFAULT_REVIEW_SOFT_GATES),
+        help="Comma-separated deterministic gates required before semantic-only soft application is allowed (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--review-allow-soft-on-structural-gap",
+        action=argparse.BooleanOptionalAction,
+        default=DEFAULT_REVIEW_ALLOW_SOFT_ON_STRUCTURAL_GAP,
+        help="Allow soft/dual output to preserve review suggestions when strict structural gates fail (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--review-preserve-rejected-rationale",
+        action=argparse.BooleanOptionalAction,
+        default=DEFAULT_REVIEW_PRESERVE_REJECTED_RATIONALE,
+        help="Preserve semantic rationale in calibration decisions even when review suggestions are rejected (default: %(default)s)",
+    )
+    parser.add_argument(
         "--verdict-review-json",
         default=None,
         help="Optional JSON file containing external LLM/BinAgent review decisions for stage-10 verdict calibration",
@@ -144,6 +171,12 @@ def _add_verdict_calibration_args(parser):
         type=int,
         default=DEFAULT_REVIEW_TIMEOUT_SEC,
         help="Timeout in seconds for each internal LLM review batch (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--review-tool-mode",
+        default="prompt_only",
+        choices=["prompt_only", "tool_assisted"],
+        help="How much extra decompiler context to fetch for the internal reviewer (default: %(default)s)",
     )
 
 
@@ -390,6 +423,7 @@ async def _cmd_mine(args):
 
     result = PipelineResult(binary_path=str(binary_path), run_id=run_id)
     setattr(result, "_max_stage", max_stage)
+    setattr(result, "_has_ground_truth", bool(getattr(args, "has_ground_truth", False)))
 
     print(f"[SourceAgent] Mining sources/sinks from: {binary_path}")
     print(f"[SourceAgent] Pipeline stages: 1-{max_stage}, run_id={run_id}")
@@ -449,8 +483,10 @@ async def _cmd_mine(args):
     if mai is not None and mcp_manager is not None:
         mai = await _run_stage_2_5(mai, mcp_manager, ghidra_binary_name)
 
-    # Keep MAI in-memory for downstream artifact builders.
+    # Keep stage-2/runtime context in-memory for downstream artifact builders and review.
     setattr(result, "_mai", mai)
+    setattr(result, "_mcp_manager", mcp_manager)
+    setattr(result, "_ghidra_binary_name", ghidra_binary_name)
 
     # ── Populate all_mmio_addrs from MAI ──────────────────────────────────
     if mai is not None:
@@ -1047,6 +1083,7 @@ def _run_stage_3(mai, memory_map, result):
 
     # VS0: MMIO_READ
     print("[Stage 3] Mining MMIO_READ sources (VS0)...")
+    print("[Stage 3]   searching MMIO load sites with constant or recoverable peripheral addresses")
     from sourceagent.pipeline.miners.mmio_read import mine_mmio_read_sources
     try:
         mmio = mine_mmio_read_sources(mai, memory_map)
@@ -1058,6 +1095,7 @@ def _run_stage_3(mai, memory_map, result):
 
     # VS2: ISR context (ISR_MMIO_READ + ISR_FILLED_BUFFER)
     print("[Stage 3] Mining ISR sources (VS2)...")
+    print("[Stage 3]   searching ISR-local MMIO reads and ISR-filled shared buffers")
     from sourceagent.pipeline.miners.isr_context import mine_isr_sources
     try:
         isr = mine_isr_sources(mai, memory_map)
@@ -1069,6 +1107,7 @@ def _run_stage_3(mai, memory_map, result):
 
     # VS3: DMA_BACKED_BUFFER
     print("[Stage 3] Mining DMA sources (VS3)...")
+    print("[Stage 3]   searching DMA config sites, backing buffers, and consumer-side evidence")
     from sourceagent.pipeline.miners.dma_buffer import mine_dma_sources
     try:
         dma = mine_dma_sources(mai, memory_map)
@@ -1091,6 +1130,7 @@ async def _run_stage_4(memory_map, mcp_manager, ghidra_binary_name, offline, res
 
     # VS1: COPY_SINK
     print("[Stage 4] Mining COPY_SINK sinks (VS1)...")
+    print("[Stage 4]   searching copy-family callsites and inline copy idioms")
     from sourceagent.pipeline.miners.copy_sink import mine_copy_sinks
     try:
         copy_sinks = await mine_copy_sinks(memory_map, mcp_manager, ghidra_binary_name, mai=mai)
@@ -1102,6 +1142,7 @@ async def _run_stage_4(memory_map, mcp_manager, ghidra_binary_name, offline, res
 
     # VS4-VS5: MEMSET_SINK, STORE_SINK, LOOP_WRITE_SINK
     print("[Stage 4] Mining additional sinks (VS4-VS5)...")
+    print("[Stage 4]   searching memset sites, pointer stores, and loop-write patterns")
     from sourceagent.pipeline.miners.additional_sinks import mine_additional_sinks
     try:
         additional = await mine_additional_sinks(
@@ -1119,6 +1160,7 @@ async def _run_stage_4(memory_map, mcp_manager, ghidra_binary_name, offline, res
 
     # VS6: FORMAT_STRING_SINK
     print("[Stage 4] Mining FORMAT_STRING_SINK sinks (VS6)...")
+    print("[Stage 4]   searching printf-family callsites with non-literal format roots")
     from sourceagent.pipeline.miners.format_string_sink import mine_format_string_sinks
     try:
         fmt_sinks = await mine_format_string_sinks(
@@ -1132,6 +1174,7 @@ async def _run_stage_4(memory_map, mcp_manager, ghidra_binary_name, offline, res
 
     # VS7: FUNC_PTR_SINK
     print("[Stage 4] Mining FUNC_PTR_SINK sinks (VS7)...")
+    print("[Stage 4]   searching indirect call sites and dispatch-table jumps")
     from sourceagent.pipeline.miners.func_ptr_sink import mine_func_ptr_sinks
     try:
         fptr_sinks = await mine_func_ptr_sinks(
@@ -1220,6 +1263,7 @@ async def _run_stage_8_10(result, *, max_stage: int, args=None):
     calibration_mode = str(getattr(args, "calibration_mode", DEFAULT_CALIBRATION_MODE) or DEFAULT_CALIBRATION_MODE)
     verdict_output_mode = str(getattr(args, "verdict_output_mode", DEFAULT_VERDICT_OUTPUT_MODE) or DEFAULT_VERDICT_OUTPUT_MODE)
     external_review_decisions = load_review_decisions(getattr(args, "verdict_review_json", None))
+    review_tool_mode = str(getattr(args, "review_tool_mode", "prompt_only") or "prompt_only")
 
     def _build_artifacts(*, review_decisions=None, review_plan=None, review_trace=None):
         return build_phase_a_artifacts(
@@ -1243,12 +1287,18 @@ async def _run_stage_8_10(result, *, max_stage: int, args=None):
             llm_promote_budget=int(getattr(args, "llm_promote_budget", DEFAULT_LLM_PROMOTE_BUDGET) or DEFAULT_LLM_PROMOTE_BUDGET),
             llm_demote_budget=int(getattr(args, "llm_demote_budget", DEFAULT_LLM_DEMOTE_BUDGET) or DEFAULT_LLM_DEMOTE_BUDGET),
             llm_soft_budget=int(getattr(args, "llm_soft_budget", DEFAULT_LLM_SOFT_BUDGET) or DEFAULT_LLM_SOFT_BUDGET),
+            review_strict_gates=tuple(v.strip() for v in str(getattr(args, "review_strict_gates", ",".join(DEFAULT_REVIEW_STRICT_GATES)) or "").split(",") if v.strip()),
+            review_soft_gates=tuple(v.strip() for v in str(getattr(args, "review_soft_gates", ",".join(DEFAULT_REVIEW_SOFT_GATES)) or "").split(",") if v.strip()),
+            review_allow_soft_on_structural_gap=bool(getattr(args, "review_allow_soft_on_structural_gap", DEFAULT_REVIEW_ALLOW_SOFT_ON_STRUCTURAL_GAP)),
+            review_preserve_rejected_rationale=bool(getattr(args, "review_preserve_rejected_rationale", DEFAULT_REVIEW_PRESERVE_REJECTED_RATIONALE)),
+            has_ground_truth=bool(getattr(args, "has_ground_truth", getattr(result, "_has_ground_truth", False))),
             review_decisions=review_decisions or [],
             review_plan=review_plan,
             review_trace=review_trace,
         )
 
     print("[Stage 8] Building ChannelGraph + refined objects...")
+    print("[Stage 8]   clustering shared SRAM/DMA objects and inferring cross-context channels")
     try:
         artifacts = _build_artifacts()
     except Exception as e:
@@ -1302,12 +1352,24 @@ async def _run_stage_8_10(result, *, max_stage: int, args=None):
                 artifacts.get("verdict_feature_pack", {}) or {},
                 artifacts.get("verdict_calibration_queue", {}) or {},
                 review_mode=review_mode,
-                max_items=int(getattr(args, "max_review_items", 8) or 8),
+                review_tool_mode=review_tool_mode,
+                max_items=int(getattr(args, "max_review_items", DEFAULT_MAX_REVIEW_ITEMS) or DEFAULT_MAX_REVIEW_ITEMS),
                 batch_size=int(getattr(args, "review_batch_size", 4) or 4),
             )
             if (review_plan_artifact.get("items", []) or []):
+                queue_preview = _summarize_review_targets(review_plan_artifact.get("items", []) or [])
+                print(
+                    f"[Stage 10] Review queue summary: "
+                    f"targets={queue_preview['target_count']}, "
+                    f"functions={queue_preview['functions']}, "
+                    f"verdicts={queue_preview['verdicts']}, "
+                    f"roots={queue_preview['root_families']}"
+                )
+                if queue_preview["examples"]:
+                    print(f"[Stage 10] Review targets: {', '.join(queue_preview['examples'])}")
                 print(
                     f"[Stage 10] Running internal review: mode={review_mode}, "
+                    f"tool_mode={review_tool_mode}, "
                     f"items={len(review_plan_artifact.get('items', []) or [])}, "
                     f"batches={len(review_plan_artifact.get('batches', []) or [])}"
                 )
@@ -1315,7 +1377,10 @@ async def _run_stage_8_10(result, *, max_stage: int, args=None):
                     review_plan_artifact,
                     model=review_model,
                     review_mode=review_mode,
+                    review_tool_mode=review_tool_mode,
                     timeout_sec=int(getattr(args, "review_timeout_sec", 120) or 120),
+                    mcp_manager=getattr(result, "_mcp_manager", None),
+                    ghidra_binary_name=getattr(result, "_ghidra_binary_name", ""),
                 )
                 internal_review_decisions = list(review_run.get("review_decisions", []) or [])
                 review_prompt_artifact = dict(review_run.get("review_prompt", {}) or review_prompt_artifact)
@@ -1376,6 +1441,39 @@ async def _run_stage_8_10(result, *, max_stage: int, args=None):
             f"review_queue={len(review_queue)}, review_needed={review_needed}, "
             f"llm_reviewed={llm_reviewed}, review_status={review_trace.get('status', 'not_run')}"
         )
+        soft_stats = (artifacts.get("verdict_soft_triage", {}) or {}).get("stats", {}) or {}
+        print(
+            "[Stage 10] soft summary: "
+            f"final_confirmed={soft_stats.get('final_confirmed', 0)}, "
+            f"final_suspicious={soft_stats.get('final_suspicious', 0)}, "
+            f"final_safe={soft_stats.get('final_safe_or_low_risk', 0)}, "
+            f"semantic_only_applied={soft_stats.get('semantic_only_applied', 0)}, "
+            f"semantic_only_not_applied={soft_stats.get('semantic_only_not_applied', 0)}"
+        )
+
+
+def _summarize_review_targets(items: List[Dict[str, Any]]) -> Dict[str, Any]:
+    verdicts: Dict[str, int] = {}
+    roots: Dict[str, int] = {}
+    functions: Dict[str, int] = {}
+    examples: List[str] = []
+    for item in items:
+        verdict = str(item.get("current_verdict", "") or "")
+        root_family = str((item.get("root", {}) or {}).get("family", "") or "unknown")
+        sink_fn = str((item.get("sink", {}) or {}).get("function", "") or "?")
+        verdicts[verdict] = verdicts.get(verdict, 0) + 1
+        roots[root_family] = roots.get(root_family, 0) + 1
+        functions[sink_fn] = functions.get(sink_fn, 0) + 1
+        if len(examples) < 5:
+            root_expr = str((item.get("root", {}) or {}).get("expr", "") or "UNKNOWN")
+            examples.append(f"{sink_fn}[{root_family}:{root_expr}]")
+    return {
+        "target_count": len(items),
+        "verdicts": verdicts,
+        "root_families": roots,
+        "functions": functions,
+        "examples": examples,
+    }
 
 
 # ── Output ─────────────────────────────────────────────────────────────────
@@ -2147,6 +2245,30 @@ async def _cmd_eval(args):
                     f"{output_stem} uses isolated Ghidra project {project_override}"
                 )
             try:
+                review_kwargs = {
+                    "calibration_mode": getattr(args, "calibration_mode", None),
+                    "verdict_output_mode": getattr(args, "verdict_output_mode", None),
+                    "max_calibration_chains": getattr(args, "max_calibration_chains", None),
+                    "sample_suspicious_ratio_threshold": getattr(args, "sample_suspicious_ratio_threshold", None),
+                    "min_risk_score": getattr(args, "min_risk_score", None),
+                    "review_needs_threshold": getattr(args, "review_needs_threshold", None),
+                    "allow_manual_llm_supervision": getattr(args, "allow_manual_llm_supervision", None),
+                    "llm_promote_budget": getattr(args, "llm_promote_budget", None),
+                    "llm_demote_budget": getattr(args, "llm_demote_budget", None),
+                    "llm_soft_budget": getattr(args, "llm_soft_budget", None),
+                    "review_strict_gates": getattr(args, "review_strict_gates", None),
+                    "review_soft_gates": getattr(args, "review_soft_gates", None),
+                    "review_allow_soft_on_structural_gap": getattr(args, "review_allow_soft_on_structural_gap", None),
+                    "review_preserve_rejected_rationale": getattr(args, "review_preserve_rejected_rationale", None),
+                    "verdict_review_json": getattr(args, "verdict_review_json", None),
+                    "disable_review": getattr(args, "disable_review", None),
+                    "review_mode": getattr(args, "review_mode", None),
+                    "review_model": getattr(args, "review_model", None),
+                    "max_review_items": getattr(args, "max_review_items", None),
+                    "review_batch_size": getattr(args, "review_batch_size", None),
+                    "review_timeout_sec": getattr(args, "review_timeout_sec", None),
+                    "review_tool_mode": getattr(args, "review_tool_mode", None),
+                }
                 run_eval_coro = run_eval(
                     str(binary_path),
                     gt if has_gt else [],
@@ -2159,6 +2281,7 @@ async def _cmd_eval(args):
                     output_path=str(raw_json_path) if raw_json_path else None,
                     run_id=run_id,
                     return_pipeline_result=True,
+                    review_kwargs=review_kwargs,
                 )
                 if sample_timeout > 0:
                     results, pipeline_result = await asyncio.wait_for(

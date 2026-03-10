@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.1",
+  "schema_version": "0.2",
   "gt_backed": {
     "sample_count": 44,
     "positive_total": 386,
@@ -29,7 +29,11 @@
       "confirmed": 118,
       "suspicious": 194,
       "safe_or_low_risk": 88,
-      "dropped": 1537
+      "dropped": 1537,
+      "object_nodes": 903,
+      "refined_objects": 954,
+      "channel_edges": 369,
+      "sink_roots": 2058
     },
     "by_dataset": {
       "monolithic-firmware-collection": {
@@ -44,7 +48,10 @@
         "confirmed": 80,
         "suspicious": 105,
         "safe_or_low_risk": 72,
-        "dropped": 688
+        "dropped": 688,
+        "object_nodes": 402,
+        "refined_objects": 437,
+        "channel_edges": 191
       },
       "p2im-unit_tests": {
         "sources": 2159,
@@ -58,7 +65,10 @@
         "confirmed": 37,
         "suspicious": 40,
         "safe_or_low_risk": 15,
-        "dropped": 738
+        "dropped": 738,
+        "object_nodes": 374,
+        "refined_objects": 383,
+        "channel_edges": 167
       },
       "uSBS": {
         "sources": 502,
@@ -72,8 +82,50 @@
         "confirmed": 1,
         "suspicious": 49,
         "safe_or_low_risk": 1,
-        "dropped": 111
+        "dropped": 111,
+        "object_nodes": 127,
+        "refined_objects": 134,
+        "channel_edges": 11
       }
+    },
+    "interpretation": {
+      "chains_lt_sinks": {
+        "verified_sinks": 2135,
+        "sink_roots": 2058,
+        "chains": 1937,
+        "no_root_gap": 77,
+        "post_root_prune_gap": 121,
+        "explanation": "Not every verified sink yields a usable root, and not every root survives chain materialization and pruning."
+      },
+      "drop_top_failure_codes": [
+        {
+          "code": "OBJECT_HIT_NONE",
+          "count": 646
+        },
+        {
+          "code": "MAX_DEPTH_REACHED",
+          "count": 211
+        },
+        {
+          "code": "OBJECT_HIT_NO_EDGE",
+          "count": 192
+        },
+        {
+          "code": "ROOT_PARSE_FAILED",
+          "count": 97
+        },
+        {
+          "code": "ROOT_WEAK_FALLBACK",
+          "count": 87
+        },
+        {
+          "code": "CHECK_UNCERTAIN",
+          "count": 55
+        }
+      ],
+      "calibration_queue_meaning": "Reviewer-eligible chains after calibration-mode and queue-budget filtering.",
+      "soft_triage_meaning": "Broader soft/dual verdict ledger including reviewer-eligible chains and deterministic soft-widened chains.",
+      "confirmed_suspicious_reasoning_note": "This older no-GT scan predates the richer reviewer reason-code/session artifacts; counts are mostly deterministic verdicts rather than fully explained semantic-reviewed outcomes."
     }
   },
   "references": {

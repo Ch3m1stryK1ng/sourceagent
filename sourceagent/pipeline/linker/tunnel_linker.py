@@ -134,7 +134,7 @@ def link_chains(
                     sink_site_hex=sink_site_hex,
                     sink_fn=sink_fn,
                     sink_label=sink_label,
-                    active_root=st.get("active_root"),
+                    active_root=_first_linkable_root(sink_root.get("roots", [])),
                     source=None,
                     source_resolve_mode="none",
                     bridge_steps=[],
@@ -174,6 +174,9 @@ def link_chains(
             )
 
             source = slice_res.get("source")
+            fallback_source = source or st.get("fallback_source")
+            fallback_source_mode = str(slice_res.get("source_resolve_mode", "none") or st.get("fallback_source_mode", "none"))
+            fallback_bridge_steps = list(slice_res.get("bridge_steps", []) or st.get("fallback_bridge_steps", []))
             obj_hits = list(slice_res.get("object_hits", []))
             prefer_tunnel = _should_prefer_tunnel(
                 st,
@@ -188,9 +191,9 @@ def link_chains(
                     sink_fn=sink_fn,
                     sink_label=sink_label,
                     active_root=st.get("active_root"),
-                    source=source,
-                    source_resolve_mode=str(slice_res.get("source_resolve_mode", "none")),
-                    bridge_steps=list(slice_res.get("bridge_steps", [])),
+                    source=fallback_source,
+                    source_resolve_mode=fallback_source_mode,
+                    bridge_steps=list(fallback_bridge_steps),
                     channel_steps=st.get("channel_steps", []),
                     sink_facts=sink_facts_by_pack.get(
                         sink_pack_id_by_site.get(_sink_site_key(sink_site_hex, sink_fn, sink_label), ""),
@@ -248,6 +251,9 @@ def link_chains(
                             "state_score": _next_state_score(st, edge_score=float(edge.get("score", 0.0))),
                             "tunnel_attempts": int(st.get("tunnel_attempts", 0)) + 1,
                             "producer_candidates": tuple(list(st.get("producer_candidates", ())) + [producer_fn]),
+                            "fallback_source": fallback_source,
+                            "fallback_source_mode": fallback_source_mode,
+                            "fallback_bridge_steps": list(fallback_bridge_steps),
                         }
                         heapq.heappush(pq, (-next_state["state_score"], counter, next_state))
                         counter += 1
@@ -271,9 +277,9 @@ def link_chains(
                     sink_fn=sink_fn,
                     sink_label=sink_label,
                     active_root=st.get("active_root"),
-                    source=None,
-                    source_resolve_mode="none",
-                    bridge_steps=[],
+                    source=st.get("fallback_source"),
+                    source_resolve_mode=str(st.get("fallback_source_mode", "none") or "none"),
+                    bridge_steps=list(st.get("fallback_bridge_steps", []) or []),
                     channel_steps=st.get("channel_steps", []),
                     sink_facts=sink_facts_by_pack.get(
                         sink_pack_id_by_site.get(_sink_site_key(sink_site_hex, sink_fn, sink_label), ""),
@@ -573,7 +579,13 @@ def _cached_slice(
     current_fn = str(st.get("current_fn", ""))
     expr = str(st.get("expr", ""))
 
-    object_hits, object_hit_mode = _resolve_object_hits(expr, current_fn, objects_by_id, access_by_fn)
+    object_hits, object_hit_mode = _resolve_object_hits(
+        expr,
+        current_fn,
+        objects_by_id,
+        access_by_fn,
+        decompiled_cache,
+    )
     # If we already hit object nodes, prefer tunnel expansion over singleton-source
     # shortcut so the chain can carry CHANNEL evidence.
     active_root = dict(st.get("active_root", {}) or {})
@@ -600,6 +612,22 @@ def _cached_slice(
         if support_hits:
             object_hits = support_hits
             object_hit_mode = support_mode
+    if source is None and object_hits:
+        proxy_source, proxy_mode, proxy_steps = _resolve_object_proxy_source(
+            current_fn=current_fn,
+            object_hits=object_hits,
+            objects_by_id=objects_by_id,
+            edges_by_object=edges_by_object,
+            sources=sources,
+            expr=expr,
+            active_root=active_root,
+            access_by_fn=access_by_fn,
+            decompiled_cache=decompiled_cache,
+        )
+        if proxy_source is not None:
+            source = proxy_source
+            source_mode = proxy_mode
+            bridge_steps = list(proxy_steps or bridge_steps)
     channel_required_hint = any(_object_requires_channel(obj_id, edges_by_object) for obj_id in object_hits)
 
     failure_code = ""
@@ -911,6 +939,9 @@ def _source_candidate_rank(
         "nested_caller_bridge": 28,
         "transitive_caller_bridge": 24,
         "caller_bridge": 25,
+        "object_source_proxy": 18,
+        "synthetic_object_source_proxy": 12,
+        "heuristic_object_source_proxy": 9,
         "singleton_fallback": 5,
         "label_guided": 10,
     }.get(mode, 0)
@@ -923,6 +954,7 @@ def _resolve_object_hits(
     current_fn: str,
     objects_by_id: Dict[str, Dict[str, Any]],
     access_by_fn: Dict[str, List[Any]],
+    decompiled_cache: Dict[str, str],
 ) -> Tuple[List[str], str]:
     member_hits = _member_object_hits(expr, objects_by_id)
     if member_hits:
@@ -965,6 +997,15 @@ def _resolve_object_hits(
     hits = _heuristic_object_hits(expr, current_fn, objects_by_id)
     if hits:
         return hits, "fn_expr_heuristic"
+
+    synthetic_obj = _ensure_synthetic_param_object(
+        expr=expr,
+        current_fn=current_fn,
+        objects_by_id=objects_by_id,
+        decompiled_cache=decompiled_cache,
+    )
+    if synthetic_obj:
+        return [synthetic_obj], "synthetic_param_object"
     return [], "none"
 
 
@@ -988,7 +1029,13 @@ def _resolve_supporting_object_hits(
         root_kind = str(root.get("kind", "")).lower()
         if root_kind not in {"src_ptr", "dst_ptr", "src_data", "target_addr"}:
             continue
-        hits, _ = _resolve_object_hits(str(root.get("expr", "")), current_fn, objects_by_id, access_by_fn)
+        hits, _ = _resolve_object_hits(
+            str(root.get("expr", "")),
+            current_fn,
+            objects_by_id,
+            access_by_fn,
+            {},
+        )
         for idx, obj_id in enumerate(hits):
             score = 1.0 - 0.05 * idx
             if root_kind in {"src_ptr", "src_data"}:
@@ -1078,6 +1125,237 @@ def _expr_tokens(expr: str) -> List[str]:
     return out
 
 
+def _resolve_object_proxy_source(
+    *,
+    current_fn: str,
+    object_hits: Sequence[str],
+    objects_by_id: Dict[str, Dict[str, Any]],
+    edges_by_object: Dict[str, List[Dict[str, Any]]],
+    sources: Sequence[Dict[str, Any]],
+    expr: str,
+    active_root: Optional[Dict[str, Any]],
+    access_by_fn: Dict[str, List[Any]],
+    decompiled_cache: Dict[str, str],
+) -> Tuple[Optional[Dict[str, Any]], str, List[Dict[str, Any]]]:
+    candidates: List[Tuple[Dict[str, Any], str]] = []
+    for obj_id in object_hits:
+        obj = objects_by_id.get(obj_id, {})
+        tf = dict(obj.get("type_facts", {}) or {})
+        hinted_label = str(tf.get("source_label", "") or "")
+        hinted_context = ""
+        for edge in edges_by_object.get(obj_id, []):
+            src_ctx = str(edge.get("src_context", "") or "")
+            if src_ctx in {"DMA", "ISR"}:
+                hinted_context = src_ctx
+                if not hinted_label:
+                    hinted_label = "DMA_BACKED_BUFFER" if src_ctx == "DMA" else "ISR_FILLED_BUFFER"
+                break
+        if hinted_label:
+            matches = [dict(src) for src in sources if str(src.get("label", "") or "") == hinted_label]
+            if matches:
+                chosen = _choose_best_source(matches, expr=expr, active_root=active_root)
+                candidates.append((chosen, "object_source_proxy"))
+                continue
+            producer_fn = _pick_producer_fn(obj, hinted_context or "UNKNOWN", fallback=current_fn)
+            candidates.append(({
+                "label": hinted_label,
+                "address": 0,
+                "function_name": producer_fn or current_fn,
+                "evidence_refs": [],
+                "synthetic": True,
+            }, "synthetic_object_source_proxy"))
+            continue
+
+        heuristic_source = _infer_object_site_source_proxy(
+            obj=obj,
+            current_fn=current_fn,
+            sources=sources,
+            expr=expr,
+            active_root=active_root,
+            access_by_fn=access_by_fn,
+            decompiled_cache=decompiled_cache,
+        )
+        if heuristic_source is not None:
+            candidates.append(heuristic_source)
+
+    if not candidates:
+        return None, "none", []
+    chosen, mode = max(
+        candidates,
+        key=lambda item: _source_candidate_rank(item[0], item[1], expr=expr, active_root=active_root),
+    )
+    return chosen, mode, []
+
+
+def _infer_object_site_source_proxy(
+    *,
+    obj: Dict[str, Any],
+    current_fn: str,
+    sources: Sequence[Dict[str, Any]],
+    expr: str,
+    active_root: Optional[Dict[str, Any]],
+    access_by_fn: Dict[str, List[Any]],
+    decompiled_cache: Dict[str, str],
+) -> Optional[Tuple[Dict[str, Any], str]]:
+    candidates: List[Tuple[float, Dict[str, Any], str]] = []
+    region_kind = str(obj.get("region_kind", "") or "").upper()
+    producer_contexts = {str(c) for c in (obj.get("producer_contexts", []) or []) if str(c)}
+    consumer_contexts = {str(c) for c in (obj.get("consumer_contexts", []) or []) if str(c)}
+    site_candidates = list(obj.get("writer_sites", []) or []) + list(obj.get("reader_sites", []) or [])
+
+    for site in site_candidates:
+        fn = str(site.get("fn", "") or "")
+        if not fn:
+            continue
+        score = 0.0
+        low = fn.lower()
+        if any(tok in low for tok in ("rx", "recv", "read", "input", "uart", "spi", "usb", "hci", "net")):
+            score += 1.5
+        if any(tok in low for tok in ("init", "config", "clock", "enable", "set_")):
+            score -= 1.0
+        ctx = str(site.get("context", "") or "")
+        if ctx in {"ISR", "TASK"}:
+            score += 0.6
+        mmio_hits = 0
+        for access in access_by_fn.get(fn, [])[:32]:
+            try:
+                addr = int(getattr(access, "target_addr", 0) or 0)
+            except Exception:
+                addr = 0
+            if addr >= 0x40000000:
+                mmio_hits += 1
+        if mmio_hits:
+            score += min(1.8, 0.25 * mmio_hits)
+        code = str(decompiled_cache.get(fn, "") or "").lower()
+        if any(tok in code for tok in ("spi", "uart", "usb", "fifo", "recv", "read packet", "rx")):
+            score += 0.4
+        if score < 1.4:
+            continue
+
+        label = "MMIO_READ"
+        if region_kind == "DMA_BUFFER" or "DMA" in producer_contexts:
+            label = "DMA_BACKED_BUFFER"
+        elif "ISR" in producer_contexts or ctx == "ISR":
+            label = "ISR_FILLED_BUFFER"
+
+        matches = [dict(src) for src in sources if str(src.get("label", "") or "") == label and str(src.get("function_name", "") or "") == fn]
+        if matches:
+            chosen = _choose_best_source(matches, expr=expr, active_root=active_root)
+            candidates.append((score + 2.0, chosen, "heuristic_object_source_proxy"))
+            continue
+
+        candidates.append((score, {
+            "label": label,
+            "address": 0,
+            "function_name": fn or current_fn,
+            "evidence_refs": [],
+            "synthetic": True,
+            "heuristic": True,
+        }, "heuristic_object_source_proxy"))
+
+    if not candidates:
+        return None
+    _, src, mode = max(candidates, key=lambda item: item[0])
+    return src, mode
+
+
+def _ensure_synthetic_param_object(
+    *,
+    expr: str,
+    current_fn: str,
+    objects_by_id: Dict[str, Dict[str, Any]],
+    decompiled_cache: Dict[str, str],
+) -> str:
+    param_name = _extract_param_like_name(expr)
+    if not param_name or not current_fn:
+        return ""
+
+    code = str(decompiled_cache.get(current_fn, "") or "")
+    if not code:
+        return ""
+    if not _looks_like_structured_param_object(code, param_name):
+        return ""
+
+    object_id = f"obj_param_{_slugify_name(current_fn)}_{_slugify_name(param_name)}"
+    if object_id not in objects_by_id:
+        objects_by_id[object_id] = {
+            "object_id": object_id,
+            "region_kind": "PARAM_OBJECT",
+            "addr_range": ["0x0", "0x0"],
+            "producer_contexts": ["UNKNOWN"],
+            "consumer_contexts": ["MAIN"],
+            "writer_sites": [{
+                "context": "MAIN",
+                "fn": current_fn,
+                "fn_addr": "0x0",
+                "site_addr": "0x0",
+                "access_kind": "store",
+                "target_addr": "0x0",
+            }],
+            "reader_sites": [],
+            "writers": [current_fn],
+            "readers": [],
+            "members": [param_name],
+            "evidence_refs": [],
+            "confidence": 0.58,
+            "type_facts": {
+                "kind_hint": "param_object",
+                "symbol_backed": False,
+                "synthetic": True,
+                "capacity_unknown": True,
+                "param_name": param_name,
+            },
+            "notes": "synthetic parameter object inferred from structured sink writes",
+        }
+    return object_id
+
+
+def _extract_param_like_name(expr: str) -> str:
+    raw = str(expr or "").strip()
+    m = re.fullmatch(r"([A-Za-z_]\w*)", raw)
+    if m:
+        candidate = m.group(1).lower()
+        if candidate not in _CONTROL_ROOT_NAMES and candidate not in {"buf", "dest", "dst", "src", "len", "idx"}:
+            return candidate
+    tokens = _expr_tokens(expr)
+    if not tokens:
+        return ""
+    for tok in tokens:
+        if tok in {"param", "local", "undefined"}:
+            continue
+        if tok in _CONTROL_ROOT_NAMES:
+            continue
+        if tok in {"buf", "dest", "dst", "src", "len", "idx"}:
+            continue
+        if len(tok) < 2:
+            continue
+        return tok
+    return tokens[0] if tokens else ""
+
+
+def _looks_like_structured_param_object(code: str, param_name: str) -> bool:
+    pname = re.escape(str(param_name))
+    patterns = [
+        rf"\b{pname}\s*->\s*[A-Za-z_]",
+        rf"\b{pname}\s*\[[^\]]+\]",
+        rf"\*\s*(?:\([^\)]*\b{pname}\b[^\)]*\)|{pname})\s*=",
+        rf"&\s*{pname}\s*->",
+    ]
+    score = 0
+    text = str(code or "")
+    for pat in patterns:
+        if re.search(pat, text):
+            score += 1
+    if any(tok in text.lower() for tok in ("descriptor", "parse", "cfg", "interface", "endpoint")):
+        score += 1
+    return score >= 2
+
+
+def _slugify_name(text: str) -> str:
+    out = re.sub(r"[^A-Za-z0-9_]+", "_", str(text or "").strip())
+    return out[:96] or "anon"
+
+
 def _heuristic_object_hits(
     expr: str,
     current_fn: str,
@@ -1109,6 +1387,8 @@ def _heuristic_object_hits(
             score += 1.0
 
         region_kind = str(obj.get("region_kind", "")).lower()
+        if region_kind == "param_object" and current_fn and current_fn.lower() not in site_fns:
+            continue
         if region_kind == "rodata_table" and (expr_tokens | fn_tokens) & {"cmd", "dispatch", "table", "handler"}:
             score += 0.8
 
@@ -1340,6 +1620,9 @@ def _initial_states_for_sink(sink_root: Dict[str, Any], *, sink_label: str, sink
             "state_score": max(0.35, 0.55 - 0.03 * idx + _root_seed_bonus(root, sink_label=sink_label)),
             "tunnel_attempts": 0,
             "producer_candidates": tuple(),
+            "fallback_source": None,
+            "fallback_source_mode": "none",
+            "fallback_bridge_steps": [],
         })
     return states
 
@@ -1422,7 +1705,7 @@ def _build_link_debug(
         "active_root_role": str((st.get("active_root") or {}).get("role", "")),
         "active_root_kind": str((st.get("active_root") or {}).get("kind", "")),
         "object_hit_mode": str(slice_res.get("object_hit_mode", "none")),
-        "source_resolve_mode": str(slice_res.get("source_resolve_mode", "none")),
+        "source_resolve_mode": str(slice_res.get("source_resolve_mode") or st.get("fallback_source_mode", "none")),
         "bridge_functions": [
             str(step.get("from_function", ""))
             for step in (slice_res.get("bridge_steps", []) or [])

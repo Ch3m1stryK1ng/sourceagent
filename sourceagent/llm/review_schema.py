@@ -7,6 +7,8 @@ import re
 from json import JSONDecoder
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
+from sourceagent.pipeline.review_reason_codes import normalize_review_reason_codes
+
 REVIEW_SCHEMA_VERSION = "0.2"
 _ALLOWED_VERDICTS = {"SAFE_OR_LOW_RISK", "SUSPICIOUS", "CONFIRMED"}
 _ALLOWED_SEGMENT_STATUS = {
@@ -69,7 +71,7 @@ def normalize_review_response(
         if suggested not in _ALLOWED_VERDICTS:
             continue
         segment_assessment = _normalize_segment_assessment(item.get("segment_assessment"))
-        reason_codes = _normalize_str_list(item.get("reason_codes"))
+        reason_codes = normalize_review_reason_codes(item.get("reason_codes") or [])
         if not reason_codes:
             reason_codes = _collect_reason_codes_from_segments(segment_assessment)
         out.append({
@@ -180,7 +182,7 @@ def _normalize_segment_assessment(value: Any) -> List[Dict[str, Any]]:
         row = {
             "segment_id": segment_id,
             "status": status,
-            "reason_codes": _normalize_str_list(item.get("reason_codes")),
+            "reason_codes": normalize_review_reason_codes(item.get("reason_codes") or []),
             "summary": str(item.get("summary", "") or "").strip(),
             "evidence_map": _normalize_evidence_map(item.get("evidence_map")),
         }
@@ -191,7 +193,7 @@ def _normalize_segment_assessment(value: Any) -> List[Dict[str, Any]]:
 def _collect_reason_codes_from_segments(rows: Sequence[Mapping[str, Any]]) -> List[str]:
     seen = []
     for row in rows:
-        for code in _normalize_str_list(row.get("reason_codes")):
+        for code in normalize_review_reason_codes(row.get("reason_codes") or []):
             if code not in seen:
                 seen.append(code)
     return seen
