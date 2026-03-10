@@ -90,6 +90,50 @@ def test_parse_review_response_accepts_required_output_wrapper():
     assert decisions[0]["chain_id"] == "c2"
 
 
+
+
+def test_parse_review_response_preserves_segment_assessment_v2():
+    text = json_text = """{
+  "decisions": [
+    {
+      "chain_id": "c3",
+      "suggested_semantic_verdict": "SUSPICIOUS",
+      "trigger_summary": "review summary",
+      "preconditions": {
+        "state_predicates": ["rx_ready != 0"],
+        "root_constraints": ["len > cap"],
+        "why_check_fails": ["wrong variable"],
+        "environment_assumptions": ["network input reachable"]
+      },
+      "segment_assessment": [
+        {
+          "segment_id": "check_binding",
+          "status": "mismatch",
+          "reason_codes": ["CHECK_NOT_BINDING_ROOT"],
+          "summary": "guard checks a different variable",
+          "evidence_map": {
+            "summary": ["sink_function"]
+          }
+        }
+      ],
+      "reason_codes": ["CHECK_NOT_BINDING_ROOT"],
+      "review_quality_flags": ["needs_more_context"],
+      "evidence_map": {
+        "trigger_summary": ["sink_function"]
+      }
+    }
+  ]
+}"""
+    decisions, meta = parse_review_response(text, default_review_mode="semantic_review", allowed_chain_ids=["c3"])
+    assert meta["ok"] is True
+    assert len(decisions) == 1
+    row = decisions[0]
+    assert row["segment_assessment"][0]["segment_id"] == "check_binding"
+    assert row["segment_assessment"][0]["status"] == "mismatch"
+    assert row["reason_codes"] == ["CHECK_NOT_BINDING_ROOT"]
+    assert row["review_quality_flags"] == ["needs_more_context"]
+
+
 def test_build_review_plan_batches_items():
     feature_pack = {
         "items": [

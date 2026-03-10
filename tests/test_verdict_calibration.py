@@ -202,3 +202,61 @@ def test_audit_only_keeps_strict_verdict_even_with_valid_review():
     decision = artifacts["verdict_calibration_decisions"]["items"][0]
     assert decision["accepted"] is True
     assert soft["final_verdict"] == soft["strict_verdict"]
+
+
+def test_rejected_review_preserves_semantic_rationale():
+    chain = _sample_chain()
+    chain["link_debug"] = {
+        "object_hits": [],
+        "producer_candidates": ["uart_receive"],
+        "bridge_functions": ["parse_packet"],
+    }
+    artifacts = build_verdict_calibration_artifacts(
+        binary_name="fw.elf",
+        binary_sha256="deadbeef",
+        chains=[chain],
+        channel_graph={"object_nodes": []},
+        sink_facts_by_pack={"p1": {"len_expr": "payload_len"}},
+        sink_pack_id_by_site={"0x08001000|copy_fn|COPY_SINK": "p1"},
+        decompiled_cache={
+            "copy_fn": "void copy_fn(char *dst, int payload_len) { memcpy(dst, src, payload_len); }",
+            "parse_packet": "void parse_packet(void) { copy_fn(dst, hdr->len); }",
+            "uart_receive": "int uart_receive(void) { return USART1_DR; }",
+        },
+        calibration_mode="all_non_exact",
+        verdict_output_mode="dual",
+        review_decisions=[
+            {
+                "chain_id": "chain_fw_0001_root000",
+                "suggested_semantic_verdict": "CONFIRMED",
+                "trigger_summary": "payload_len can exceed destination capacity",
+                "preconditions": {
+                    "state_predicates": ["rx_ready != 0"],
+                    "root_constraints": ["payload_len > dst_capacity"],
+                    "why_check_fails": ["guard missing"],
+                },
+                "segment_assessment": [
+                    {
+                        "segment_id": "sink_triggerability",
+                        "status": "possible",
+                        "reason_codes": ["TRIGGERABLE_LEN_GT_CAPACITY"],
+                        "summary": "root can exceed destination capacity",
+                        "evidence_map": {"summary": ["sink_function"]}
+                    }
+                ],
+                "reason_codes": ["TRIGGERABLE_LEN_GT_CAPACITY"],
+                "evidence_map": {
+                    "trigger_summary": ["sink_function"],
+                    "root_controllability": ["sink_function"],
+                },
+            }
+        ],
+    )
+
+    decision = artifacts["verdict_calibration_decisions"]["items"][0]
+    assert decision["accepted"] is False
+    assert decision["accept_reason"] == "STRUCTURAL_CONSTRAINT_NOT_MET"
+    assert decision["trigger_summary"] == "payload_len can exceed destination capacity"
+    assert decision["preconditions"]["root_constraints"] == ["payload_len > dst_capacity"]
+    assert decision["segment_assessment"][0]["segment_id"] == "sink_triggerability"
+    assert decision["reason_codes"] == ["TRIGGERABLE_LEN_GT_CAPACITY"]

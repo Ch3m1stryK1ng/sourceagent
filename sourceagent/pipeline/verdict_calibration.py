@@ -298,6 +298,15 @@ def _build_feature_item(
         "sink_semantics_hints": _sink_semantics_hints(sink_label, sink_facts, active_root, derive_facts, checks),
         "guard_context": _guard_context(sink_facts, checks),
         "capacity_evidence": _capacity_evidence(sink_label, sink_facts, checks, active_root),
+        "chain_segments": _build_chain_segments(
+            chain,
+            sink_label=sink_label,
+            sink_function=sink_fn,
+            active_root=active_root,
+            object_nodes=object_nodes,
+            checks=checks,
+            derive_facts=derive_facts,
+        ),
         "evidence_refs": list(chain.get("evidence_refs", []) or []),
         "decompiled_snippets": snippets,
         "deterministic_constraints": _deterministic_constraints(chain, decision_basis),
@@ -403,6 +412,12 @@ def _apply_review_decisions(
         audit_flags = list(item.get("audit_flags", []) or [])
         trigger_summary = ""
         preconditions = {}
+        segment_assessment = []
+        reason_codes = []
+        evidence_map = {}
+        review_quality_flags = []
+        review_confidence = None
+        review_notes = ""
 
         if raw_decision is not None:
             verdict_candidate, decision_record = _validate_and_apply_decision(
@@ -417,6 +432,12 @@ def _apply_review_decisions(
             llm_reviewed = True
             trigger_summary = str(decision_record.get("trigger_summary", "") or "")
             preconditions = dict(decision_record.get("preconditions", {}) or {})
+            segment_assessment = list(decision_record.get("segment_assessment", []) or [])
+            reason_codes = list(decision_record.get("reason_codes", []) or [])
+            evidence_map = dict(decision_record.get("evidence_map", {}) or {})
+            review_quality_flags = list(decision_record.get("review_quality_flags", []) or [])
+            review_confidence = decision_record.get("confidence")
+            review_notes = str(decision_record.get("review_notes", "") or "")
             audit_flags.extend(str(flag) for flag in (decision_record.get("audit_flags", []) or []) if str(flag))
             if accepted and calibration_mode != "audit_only":
                 if strict_verdict != verdict_candidate:
@@ -449,6 +470,12 @@ def _apply_review_decisions(
                 "soft_verdict": soft_verdict,
                 "trigger_summary": trigger_summary,
                 "preconditions": preconditions,
+                "segment_assessment": segment_assessment,
+                "reason_codes": reason_codes,
+                "evidence_map": evidence_map,
+                "review_quality_flags": review_quality_flags,
+                "confidence": review_confidence,
+                "review_notes": review_notes,
                 "audit_flags": sorted(set(audit_flags)),
             })
         else:
@@ -462,6 +489,12 @@ def _apply_review_decisions(
                 "soft_verdict": soft_verdict,
                 "trigger_summary": "",
                 "preconditions": {},
+                "segment_assessment": [],
+                "reason_codes": [],
+                "evidence_map": {},
+                "review_quality_flags": [],
+                "confidence": None,
+                "review_notes": "",
                 "audit_flags": sorted(set(audit_flags)),
             })
 
@@ -500,6 +533,13 @@ def _apply_review_decisions(
             "queue_eligible": chain_id in queued,
             "sink": item.get("sink", {}),
             "root": item.get("root", {}),
+            "trigger_summary": trigger_summary,
+            "preconditions": preconditions,
+            "segment_assessment": segment_assessment,
+            "reason_codes": reason_codes,
+            "evidence_map": evidence_map,
+            "review_quality_flags": review_quality_flags,
+            "confidence": review_confidence,
             "audit_flags": sorted(set(audit_flags)),
         })
 
@@ -518,76 +558,88 @@ def _validate_and_apply_decision(
     allow_manual_llm_supervision: bool,
 ) -> Tuple[str, Dict[str, Any]]:
     suggested = str(raw_decision.get("suggested_semantic_verdict", "") or "")
+    base_record = {
+        "review_mode": str(raw_decision.get("review_mode", "external") or "external"),
+        "trigger_summary": str(raw_decision.get("trigger_summary", "") or ""),
+        "preconditions": dict(raw_decision.get("preconditions", {}) or {}),
+        "segment_assessment": list(raw_decision.get("segment_assessment", []) or []),
+        "reason_codes": list(raw_decision.get("reason_codes", []) or []),
+        "evidence_map": dict(raw_decision.get("evidence_map", {}) or {}),
+        "review_quality_flags": list(raw_decision.get("review_quality_flags", []) or []),
+        "confidence": raw_decision.get("confidence"),
+        "review_notes": str(raw_decision.get("review_notes", "") or ""),
+    }
+
     if suggested not in _ALLOWED_VERDICTS:
         return feature_item.get("strict_verdict", "DROP"), {
+            **base_record,
             "accepted": False,
             "accept_reason": "INVALID_SUGGESTED_VERDICT",
-            "review_mode": str(raw_decision.get("review_mode", "external") or "external"),
             "audit_flags": ["invalid_suggested_verdict"],
         }
     evidence_map = raw_decision.get("evidence_map")
     if not isinstance(evidence_map, dict) or not evidence_map:
         return feature_item.get("strict_verdict", "DROP"), {
+            **base_record,
             "accepted": False,
             "accept_reason": "MISSING_EVIDENCE_MAP",
-            "review_mode": str(raw_decision.get("review_mode", "external") or "external"),
             "audit_flags": ["missing_evidence_map"],
         }
     snippets = dict(feature_item.get("decompiled_snippets", {}) or {})
     for refs in evidence_map.values():
         if not isinstance(refs, list) or not refs:
             return feature_item.get("strict_verdict", "DROP"), {
+                **base_record,
                 "accepted": False,
                 "accept_reason": "INVALID_EVIDENCE_MAP_ENTRY",
-                "review_mode": str(raw_decision.get("review_mode", "external") or "external"),
                 "audit_flags": ["invalid_evidence_map_entry"],
             }
         for key in refs:
             if str(key) not in _SNIPPET_KEYS:
                 return feature_item.get("strict_verdict", "DROP"), {
+                    **base_record,
                     "accepted": False,
                     "accept_reason": "UNKNOWN_SNIPPET_KEY",
-                    "review_mode": str(raw_decision.get("review_mode", "external") or "external"),
                     "audit_flags": ["unknown_snippet_key"],
                 }
             if not str(snippets.get(str(key), "") or "").strip():
                 return feature_item.get("strict_verdict", "DROP"), {
+                    **base_record,
                     "accepted": False,
                     "accept_reason": "SNIPPET_MISSING",
-                    "review_mode": str(raw_decision.get("review_mode", "external") or "external"),
                     "audit_flags": ["snippet_missing"],
                 }
 
     if bool(raw_decision.get("manual_supervision", False)) and not allow_manual_llm_supervision:
         return feature_item.get("strict_verdict", "DROP"), {
+            **base_record,
             "accepted": False,
             "accept_reason": "MANUAL_SUPERVISION_DISABLED",
-            "review_mode": str(raw_decision.get("review_mode", "external") or "external"),
             "audit_flags": ["manual_supervision_disabled"],
         }
 
     constraints = dict(feature_item.get("deterministic_constraints", {}) or {})
     if not (constraints.get("source_reached") and constraints.get("root_bound") and constraints.get("object_bound")):
         return feature_item.get("strict_verdict", "DROP"), {
+            **base_record,
             "accepted": False,
             "accept_reason": "STRUCTURAL_CONSTRAINT_NOT_MET",
-            "review_mode": str(raw_decision.get("review_mode", "external") or "external"),
             "audit_flags": ["structural_constraint_not_met"],
         }
     if constraints.get("channel_required") and not constraints.get("channel_satisfied"):
         return feature_item.get("strict_verdict", "DROP"), {
+            **base_record,
             "accepted": False,
             "accept_reason": "CHANNEL_REQUIRED_NOT_SATISFIED",
-            "review_mode": str(raw_decision.get("review_mode", "external") or "external"),
             "audit_flags": ["channel_required_not_satisfied"],
         }
 
     reason_code = str((feature_item.get("decision_basis", {}) or {}).get("reason_code", "") or "")
     if reason_code in _HARD_BLOCK_REASON_CODES:
         return feature_item.get("strict_verdict", "DROP"), {
+            **base_record,
             "accepted": False,
             "accept_reason": "HARD_BLOCK_REASON_CODE",
-            "review_mode": str(raw_decision.get("review_mode", "external") or "external"),
             "audit_flags": ["hard_block_reason_code"],
         }
 
@@ -599,11 +651,9 @@ def _validate_and_apply_decision(
         )
 
     return final_suggested, {
+        **base_record,
         "accepted": accepted,
         "accept_reason": "ACCEPTED_REVIEW",
-        "review_mode": str(raw_decision.get("review_mode", "external") or "external"),
-        "trigger_summary": str(raw_decision.get("trigger_summary", "") or ""),
-        "preconditions": dict(raw_decision.get("preconditions", {}) or {}),
         "audit_flags": list(raw_decision.get("audit_flags", []) or []),
     }
 
@@ -626,6 +676,132 @@ def _build_object_path(chain: Mapping[str, Any], *, object_nodes: Mapping[str, D
             "type_facts": dict(obj.get("type_facts", {}) or {}),
         })
     return out
+
+
+def _build_chain_segments(
+    chain: Mapping[str, Any],
+    *,
+    sink_label: str,
+    sink_function: str,
+    active_root: Mapping[str, Any],
+    object_nodes: Mapping[str, Dict[str, Any]],
+    checks: Sequence[Mapping[str, Any]],
+    derive_facts: Sequence[Mapping[str, Any]],
+) -> List[Dict[str, Any]]:
+    object_path = _build_object_path(chain, object_nodes=object_nodes)
+    channel_path = _build_channel_path(chain)
+    source_steps = [dict(step) for step in (chain.get("steps", []) or []) if str(step.get("kind", "")) == "SOURCE"]
+    segments: List[Dict[str, Any]] = []
+
+    if source_steps and object_path:
+        segments.append({
+            "segment_id": "source_to_object",
+            "kind": "SOURCE_TO_OBJECT",
+            "src": {
+                "label": str(source_steps[0].get("label", "") or ""),
+                "function": str(source_steps[0].get("function", "") or ""),
+                "site": str(source_steps[0].get("site", "") or ""),
+            },
+            "dst": {
+                "object_id": str(object_path[0].get("object_id", "") or ""),
+                "members": list(object_path[0].get("members", []) or []),
+            },
+            "facts": ["source_reached", "object_candidate"],
+            "snippet_keys": ["producer_function"],
+        })
+    elif source_steps:
+        segments.append({
+            "segment_id": "source_to_sink",
+            "kind": "SOURCE_TO_SINK",
+            "src": {
+                "label": str(source_steps[0].get("label", "") or ""),
+                "function": str(source_steps[0].get("function", "") or ""),
+                "site": str(source_steps[0].get("site", "") or ""),
+            },
+            "dst": {
+                "sink_function": sink_function,
+                "sink_label": sink_label,
+            },
+            "facts": ["source_reached"],
+            "snippet_keys": ["producer_function", "sink_function"],
+        })
+
+    if object_path and channel_path:
+        segments.append({
+            "segment_id": "object_to_channel",
+            "kind": "OBJECT_TO_CHANNEL",
+            "src": {
+                "object_id": str(object_path[0].get("object_id", "") or ""),
+            },
+            "dst": {
+                "edge": str(channel_path[0].get("edge", "") or ""),
+                "object_id": str(channel_path[0].get("object_id", "") or ""),
+            },
+            "facts": ["channel_candidate"],
+            "snippet_keys": ["producer_function", "caller_bridge"],
+        })
+
+    if channel_path:
+        segments.append({
+            "segment_id": "channel_to_sink",
+            "kind": "CHANNEL_TO_SINK",
+            "src": {
+                "edge": str(channel_path[0].get("edge", "") or ""),
+                "object_id": str(channel_path[0].get("object_id", "") or ""),
+            },
+            "dst": {
+                "sink_function": sink_function,
+                "sink_label": sink_label,
+            },
+            "facts": ["channel_satisfied"],
+            "snippet_keys": ["caller_bridge", "sink_function"],
+        })
+
+    if derive_facts:
+        segments.append({
+            "segment_id": "derive_to_root",
+            "kind": "DERIVE_TO_ROOT",
+            "src": {
+                "derive_exprs": [str(row.get("expr", "") or "") for row in derive_facts],
+            },
+            "dst": {
+                "root_expr": str(active_root.get("expr", "") or ""),
+                "root_kind": str(active_root.get("kind", "") or ""),
+            },
+            "facts": ["root_bound"],
+            "snippet_keys": ["sink_function", "caller_bridge"],
+        })
+
+    segments.append({
+        "segment_id": "check_binding",
+        "kind": "CHECK_BINDING",
+        "src": {
+            "check_exprs": [str(row.get("expr", "") or "") for row in checks],
+        },
+        "dst": {
+            "root_expr": str(active_root.get("expr", "") or ""),
+            "root_kind": str(active_root.get("kind", "") or ""),
+        },
+        "facts": [str(row.get("strength", "unknown") or "unknown") for row in checks] or ["unknown"],
+        "snippet_keys": ["sink_function", "caller_bridge"],
+    })
+
+    segments.append({
+        "segment_id": "sink_triggerability",
+        "kind": "SINK_TRIGGERABILITY",
+        "src": {
+            "sink_label": sink_label,
+            "sink_function": sink_function,
+        },
+        "dst": {
+            "root_expr": str(active_root.get("expr", "") or ""),
+            "root_kind": str(active_root.get("kind", "") or ""),
+        },
+        "facts": ["verdict_target"],
+        "snippet_keys": ["sink_function", "caller_bridge", "producer_function"],
+    })
+
+    return segments
 
 
 def _build_channel_path(chain: Mapping[str, Any]) -> List[Dict[str, Any]]:

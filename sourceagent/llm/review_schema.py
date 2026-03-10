@@ -7,12 +7,25 @@ import re
 from json import JSONDecoder
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
-REVIEW_SCHEMA_VERSION = "0.1"
+REVIEW_SCHEMA_VERSION = "0.2"
 _ALLOWED_VERDICTS = {"SAFE_OR_LOW_RISK", "SUSPICIOUS", "CONFIRMED"}
+_ALLOWED_SEGMENT_STATUS = {
+    "taint_preserved",
+    "taint_weakened",
+    "taint_cleansed",
+    "effective",
+    "weak",
+    "absent",
+    "mismatch",
+    "triggerable",
+    "possible",
+    "unlikely",
+    "unknown",
+    "n/a",
+}
 
 
 def extract_json_payload(text: str) -> Any:
-    """Best-effort extraction of a JSON object/array from model output."""
     raw = str(text or "").strip()
     if not raw:
         raise ValueError("empty_review_response")
@@ -55,11 +68,18 @@ def normalize_review_response(
         suggested = str(item.get("suggested_semantic_verdict", "") or "").strip().upper()
         if suggested not in _ALLOWED_VERDICTS:
             continue
+        segment_assessment = _normalize_segment_assessment(item.get("segment_assessment"))
+        reason_codes = _normalize_str_list(item.get("reason_codes"))
+        if not reason_codes:
+            reason_codes = _collect_reason_codes_from_segments(segment_assessment)
         out.append({
             "chain_id": chain_id,
             "suggested_semantic_verdict": suggested,
             "trigger_summary": str(item.get("trigger_summary", "") or "").strip(),
             "preconditions": _normalize_preconditions(item.get("preconditions")),
+            "segment_assessment": segment_assessment,
+            "reason_codes": reason_codes,
+            "review_quality_flags": _normalize_str_list(item.get("review_quality_flags")),
             "evidence_map": _normalize_evidence_map(item.get("evidence_map")),
             "audit_flags": _normalize_str_list(item.get("audit_flags")),
             "manual_supervision": bool(item.get("manual_supervision", False)),
@@ -134,12 +154,47 @@ def _normalize_preconditions(value: Any) -> Dict[str, List[str]]:
             "state_predicates": [],
             "root_constraints": [],
             "why_check_fails": [],
+            "environment_assumptions": [],
         }
     return {
         "state_predicates": _normalize_str_list(value.get("state_predicates")),
         "root_constraints": _normalize_str_list(value.get("root_constraints")),
         "why_check_fails": _normalize_str_list(value.get("why_check_fails")),
+        "environment_assumptions": _normalize_str_list(value.get("environment_assumptions")),
     }
+
+
+def _normalize_segment_assessment(value: Any) -> List[Dict[str, Any]]:
+    if not isinstance(value, Sequence) or isinstance(value, (str, bytes)):
+        return []
+    out: List[Dict[str, Any]] = []
+    for item in value:
+        if not isinstance(item, Mapping):
+            continue
+        segment_id = str(item.get("segment_id", "") or "").strip()
+        if not segment_id:
+            continue
+        status = str(item.get("status", "unknown") or "unknown").strip().lower()
+        if status not in _ALLOWED_SEGMENT_STATUS:
+            status = "unknown"
+        row = {
+            "segment_id": segment_id,
+            "status": status,
+            "reason_codes": _normalize_str_list(item.get("reason_codes")),
+            "summary": str(item.get("summary", "") or "").strip(),
+            "evidence_map": _normalize_evidence_map(item.get("evidence_map")),
+        }
+        out.append(row)
+    return out
+
+
+def _collect_reason_codes_from_segments(rows: Sequence[Mapping[str, Any]]) -> List[str]:
+    seen = []
+    for row in rows:
+        for code in _normalize_str_list(row.get("reason_codes")):
+            if code not in seen:
+                seen.append(code)
+    return seen
 
 
 def _normalize_evidence_map(value: Any) -> Dict[str, List[str]]:

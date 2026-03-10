@@ -12,6 +12,7 @@ from sourceagent.llm.llm import LLM
 from sourceagent.llm.review_schema import parse_review_response
 
 DEFAULT_REVIEW_TIMEOUT_SEC = 120
+REVIEW_TRANSCRIPT_SCHEMA_VERSION = "0.2"
 
 _SYSTEM_PROMPT = """You are a semantic firmware vulnerability reviewer.
 Deterministic facts from SourceAgent are authoritative and must not be contradicted.
@@ -24,7 +25,7 @@ Return JSON only.
 def _semantic_prompt(batch: Mapping[str, Any], *, review_mode: str) -> str:
     mode_text = (
         "Audit only. Keep the current verdict unless there is an explicit semantic inconsistency worth flagging. "
-        "Focus on audit_flags and weak or missing semantic checks."
+        "Focus on audit_flags, semantic gaps, and whether checks truly bind the active root."
         if review_mode == "audit_only"
         else "Review each chain semantically and choose SAFE_OR_LOW_RISK, SUSPICIOUS, or CONFIRMED."
     )
@@ -34,15 +35,29 @@ def _semantic_prompt(batch: Mapping[str, Any], *, review_mode: str) -> str:
                 {
                     "chain_id": "string",
                     "suggested_semantic_verdict": "SAFE_OR_LOW_RISK|SUSPICIOUS|CONFIRMED",
-                    "trigger_summary": "one sentence",
+                    "trigger_summary": "one to three sentences describing how the chain could trigger or why it is blocked",
                     "preconditions": {
                         "state_predicates": ["..."],
                         "root_constraints": ["..."],
                         "why_check_fails": ["..."],
+                        "environment_assumptions": ["..."],
                     },
+                    "segment_assessment": [
+                        {
+                            "segment_id": "source_to_object|object_to_channel|channel_to_sink|derive_to_root|check_binding|sink_triggerability",
+                            "status": "taint_preserved|taint_weakened|taint_cleansed|effective|weak|absent|mismatch|triggerable|possible|unlikely|unknown|n/a",
+                            "reason_codes": ["CHECK_NOT_BINDING_ROOT"],
+                            "summary": "brief explanation",
+                            "evidence_map": {
+                                "summary": ["sink_function", "caller_bridge", "producer_function"]
+                            }
+                        }
+                    ],
+                    "reason_codes": ["CHECK_NOT_BINDING_ROOT"],
+                    "review_quality_flags": ["needs_more_context"],
                     "evidence_map": {
                         "trigger_summary": ["sink_function", "caller_bridge", "producer_function"],
-                        "root_controllability": ["sink_function"],
+                        "root_controllability": ["sink_function"]
                     },
                     "audit_flags": ["CHECK_NOT_BINDING_ROOT"],
                     "confidence": 0.0,
@@ -51,6 +66,10 @@ def _semantic_prompt(batch: Mapping[str, Any], *, review_mode: str) -> str:
             ]
         },
         "constraints": [
+            "Deterministic facts are authoritative; do not contradict source reachability, object binding, channel traversal, or root matching.",
+            "Review the chain in both directions: source->...->sink and sink/root->...->source.",
+            "Inspect every chain segment and decide whether taint is preserved, weakened, cleansed, or unknown.",
+            "Judge whether each visible check truly constrains the active root, not just nearby state.",
             "Only cite snippet keys: sink_function, caller_bridge, producer_function",
             "Do not leave evidence_map empty",
             "Do not invent facts absent from the provided items",
@@ -87,26 +106,26 @@ async def run_review_plan(
         return {
             "review_decisions": [],
             "review_prompt": {
-                "schema_version": "0.1",
+                "schema_version": REVIEW_TRANSCRIPT_SCHEMA_VERSION,
                 "review_mode": review_mode,
                 "status": "empty",
                 "batches": [],
             },
             "review_raw_response": {
-                "schema_version": "0.1",
+                "schema_version": REVIEW_TRANSCRIPT_SCHEMA_VERSION,
                 "review_mode": review_mode,
                 "status": "empty",
                 "batches": [],
             },
             "review_session": {
-                "schema_version": "0.1",
+                "schema_version": REVIEW_TRANSCRIPT_SCHEMA_VERSION,
                 "review_mode": review_mode,
                 "status": "empty",
                 "decision_count": 0,
                 "batches": [],
             },
             "review_trace": {
-                "schema_version": "0.1",
+                "schema_version": REVIEW_TRANSCRIPT_SCHEMA_VERSION,
                 "review_mode": review_mode,
                 "status": "empty",
                 "batches": [],
@@ -119,21 +138,21 @@ async def run_review_plan(
         return {
             "review_decisions": [],
             "review_prompt": {
-                "schema_version": "0.1",
+                "schema_version": REVIEW_TRANSCRIPT_SCHEMA_VERSION,
                 "review_mode": review_mode,
                 "status": "skipped_unconfigured",
                 "reason": "missing_model",
                 "batches": [],
             },
             "review_raw_response": {
-                "schema_version": "0.1",
+                "schema_version": REVIEW_TRANSCRIPT_SCHEMA_VERSION,
                 "review_mode": review_mode,
                 "status": "skipped_unconfigured",
                 "reason": "missing_model",
                 "batches": [],
             },
             "review_session": {
-                "schema_version": "0.1",
+                "schema_version": REVIEW_TRANSCRIPT_SCHEMA_VERSION,
                 "review_mode": review_mode,
                 "status": "skipped_unconfigured",
                 "reason": "missing_model",
@@ -141,7 +160,7 @@ async def run_review_plan(
                 "batches": [],
             },
             "review_trace": {
-                "schema_version": "0.1",
+                "schema_version": REVIEW_TRANSCRIPT_SCHEMA_VERSION,
                 "review_mode": review_mode,
                 "status": "skipped_unconfigured",
                 "reason": "missing_model",
@@ -249,14 +268,14 @@ async def run_review_plan(
     return {
         "review_decisions": all_decisions,
         "review_prompt": {
-            "schema_version": "0.1",
+            "schema_version": REVIEW_TRANSCRIPT_SCHEMA_VERSION,
             "review_mode": review_mode,
             "model": chosen_model,
             "status": "ok" if prompt_batches else "empty",
             "batches": prompt_batches,
         },
         "review_raw_response": {
-            "schema_version": "0.1",
+            "schema_version": REVIEW_TRANSCRIPT_SCHEMA_VERSION,
             "review_mode": review_mode,
             "model": chosen_model,
             "status": "ok" if raw_response_batches else "empty",
@@ -264,7 +283,7 @@ async def run_review_plan(
             "batches": raw_response_batches,
         },
         "review_session": {
-            "schema_version": "0.1",
+            "schema_version": REVIEW_TRANSCRIPT_SCHEMA_VERSION,
             "review_mode": review_mode,
             "model": chosen_model,
             "status": "ok" if any(batch.get("ok") for batch in session_batches) else "error",
@@ -277,7 +296,7 @@ async def run_review_plan(
             "batches": session_batches,
         },
         "review_trace": {
-            "schema_version": "0.1",
+            "schema_version": REVIEW_TRANSCRIPT_SCHEMA_VERSION,
             "review_mode": review_mode,
             "model": chosen_model,
             "status": "ok" if any(batch.get("ok") for batch in trace_batches) else "error",

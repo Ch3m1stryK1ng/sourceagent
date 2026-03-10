@@ -55,6 +55,7 @@ def build_review_plan(
             "sink_semantics_hints": dict(feat.get("sink_semantics_hints", {}) or {}),
             "guard_context": list(feat.get("guard_context", []) or []),
             "capacity_evidence": list(feat.get("capacity_evidence", []) or []),
+            "chain_segments": list(feat.get("chain_segments", []) or []),
             "deterministic_constraints": dict(feat.get("deterministic_constraints", {}) or {}),
             "decision_basis": dict(feat.get("decision_basis", {}) or {}),
             "decompiled_snippets": dict(feat.get("decompiled_snippets", {}) or {}),
