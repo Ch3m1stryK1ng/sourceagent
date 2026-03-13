@@ -5,6 +5,7 @@ Subcommands:
   sourceagent mine <binary> --stage 3  # Run up to Stage N
   sourceagent eval <binary>          # Evaluate against ground truth
   sourceagent eval --all <dir>       # Batch evaluation
+  sourceagent diagnose --diagnostic-source anchor --sample <id>  # Run standalone Phase B diagnosis
 """
 
 import argparse
@@ -22,6 +23,17 @@ from typing import Any, Dict, List, Optional, Set
 
 from sourceagent.config.constants import APP_NAME, APP_VERSION
 from sourceagent.agents.review_plan import DEFAULT_MAX_REVIEW_ITEMS
+from sourceagent.agents.supervision_runner import (
+    DEFAULT_SUPERVISION_BATCH_SIZE,
+    DEFAULT_SUPERVISION_TIMEOUT_SEC,
+    build_supervision_batches,
+    run_supervision_plan,
+)
+from sourceagent.pipeline.supervision_queue import (
+    DEFAULT_MAX_SUPERVISION_ITEMS,
+    DEFAULT_SUPERVISION_SCOPE,
+    build_supervision_queue,
+)
 from sourceagent.pipeline.verdict_calibration import (
     DEFAULT_ALLOW_MANUAL_LLM_SUPERVISION,
     DEFAULT_CALIBRATION_MODE,
@@ -178,6 +190,192 @@ def _add_verdict_calibration_args(parser):
         choices=["prompt_only", "tool_assisted"],
         help="How much extra decompiler context to fetch for the internal reviewer (default: %(default)s)",
     )
+    parser.add_argument(
+        "--enable-supervision",
+        action="store_true",
+        help="Enable Phase A.5 bounded supervision over low-confidence deterministic candidates",
+    )
+    parser.add_argument(
+        "--supervision-scope",
+        default=DEFAULT_SUPERVISION_SCOPE,
+        choices=["sinks", "sources", "objects", "channels", "all"],
+        help="Scope for Phase A.5 supervision (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--supervision-model",
+        default=None,
+        help="Model name for Phase A.5 supervision (default: SOURCEAGENT_MODEL or --review-model/--model)",
+    )
+    parser.add_argument(
+        "--max-supervision-items",
+        type=int,
+        default=DEFAULT_MAX_SUPERVISION_ITEMS,
+        help="Maximum queued supervision items per binary (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--supervision-batch-size",
+        type=int,
+        default=DEFAULT_SUPERVISION_BATCH_SIZE,
+        help="Number of supervision items per LLM batch (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--supervision-timeout-sec",
+        type=int,
+        default=DEFAULT_SUPERVISION_TIMEOUT_SEC,
+        help="Timeout in seconds for each internal supervision batch (default: %(default)s)",
+    )
+
+
+def _add_phaseb_diagnostic_args(parser):
+    from sourceagent.agents.review_plan import DEFAULT_REVIEW_BATCH_SIZE
+    from sourceagent.agents.review_runner import DEFAULT_REVIEW_TIMEOUT_SEC
+
+    parser.add_argument(
+        "--eval-dir",
+        default=None,
+        help="Evaluation directory containing raw_views/*.verdict_* artifacts for runtime/anchor diagnosis",
+    )
+    parser.add_argument(
+        "--diagnostic-source",
+        required=True,
+        choices=["runtime", "anchor", "file"],
+        help="Where diagnostic chains come from",
+    )
+    parser.add_argument(
+        "--sample",
+        default=None,
+        help="Sample ID / eval stem for runtime or anchor diagnosis",
+    )
+    parser.add_argument(
+        "--chain-id",
+        action="append",
+        default=None,
+        help="Specific chain ID to diagnose; may be repeated",
+    )
+    parser.add_argument(
+        "--diagnostic-json",
+        default=None,
+        help="External diagnostic JSON file when --diagnostic-source=file",
+    )
+    parser.add_argument(
+        "--gt-root",
+        default=None,
+        help="Override GT root for anchor diagnosis (defaults to gt_backed_suite)",
+    )
+    parser.add_argument(
+        "--include-related",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Include related risky anchor chains when --diagnostic-source=anchor (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--include-supporting",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Include supporting risky anchor chains when --diagnostic-source=anchor (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--include-peripheral-suspicious",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="Include peripheral suspicious runtime chains for anchor diagnosis (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--review-mode",
+        default="semantic",
+        choices=["semantic", "audit_only"],
+        help="Phase B review mode (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--review-model",
+        default=None,
+        help="Model name for Phase B review (default: SOURCEAGENT_MODEL)",
+    )
+    parser.add_argument(
+        "--review-tool-mode",
+        default="prompt_only",
+        choices=["prompt_only", "tool_assisted"],
+        help="Decompiler assistance level for Phase B review (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--review-batch-size",
+        type=int,
+        default=DEFAULT_REVIEW_BATCH_SIZE,
+        help="Number of diagnostic chains per review batch (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--max-items",
+        type=int,
+        default=0,
+        help="Maximum diagnostic chains to review (0 keeps all selected items)",
+    )
+    parser.add_argument(
+        "--review-timeout-sec",
+        type=int,
+        default=DEFAULT_REVIEW_TIMEOUT_SEC,
+        help="Timeout in seconds for each diagnostic review batch (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--allow-manual-llm-supervision",
+        action="store_true",
+        default=DEFAULT_ALLOW_MANUAL_LLM_SUPERVISION,
+        help="Allow external/manual review decisions to influence final diagnostic soft triage",
+    )
+    parser.add_argument(
+        "--llm-promote-budget",
+        type=int,
+        default=DEFAULT_LLM_PROMOTE_BUDGET,
+        help="Per-sample promotion budget for accepted diagnostic review suggestions (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--llm-demote-budget",
+        type=int,
+        default=DEFAULT_LLM_DEMOTE_BUDGET,
+        help="Per-sample demotion budget for accepted diagnostic review suggestions (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--llm-soft-budget",
+        type=int,
+        default=DEFAULT_LLM_SOFT_BUDGET,
+        help="Per-sample soft-widen budget for diagnostic review suggestions (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--review-strict-gates",
+        default=",".join(DEFAULT_REVIEW_STRICT_GATES),
+        help="Comma-separated deterministic gates required before diagnostic review may affect strict verdicts",
+    )
+    parser.add_argument(
+        "--review-soft-gates",
+        default=",".join(DEFAULT_REVIEW_SOFT_GATES),
+        help="Comma-separated deterministic gates required before soft diagnostic widening is allowed",
+    )
+    parser.add_argument(
+        "--review-allow-soft-on-structural-gap",
+        action=argparse.BooleanOptionalAction,
+        default=DEFAULT_REVIEW_ALLOW_SOFT_ON_STRUCTURAL_GAP,
+        help="Allow diagnostic soft output to preserve review suggestions on structural gaps (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--review-preserve-rejected-rationale",
+        action=argparse.BooleanOptionalAction,
+        default=DEFAULT_REVIEW_PRESERVE_REJECTED_RATIONALE,
+        help="Preserve rejected diagnostic review rationale in outputs (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--min-risk-score",
+        type=float,
+        default=DEFAULT_MIN_RISK_SCORE,
+        help="Minimum deterministic risk score used by diagnostic calibration (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--output-dir",
+        default=None,
+        help="Directory to write phaseb_diagnostic_* artifacts",
+    )
+
+
+def _parse_csv_arg(raw: str | None) -> List[str]:
+    return [part.strip() for part in str(raw or "").split(",") if part.strip()]
 
 
 def main():
@@ -285,7 +483,7 @@ def main():
         help="Filter evaluation to sinks/sources/all. auto infers from GT labels (default: auto)",
     )
     eval_parser.add_argument(
-        "--sample-timeout", type=int, default=240,
+        "--sample-timeout", type=int, default=600,
         help="Per-sample timeout in seconds for eval runs (0 disables timeout, default: 240)",
     )
     eval_parser.add_argument(
@@ -298,6 +496,36 @@ def main():
     )
 
     _add_verdict_calibration_args(eval_parser)
+
+    parity_parser = subparsers.add_parser(
+        "eval-parity",
+        help="Compare stripped eval output against unstripped reference runs",
+    )
+    parity_parser.add_argument(
+        "stripped_eval_dir",
+        help="Evaluation output directory for stripped binaries",
+    )
+    parity_parser.add_argument(
+        "--unstripped-eval-dir",
+        required=True,
+        help="Evaluation output directory for unstripped reference binaries",
+    )
+    parity_parser.add_argument(
+        "--manifest-json",
+        required=True,
+        help="Stripped manifest JSON with unstripped peer metadata",
+    )
+    parity_parser.add_argument(
+        "--output-dir",
+        default=None,
+        help="Write parity artifacts to this directory",
+    )
+
+    diagnose_parser = subparsers.add_parser(
+        "diagnose",
+        help="Run standalone Phase B diagnostic review on runtime, anchor, or external chains",
+    )
+    _add_phaseb_diagnostic_args(diagnose_parser)
 
     # gt-sinks subcommand
     gt_sinks_parser = subparsers.add_parser(
@@ -379,6 +607,10 @@ async def _dispatch(args):
         await _cmd_export(args)
     elif args.command == "eval":
         await _cmd_eval(args)
+    elif args.command == "eval-parity":
+        await _cmd_eval_parity(args)
+    elif args.command == "diagnose":
+        await _cmd_diagnose(args)
     elif args.command == "gt-sinks":
         await _cmd_gt_sinks(args)
     elif args.command == "gt-sources":
@@ -1259,13 +1491,25 @@ async def _run_stage_8_10(result, *, max_stage: int, args=None):
     from sourceagent.agents.review_plan import build_review_plan
     from sourceagent.agents.review_runner import run_review_plan
     from sourceagent.pipeline.chain_artifacts import build_phase_a_artifacts
+    from sourceagent.pipeline.models import SinkLabel, SourceLabel, VerificationVerdict
 
     calibration_mode = str(getattr(args, "calibration_mode", DEFAULT_CALIBRATION_MODE) or DEFAULT_CALIBRATION_MODE)
     verdict_output_mode = str(getattr(args, "verdict_output_mode", DEFAULT_VERDICT_OUTPUT_MODE) or DEFAULT_VERDICT_OUTPUT_MODE)
     external_review_decisions = load_review_decisions(getattr(args, "verdict_review_json", None))
     review_tool_mode = str(getattr(args, "review_tool_mode", "prompt_only") or "prompt_only")
 
-    def _build_artifacts(*, review_decisions=None, review_plan=None, review_trace=None):
+    def _build_artifacts(
+        *,
+        review_decisions=None,
+        review_plan=None,
+        review_trace=None,
+        supervision_queue=None,
+        supervision_decisions=None,
+        supervision_prompt=None,
+        supervision_raw_response=None,
+        supervision_session=None,
+        supervision_trace=None,
+    ):
         return build_phase_a_artifacts(
             result,
             max_stage=max_stage,
@@ -1295,6 +1539,12 @@ async def _run_stage_8_10(result, *, max_stage: int, args=None):
             review_decisions=review_decisions or [],
             review_plan=review_plan,
             review_trace=review_trace,
+            supervision_queue=supervision_queue,
+            supervision_decisions=supervision_decisions,
+            supervision_prompt=supervision_prompt,
+            supervision_raw_response=supervision_raw_response,
+            supervision_session=supervision_session,
+            supervision_trace=supervision_trace,
         )
 
     print("[Stage 8] Building ChannelGraph + refined objects...")
@@ -1307,6 +1557,237 @@ async def _run_stage_8_10(result, *, max_stage: int, args=None):
         return
 
     if max_stage >= 10:
+        supervision_enabled = bool(getattr(args, "enable_supervision", False))
+        supervision_scope = str(getattr(args, "supervision_scope", DEFAULT_SUPERVISION_SCOPE) or DEFAULT_SUPERVISION_SCOPE)
+        supervision_model = str(
+            getattr(args, "supervision_model", None)
+            or getattr(args, "review_model", None)
+            or getattr(args, "model", None)
+            or ""
+        ).strip() or None
+        supervision_queue_artifact = {
+            "schema_version": "0.1",
+            "binary": str(result.binary_path or ""),
+            "scope": supervision_scope,
+            "status": "disabled" if not supervision_enabled else "not_run",
+            "items": [],
+        }
+        supervision_decisions_artifact = {
+            "schema_version": "0.1",
+            "binary": str(result.binary_path or ""),
+            "status": "disabled" if not supervision_enabled else "not_run",
+            "items": [],
+        }
+        supervision_prompt_artifact = {
+            "schema_version": "0.1",
+            "binary": str(result.binary_path or ""),
+            "status": "disabled" if not supervision_enabled else "not_run",
+            "items": [],
+            "batches": [],
+        }
+        supervision_raw_response_artifact = {
+            "schema_version": "0.1",
+            "binary": str(result.binary_path or ""),
+            "status": "disabled" if not supervision_enabled else "not_run",
+            "items": [],
+            "batches": [],
+        }
+        supervision_session_artifact = {
+            "schema_version": "0.1",
+            "binary": str(result.binary_path or ""),
+            "status": "disabled" if not supervision_enabled else "not_run",
+            "items": [],
+            "batches": [],
+        }
+        supervision_trace_artifact = {
+            "schema_version": "0.1",
+            "binary": str(result.binary_path or ""),
+            "status": "disabled" if not supervision_enabled else "not_run",
+            "items": [],
+            "batches": [],
+        }
+        if supervision_enabled:
+            source_labels = {
+                SourceLabel.MMIO_READ.value,
+                SourceLabel.ISR_MMIO_READ.value,
+                SourceLabel.ISR_FILLED_BUFFER.value,
+                SourceLabel.DMA_BACKED_BUFFER.value,
+            }
+            sink_labels = {
+                SinkLabel.COPY_SINK.value,
+                SinkLabel.MEMSET_SINK.value,
+                SinkLabel.STORE_SINK.value,
+                SinkLabel.LOOP_WRITE_SINK.value,
+                SinkLabel.FORMAT_STRING_SINK.value,
+                SinkLabel.FUNC_PTR_SINK.value,
+            }
+            accepted_verdicts = {VerificationVerdict.VERIFIED, VerificationVerdict.PARTIAL}
+            sink_facts_by_pack = {
+                str(getattr(pack, "pack_id", "") or ""): dict(getattr(pack, "facts", {}) or {})
+                for pack in getattr(result, "evidence_packs", []) or []
+            }
+            verified_sources = []
+            verified_sinks = []
+            for vl in getattr(result, "verified_labels", []) or []:
+                if getattr(vl, "verdict", None) not in accepted_verdicts:
+                    continue
+                proposal = getattr(vl, "proposal", None)
+                label = str(getattr(vl, "final_label", "") or getattr(proposal, "label", "") or "")
+                if label not in source_labels:
+                    if label not in sink_labels:
+                        continue
+                    facts = {}
+                    for claim in (getattr(proposal, "claims", []) or []):
+                        if isinstance(claim, dict):
+                            facts.update(claim)
+                    verified_sinks.append({
+                        "pack_id": str(getattr(vl, "pack_id", "") or ""),
+                        "label": label,
+                        "address": int(getattr(proposal, "address", 0) or 0),
+                        "function_name": str(getattr(proposal, "function_name", "") or ""),
+                        "verdict": str(getattr(getattr(vl, "verdict", None), "value", "") or ""),
+                        "confidence": float(getattr(proposal, "confidence", 0.0) or 0.0),
+                        "evidence_refs": list(getattr(proposal, "evidence_refs", []) or []),
+                        "facts": facts,
+                    })
+                    continue
+                facts = {}
+                for claim in (getattr(proposal, "claims", []) or []):
+                    if isinstance(claim, dict):
+                        facts.update(claim)
+                verified_sources.append({
+                    "pack_id": str(getattr(vl, "pack_id", "") or ""),
+                    "label": label,
+                    "address": int(getattr(proposal, "address", 0) or 0),
+                    "function_name": str(getattr(proposal, "function_name", "") or ""),
+                    "verdict": str(getattr(getattr(vl, "verdict", None), "value", "") or ""),
+                    "confidence": float(getattr(proposal, "confidence", 0.0) or 0.0),
+                    "evidence_refs": list(getattr(proposal, "evidence_refs", []) or []),
+                    "facts": facts,
+                })
+            source_candidates = []
+            for cand in getattr(result, "source_candidates", []) or []:
+                source_candidates.append({
+                    "address": int(getattr(cand, "address", 0) or 0),
+                    "function_name": str(getattr(cand, "function_name", "") or ""),
+                    "preliminary_label": str(
+                        getattr(getattr(cand, "preliminary_label", None), "value", "")
+                        or getattr(cand, "preliminary_label", "")
+                        or ""
+                    ),
+                    "confidence_score": float(getattr(cand, "confidence_score", 0.0) or 0.0),
+                    "facts": dict(getattr(cand, "facts", {}) or {}),
+                    "evidence": [
+                        {
+                            "evidence_id": str(getattr(ev, "evidence_id", "") or ""),
+                            "kind": str(getattr(ev, "kind", "") or ""),
+                            "text": str(getattr(ev, "text", "") or ""),
+                            "address": getattr(ev, "address", None),
+                            "metadata": dict(getattr(ev, "metadata", {}) or {}),
+                        }
+                        for ev in (getattr(cand, "evidence", []) or [])
+                    ],
+                })
+            sink_candidates = []
+            for cand in getattr(result, "sink_candidates", []) or []:
+                sink_candidates.append({
+                    "address": int(getattr(cand, "address", 0) or 0),
+                    "function_name": str(getattr(cand, "function_name", "") or ""),
+                    "preliminary_label": str(
+                        getattr(getattr(cand, "preliminary_label", None), "value", "")
+                        or getattr(cand, "preliminary_label", "")
+                        or ""
+                    ),
+                    "confidence_score": float(getattr(cand, "confidence_score", 0.0) or 0.0),
+                    "facts": dict(getattr(cand, "facts", {}) or {}),
+                    "evidence": [
+                        {
+                            "evidence_id": str(getattr(ev, "evidence_id", "") or ""),
+                            "kind": str(getattr(ev, "kind", "") or ""),
+                            "text": str(getattr(ev, "text", "") or ""),
+                            "address": getattr(ev, "address", None),
+                            "metadata": dict(getattr(ev, "metadata", {}) or {}),
+                        }
+                        for ev in (getattr(cand, "evidence", []) or [])
+                    ],
+                })
+            sink_evidence_packs = []
+            for pack in getattr(result, "evidence_packs", []) or []:
+                label = str(getattr(pack, "candidate_hint", "") or "")
+                if label not in sink_labels:
+                    continue
+                sink_evidence_packs.append({
+                    "pack_id": str(getattr(pack, "pack_id", "") or ""),
+                    "candidate_hint": label,
+                    "address": int(getattr(pack, "address", 0) or 0),
+                    "function_name": str(getattr(pack, "function_name", "") or ""),
+                    "facts": dict(getattr(pack, "facts", {}) or {}),
+                    "evidence": [
+                        {
+                            "evidence_id": str(getattr(ev, "evidence_id", "") or ""),
+                            "kind": str(getattr(ev, "kind", "") or ""),
+                            "text": str(getattr(ev, "text", "") or ""),
+                            "address": getattr(ev, "address", None),
+                            "metadata": dict(getattr(ev, "metadata", {}) or {}),
+                        }
+                        for ev in (getattr(pack, "evidence", []) or [])
+                    ],
+                })
+            supervision_queue_artifact = build_supervision_queue(
+                binary_name=str(result.binary_path or ""),
+                binary_sha256=((artifacts.get("channel_graph", {}) or {}).get("binary_sha256", "") or ""),
+                low_conf_sinks=(artifacts.get("low_conf_sinks", {}) or {}).get("items", []) or [],
+                triage_queue=(artifacts.get("triage_queue", {}) or {}).get("items", []) or [],
+                feature_pack=artifacts.get("verdict_feature_pack", {}) or {},
+                verified_sinks=verified_sinks,
+                sink_facts_by_pack=sink_facts_by_pack,
+                verified_sources=verified_sources,
+                source_candidates=source_candidates,
+                sink_candidates=sink_candidates,
+                sink_evidence_packs=sink_evidence_packs,
+                decompiled_cache=getattr(getattr(result, "_mai", None), "decompiled_cache", {}) or {},
+                channel_graph=artifacts.get("channel_graph", {}) or {},
+                refined_objects=artifacts.get("refined_objects", {}) or {},
+                max_items=int(getattr(args, "max_supervision_items", DEFAULT_MAX_SUPERVISION_ITEMS) or DEFAULT_MAX_SUPERVISION_ITEMS),
+                scope=supervision_scope,
+            )
+            if (supervision_queue_artifact.get("items", []) or []):
+                preview = [
+                    f"{str((item.get('context', {}) or {}).get('function', '?'))}[{item.get('proposed_label', '')}]"
+                    for item in (supervision_queue_artifact.get("items", []) or [])[:4]
+                ]
+                print(
+                    f"[Stage 10] Supervision queue summary: "
+                    f"items={len(supervision_queue_artifact.get('items', []) or [])}, "
+                    f"scope={supervision_scope}"
+                )
+                if preview:
+                    print(f"[Stage 10] Supervision targets: {', '.join(preview)}")
+                supervision_plan = build_supervision_batches(
+                    supervision_queue_artifact,
+                    batch_size=int(getattr(args, "supervision_batch_size", DEFAULT_SUPERVISION_BATCH_SIZE) or DEFAULT_SUPERVISION_BATCH_SIZE),
+                )
+                print(
+                    f"[Stage 10] Running internal supervision: "
+                    f"items={len(supervision_plan.get('items', []) or [])}, "
+                    f"batches={len(supervision_plan.get('batches', []) or [])}"
+                )
+                supervision_run = await run_supervision_plan(
+                    supervision_plan,
+                    model=supervision_model,
+                    timeout_sec=int(getattr(args, "supervision_timeout_sec", DEFAULT_SUPERVISION_TIMEOUT_SEC) or DEFAULT_SUPERVISION_TIMEOUT_SEC),
+                )
+                supervision_decisions_artifact = {
+                    "schema_version": "0.1",
+                    "binary": str(result.binary_path or ""),
+                    "status": "ok" if (supervision_run.get("supervision_decisions", []) or []) else "empty",
+                    "items": list(supervision_run.get("supervision_decisions", []) or []),
+                }
+                supervision_prompt_artifact = dict(supervision_run.get("supervision_prompt", {}) or supervision_prompt_artifact)
+                supervision_raw_response_artifact = dict(supervision_run.get("supervision_raw_response", {}) or supervision_raw_response_artifact)
+                supervision_session_artifact = dict(supervision_run.get("supervision_session", {}) or supervision_session_artifact)
+                supervision_trace_artifact = dict(supervision_run.get("supervision_trace", {}) or supervision_trace_artifact)
+
         review_enabled = not bool(getattr(args, "disable_review", False))
         review_mode = str(getattr(args, "review_mode", "semantic") or "semantic")
         review_model = str(
@@ -1348,6 +1829,14 @@ async def _run_stage_8_10(result, *, max_stage: int, args=None):
         internal_review_decisions = []
 
         if review_enabled:
+            artifacts = _build_artifacts(
+                supervision_queue=supervision_queue_artifact,
+                supervision_decisions=(supervision_decisions_artifact.get("items", []) or []),
+                supervision_prompt=supervision_prompt_artifact,
+                supervision_raw_response=supervision_raw_response_artifact,
+                supervision_session=supervision_session_artifact,
+                supervision_trace=supervision_trace_artifact,
+            )
             review_plan_artifact = build_review_plan(
                 artifacts.get("verdict_feature_pack", {}) or {},
                 artifacts.get("verdict_calibration_queue", {}) or {},
@@ -1406,6 +1895,12 @@ async def _run_stage_8_10(result, *, max_stage: int, args=None):
                 "review_session": review_session_artifact,
             },
             review_trace=review_trace_artifact,
+            supervision_queue=supervision_queue_artifact,
+            supervision_decisions=(supervision_decisions_artifact.get("items", []) or []),
+            supervision_prompt=supervision_prompt_artifact,
+            supervision_raw_response=supervision_raw_response_artifact,
+            supervision_session=supervision_session_artifact,
+            supervision_trace=supervision_trace_artifact,
         )
 
     # Cache staged artifacts so output serialization does not rebuild.
@@ -1432,23 +1927,37 @@ async def _run_stage_8_10(result, *, max_stage: int, args=None):
         low_conf = (artifacts.get("low_conf_sinks", {}) or {}).get("items", []) or []
         triage = (artifacts.get("triage_queue", {}) or {}).get("items", []) or []
         review_queue = (artifacts.get("verdict_calibration_queue", {}) or {}).get("items", []) or []
+        supervision_queue = (artifacts.get("supervision_queue", {}) or {}).get("items", []) or []
+        supervision_decisions = (artifacts.get("supervision_decisions", {}) or {}).get("items", []) or []
+        supervision_merge = (artifacts.get("supervision_merge", {}) or {}).get("items", []) or []
+        verified_enriched = (artifacts.get("verified_enriched", {}) or {}).get("items", []) or []
+        objects_enriched = (artifacts.get("objects_enriched", {}) or {}).get("items", []) or []
+        channels_enriched = (artifacts.get("channels_enriched", {}) or {}).get("items", []) or []
         soft_rows = (artifacts.get("verdict_soft_triage", {}) or {}).get("items", []) or []
         review_needed = sum(1 for row in soft_rows if row.get("needs_review"))
         llm_reviewed = sum(1 for row in soft_rows if row.get("llm_reviewed"))
         review_trace = artifacts.get("verdict_review_trace", {}) or {}
+        supervision_trace = artifacts.get("supervision_trace", {}) or {}
         print(
             f"[Stage 10] low_conf={len(low_conf)}, triage_topk={len(triage)}, "
             f"review_queue={len(review_queue)}, review_needed={review_needed}, "
-            f"llm_reviewed={llm_reviewed}, review_status={review_trace.get('status', 'not_run')}"
+            f"llm_reviewed={llm_reviewed}, review_status={review_trace.get('status', 'not_run')}, "
+            f"supervision_queue={len(supervision_queue)}, supervision_reviewed={len(supervision_decisions)}, "
+            f"supervision_status={supervision_trace.get('status', 'not_run')}, "
+            f"supervision_accepted={len(verified_enriched)}, "
+            f"objects_enriched={len(objects_enriched)}, "
+            f"channels_enriched={len(channels_enriched)}"
         )
         soft_stats = (artifacts.get("verdict_soft_triage", {}) or {}).get("stats", {}) or {}
+        merge_stats = (artifacts.get("supervision_merge", {}) or {}).get("stats", {}) or {}
         print(
             "[Stage 10] soft summary: "
             f"final_confirmed={soft_stats.get('final_confirmed', 0)}, "
             f"final_suspicious={soft_stats.get('final_suspicious', 0)}, "
             f"final_safe={soft_stats.get('final_safe_or_low_risk', 0)}, "
             f"semantic_only_applied={soft_stats.get('semantic_only_applied', 0)}, "
-            f"semantic_only_not_applied={soft_stats.get('semantic_only_not_applied', 0)}"
+            f"semantic_only_not_applied={soft_stats.get('semantic_only_not_applied', 0)}, "
+            f"supervision_merge_accepts={merge_stats.get('accepted', 0)}"
         )
 
 
@@ -1530,6 +2039,89 @@ def _write_json_output(result, output_path: str):
     print(f"[SourceAgent] Results written to: {out}")
 
 
+async def _cmd_diagnose(args):
+    from sourceagent.pipeline.phaseb_diagnostic import run_phaseb_diagnostic
+
+    diagnostic_source = str(getattr(args, "diagnostic_source", "") or "").strip()
+    sample = str(getattr(args, "sample", "") or "").strip() or None
+    eval_dir = str(getattr(args, "eval_dir", "") or "").strip() or None
+    diagnostic_json = str(getattr(args, "diagnostic_json", "") or "").strip() or None
+    gt_root = str(getattr(args, "gt_root", "") or "").strip() or None
+    output_dir = str(getattr(args, "output_dir", "") or "").strip() or None
+    chain_ids = [str(chain_id).strip() for chain_id in (getattr(args, "chain_id", None) or []) if str(chain_id).strip()]
+
+    if diagnostic_source in {"runtime", "anchor"} and not sample:
+        print("Error: --sample is required for runtime/anchor diagnostics")
+        return
+    if diagnostic_source == "runtime" and not eval_dir:
+        print("Error: --eval-dir is required for runtime diagnostics")
+        return
+    if diagnostic_source == "file" and not diagnostic_json:
+        print("Error: --diagnostic-json is required for file diagnostics")
+        return
+
+    resolved_output_dir = str(Path(output_dir).resolve()) if output_dir else None
+    print(
+        f"[SourceAgent] Phase B diagnostic: source={diagnostic_source}, "
+        f"sample={sample or 'n/a'}, chains={len(chain_ids) or 'auto'}"
+    )
+    result = await run_phaseb_diagnostic(
+        diagnostic_source=diagnostic_source,
+        eval_dir=eval_dir,
+        sample=sample,
+        chain_ids=chain_ids or None,
+        diagnostic_json=diagnostic_json,
+        gt_root=gt_root,
+        include_related=bool(getattr(args, "include_related", True)),
+        include_supporting=bool(getattr(args, "include_supporting", True)),
+        include_peripheral_suspicious=bool(getattr(args, "include_peripheral_suspicious", False)),
+        review_model=getattr(args, "review_model", None),
+        review_mode=str(getattr(args, "review_mode", "semantic") or "semantic"),
+        review_tool_mode=str(getattr(args, "review_tool_mode", "prompt_only") or "prompt_only"),
+        batch_size=max(1, int(getattr(args, "review_batch_size", 1) or 1)),
+        max_items=int(getattr(args, "max_items", 0) or 0),
+        timeout_sec=int(getattr(args, "review_timeout_sec", 0) or 0),
+        output_dir=resolved_output_dir,
+        allow_manual_llm_supervision=bool(
+            getattr(args, "allow_manual_llm_supervision", DEFAULT_ALLOW_MANUAL_LLM_SUPERVISION)
+        ),
+        llm_promote_budget=int(
+            getattr(args, "llm_promote_budget", DEFAULT_LLM_PROMOTE_BUDGET) or DEFAULT_LLM_PROMOTE_BUDGET
+        ),
+        llm_demote_budget=int(
+            getattr(args, "llm_demote_budget", DEFAULT_LLM_DEMOTE_BUDGET) or DEFAULT_LLM_DEMOTE_BUDGET
+        ),
+        llm_soft_budget=int(
+            getattr(args, "llm_soft_budget", DEFAULT_LLM_SOFT_BUDGET) or DEFAULT_LLM_SOFT_BUDGET
+        ),
+        review_strict_gates=tuple(
+            _parse_csv_arg(getattr(args, "review_strict_gates", ",".join(DEFAULT_REVIEW_STRICT_GATES)))
+        ),
+        review_soft_gates=tuple(
+            _parse_csv_arg(getattr(args, "review_soft_gates", ",".join(DEFAULT_REVIEW_SOFT_GATES)))
+        ),
+        review_allow_soft_on_structural_gap=bool(
+            getattr(args, "review_allow_soft_on_structural_gap", DEFAULT_REVIEW_ALLOW_SOFT_ON_STRUCTURAL_GAP)
+        ),
+        review_preserve_rejected_rationale=bool(
+            getattr(args, "review_preserve_rejected_rationale", DEFAULT_REVIEW_PRESERVE_REJECTED_RATIONALE)
+        ),
+        min_risk_score=float(getattr(args, "min_risk_score", DEFAULT_MIN_RISK_SCORE) or DEFAULT_MIN_RISK_SCORE),
+    )
+    summary = dict(result.get("summary", {}) or {})
+    counts = dict(summary.get("counts", {}) or {})
+    print("[SourceAgent] Phase B diagnostic complete")
+    print(f"  Diagnostic source: {summary.get('diagnostic_source', diagnostic_source)}")
+    print(f"  Sample:            {summary.get('sample_id', sample or '')}")
+    print(f"  Chains reviewed:   {counts.get('chain_count', 0)}")
+    print(f"  Exact matches:     {counts.get('agreement_exact', 0)}")
+    print(f"  Final verdicts:    {summary.get('diagnostic_final_verdict', {})}")
+    print(f"  Final risk bands:  {summary.get('diagnostic_final_risk_band', {})}")
+    print(f"  Review priority:   {summary.get('diagnostic_review_priority', {})}")
+    if resolved_output_dir:
+        print(f"  Output:            {resolved_output_dir}")
+
+
 def _pipeline_result_to_dict(result) -> Dict[str, Any]:
     """Convert PipelineResult dataclasses/enums to plain JSON-serializable dict."""
     from dataclasses import asdict
@@ -1557,7 +2149,20 @@ def _pipeline_result_to_dict(result) -> Dict[str, Any]:
                 "verdict_audit_flags": {},
                 "verdict_soft_triage": {},
                 "verdict_review_plan": {},
+                "verdict_review_prompt": {},
+                "verdict_review_raw_response": {},
+                "verdict_review_session": {},
                 "verdict_review_trace": {},
+                "supervision_queue": {},
+                "supervision_decisions": {},
+                "supervision_prompt": {},
+                "supervision_raw_response": {},
+                "supervision_session": {},
+                "supervision_trace": {},
+                "supervision_merge": {},
+                "verified_enriched": {},
+                "objects_enriched": {},
+                "channels_enriched": {},
                 "status": "failed",
                 "failure_code": "ARTIFACT_BUILD_ERROR",
                 "failure_detail": str(e),
@@ -2268,6 +2873,12 @@ async def _cmd_eval(args):
                     "review_batch_size": getattr(args, "review_batch_size", None),
                     "review_timeout_sec": getattr(args, "review_timeout_sec", None),
                     "review_tool_mode": getattr(args, "review_tool_mode", None),
+                    "enable_supervision": getattr(args, "enable_supervision", None),
+                    "supervision_scope": getattr(args, "supervision_scope", None),
+                    "supervision_model": getattr(args, "supervision_model", None),
+                    "max_supervision_items": getattr(args, "max_supervision_items", None),
+                    "supervision_batch_size": getattr(args, "supervision_batch_size", None),
+                    "supervision_timeout_sec": getattr(args, "supervision_timeout_sec", None),
                 }
                 run_eval_coro = run_eval(
                     str(binary_path),
@@ -2518,6 +3129,16 @@ async def _cmd_eval(args):
                     "verdict_review_raw_response",
                     "verdict_review_session",
                     "verdict_review_trace",
+                    "supervision_queue",
+                    "supervision_decisions",
+                    "supervision_prompt",
+                    "supervision_raw_response",
+                    "supervision_session",
+                    "supervision_trace",
+                    "supervision_merge",
+                    "verified_enriched",
+                    "objects_enriched",
+                    "channels_enriched",
                 ):
                     (output_dir / "raw_views" / f"{output_stem}.{artifact_name}.json").write_text(
                         json.dumps(phase_a.get(artifact_name, {}), indent=2),
@@ -3052,6 +3673,53 @@ async def _cmd_eval(args):
             json.dumps(detailed_rows, indent=2), encoding="utf-8",
         )
         print(f"[SourceAgent] Eval artifacts written to: {output_dir}")
+
+
+async def _cmd_eval_parity(args):
+    """Compare stripped eval output against unstripped reference runs."""
+    from sourceagent.pipeline.stripped_parity_harness import evaluate_stripped_parity_run
+
+    stripped_eval_dir = Path(args.stripped_eval_dir).resolve()
+    unstripped_eval_dir = Path(args.unstripped_eval_dir).resolve()
+    manifest_path = Path(args.manifest_json).resolve()
+    output_dir = Path(args.output_dir).resolve() if args.output_dir else None
+
+    if not stripped_eval_dir.exists():
+        print(f"Error: stripped eval dir not found: {stripped_eval_dir}")
+        sys.exit(1)
+    if not unstripped_eval_dir.exists():
+        print(f"Error: unstripped eval dir not found: {unstripped_eval_dir}")
+        sys.exit(1)
+    if not manifest_path.exists():
+        print(f"Error: manifest not found: {manifest_path}")
+        sys.exit(1)
+
+    report = evaluate_stripped_parity_run(
+        stripped_eval_dir,
+        unstripped_eval_dir=unstripped_eval_dir,
+        manifest_path=manifest_path,
+        output_dir=output_dir,
+    )
+    summary = report["summary"]
+    sinks = summary["parity"]["sinks"]
+    roots = summary["parity"]["sink_roots"]
+    chains = summary["parity"]["positive_chains"]
+    print(
+        "[SourceAgent] Stripped parity: "
+        f"samples={summary['sample_count']} complete_pairs={summary['complete_pairs']}"
+    )
+    print(
+        "[SourceAgent] Sinks parity: "
+        f"matched={sinks['matched_gt']}/{sinks['gt_total']} "
+        f"precision={sinks['precision']:.3f} recall={sinks['recall']:.3f} f1={sinks['f1']:.3f}"
+    )
+    print(
+        "[SourceAgent] Stage9/10 parity: "
+        f"roots_recall={roots['recall']:.3f} chain_recall={chains['recall']:.3f} "
+        f"verdict_exact/over/under="
+        f"{chains['verdict_exact']}/{chains['verdict_over']}/{chains['verdict_under']}"
+    )
+    print(f"[SourceAgent] Parity artifacts written to: {report['output_dir']}")
 
 
 async def _cmd_gt_sinks(args):

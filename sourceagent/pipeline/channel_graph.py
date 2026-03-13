@@ -19,6 +19,7 @@ SCHEMA_VERSION = "0.1"
 _SRAM_BASE = 0x20000000
 _SRAM_END = 0x3FFFFFFF
 _CLUSTER_MASK = 0xFFFFFF00
+_SLICE_MERGE_GAP = 0x20
 
 _CONTEXTS = {"ISR", "TASK", "MAIN", "UNKNOWN", "DMA"}
 _LINKER_NOISE_SYMBOLS = {
@@ -58,6 +59,9 @@ def build_channel_graph(
     object_nodes.extend(_build_symbol_only_objects(mai))
     _augment_symbol_backed_consumers(object_nodes, mai)
     _augment_objects_from_labels(object_nodes, verified_labels)
+    _finalize_object_metadata(object_nodes)
+    object_nodes.extend(_augment_object_overlays(object_nodes))
+    _finalize_object_metadata(object_nodes)
 
     channel_edges = _build_channel_edges(object_nodes, top_k=top_k)
 
@@ -230,11 +234,30 @@ def _augment_objects_from_labels(
         if label == "DMA_BACKED_BUFFER":
             if _merge_dma_label_into_symbol_object(object_nodes, base=base, fn=fn, refs=refs, facts=facts):
                 continue
-        merged = _merge_label_into_existing_object(object_nodes, label, base, fn, refs)
+        binding_targets = _binding_target_rows(label, base=base, facts=facts)
+        merged = False
+        if binding_targets:
+            merged = _merge_label_binding_targets(
+                object_nodes,
+                label=label,
+                binding_targets=binding_targets,
+                fn=fn,
+                refs=refs,
+                facts=facts,
+            )
+        if not merged:
+            merged = _merge_label_into_existing_object(object_nodes, label, base, fn, refs, facts=facts)
         if merged:
             continue
 
-        if label == "DMA_BACKED_BUFFER":
+        if binding_targets:
+            synth_base = int(binding_targets[0].get("cluster", base) or base)
+            obj_id = f"obj_sram_{synth_base:08x}_{(synth_base + 0xFF):08x}"
+            region_kind = "DMA_BUFFER" if label == "DMA_BACKED_BUFFER" else "SRAM_CLUSTER"
+            prod_context = "DMA" if label == "DMA_BACKED_BUFFER" else "ISR"
+            cons_context = "MAIN"
+            notes = "m8.5 payload synthetic producer object"
+        elif label == "DMA_BACKED_BUFFER":
             obj_id = f"obj_dma_{base:08x}_{(base + 0xFF):08x}"
             region_kind = "DMA_BUFFER"
             prod_context = "DMA"
@@ -253,7 +276,7 @@ def _augment_objects_from_labels(
         object_nodes.append({
             "object_id": obj_id,
             "region_kind": region_kind,
-            "addr_range": [_hex_addr(base), _hex_addr(base + 0xFF)],
+            "addr_range": [_hex_addr(synth_base if binding_targets else base), _hex_addr((synth_base if binding_targets else base) + 0xFF)],
             "producer_contexts": [prod_context],
             "consumer_contexts": [cons_context],
             "writer_sites": [{
@@ -262,21 +285,22 @@ def _augment_objects_from_labels(
                 "fn_addr": _hex_addr(addr),
                 "site_addr": _hex_addr(addr),
                 "access_kind": "store",
-                "target_addr": _hex_addr(base),
+                "target_addr": _hex_addr(synth_base if binding_targets else base),
             }],
-            "reader_sites": [],
+            "reader_sites": _buffer_reader_sites(base=synth_base if binding_targets else base, facts=facts),
             "writers": [fn or "DMA_CONFIG"],
-            "readers": [],
+            "readers": [str(v) for v in ((facts or {}).get("buffer_readers", []) or []) if str(v).strip()],
             "members": [],
             "evidence_refs": refs,
             "confidence": 0.60,
-            "type_facts": {
-                "kind_hint": "payload",
-                "source_label": label,
-                "config_function": fn or "",
-            },
-            "notes": notes,
-        })
+                "type_facts": {
+                    "kind_hint": "payload",
+                    "source_label": label,
+                    "config_function": fn or "",
+                    **_binding_type_facts(label=label, base=base, facts=facts),
+                },
+                "notes": notes,
+            })
 
 
 def _build_channel_edges(
@@ -297,15 +321,21 @@ def _build_channel_edges(
                     continue
                 if src != "DMA" and (src == "UNKNOWN" or dst == "UNKNOWN"):
                     continue
-                score = float(obj.get("confidence", 0.0))
+                quality = _object_quality_score(obj)
+                ambiguity = _object_ambiguity_penalty(obj)
+                score = 0.55 * float(obj.get("confidence", 0.0)) + 0.35 * quality - 0.15 * ambiguity
                 if src == "DMA":
                     score = min(1.0, score + 0.10)
+                if str(obj.get("region_kind", "")).upper() == "DMA_BUFFER":
+                    score = min(1.0, score + 0.05)
                 candidates.append((src, dst, score))
 
         candidates.sort(key=lambda x: x[2], reverse=True)
         kept = candidates[: max(1, int(top_k))] if candidates else []
 
         for src, dst, score in kept:
+            quality = _object_quality_score(obj)
+            ambiguity = _object_ambiguity_penalty(obj)
             edges.append({
                 "src_context": src,
                 "object_id": obj["object_id"],
@@ -314,6 +344,8 @@ def _build_channel_edges(
                 "constraints": [],
                 "evidence_refs": list(obj.get("evidence_refs", [])),
                 "score": round(float(score), 4),
+                "object_quality": round(quality, 4),
+                "ambiguity_penalty": round(ambiguity, 4),
             })
 
     return edges
@@ -336,6 +368,18 @@ def _context_from_function_name(fn: str) -> str:
     if any(tok in fn for tok in ("task", "thread", "worker")):
         return "TASK"
     return "MAIN"
+
+
+def _looks_stripped_function_name(fn: str) -> bool:
+    lowered = str(fn or "").strip().lower()
+    if not lowered:
+        return False
+    return bool(
+        lowered.startswith("fun_")
+        or lowered.startswith("lab_")
+        or lowered.startswith("sub_")
+        or lowered.startswith("thunk_fun_")
+    )
 
 
 def _normalize_contexts(values: Iterable[str]) -> List[str]:
@@ -425,6 +469,9 @@ def _merge_label_into_existing_object(
     base: int,
     fn: str,
     refs: List[str],
+    *,
+    facts: Optional[Dict[str, Any]] = None,
+    site_addr: Optional[int] = None,
 ) -> bool:
     if base <= 0:
         return False
@@ -456,12 +503,14 @@ def _merge_label_into_existing_object(
                 site={
                     "context": "DMA",
                     "fn": fn or "DMA_CONFIG",
-                    "fn_addr": _hex_addr(base),
-                    "site_addr": _hex_addr(base),
+                    "fn_addr": _hex_addr(site_addr or base),
+                    "site_addr": _hex_addr(site_addr or base),
                     "access_kind": "store",
                     "target_addr": _hex_addr(base),
                 },
             )
+            for reader_site in _buffer_reader_sites(base=base, facts=facts):
+                _append_site(obj, site_kind="reader_sites", site=reader_site)
         else:
             if "ISR" not in producers:
                 producers.append("ISR")
@@ -473,23 +522,33 @@ def _merge_label_into_existing_object(
                 site={
                     "context": "ISR",
                     "fn": fn or "ISR_WRITER",
-                    "fn_addr": _hex_addr(base),
-                    "site_addr": _hex_addr(base),
+                    "fn_addr": _hex_addr(site_addr or base),
+                    "site_addr": _hex_addr(site_addr or base),
                     "access_kind": "store",
                     "target_addr": _hex_addr(base),
                 },
             )
 
         obj["producer_contexts"] = producers
+        if facts and label == "DMA_BACKED_BUFFER":
+            for reader in list((facts or {}).get("buffer_readers", []) or []):
+                ctx = _context_from_function_name(str(reader or ""))
+                if ctx and ctx not in consumers:
+                    consumers.append(ctx)
         obj["consumer_contexts"] = consumers or ["UNKNOWN"]
         writers = sorted(set(obj.get("writers", []) or []))
         if fn:
             writers = sorted(set(writers + [fn]))
         obj["writers"] = writers
+        readers = sorted(set(obj.get("readers", []) or []))
+        if facts:
+            readers = sorted(set(readers + [str(name) for name in ((facts or {}).get("buffer_readers", []) or []) if str(name)]))
+        obj["readers"] = readers
         type_facts = dict(obj.get("type_facts", {}))
         type_facts["source_label"] = label
         if label == "ISR_FILLED_BUFFER":
             type_facts["kind_hint"] = "payload"
+        type_facts.update(_binding_type_facts(label=label, base=base, facts=facts or {}))
         obj["type_facts"] = type_facts
         obj["confidence"] = round(min(1.0, float(obj.get("confidence", 0.0)) + 0.05), 4)
         notes = str(obj.get("notes", "") or "")
@@ -567,6 +626,7 @@ def _merge_dma_label_into_symbol_object(
     if fn:
         type_facts["config_function"] = fn
     type_facts["dma_buffer_members"] = sorted(wanted_members)
+    type_facts.update(_binding_type_facts(label="DMA_BACKED_BUFFER", base=base, facts=facts))
     best_obj["type_facts"] = type_facts
 
     best_obj["confidence"] = round(min(1.0, float(best_obj.get("confidence", 0.0)) + 0.08), 4)
@@ -701,6 +761,496 @@ def _append_site(obj: Dict[str, Any], *, site_kind: str, site: Dict[str, Any]) -
     obj[site_kind] = sites[:24]
 
 
+def _binding_target_rows(label: str, *, base: int, facts: Dict[str, Any]) -> List[Dict[str, Any]]:
+    rows: Dict[int, Dict[str, Any]] = {}
+
+    def _add(cluster: int, *, score: float, reason: str) -> None:
+        if not (_SRAM_BASE <= cluster <= _SRAM_END):
+            return
+        existing = rows.get(cluster)
+        payload = {
+            "cluster": cluster,
+            "score": round(max(0.0, min(1.0, score)), 4),
+            "reason": reason,
+        }
+        if existing is None or float(payload["score"]) > float(existing.get("score", 0.0) or 0.0):
+            rows[cluster] = payload
+
+    if _SRAM_BASE <= int(base or 0) <= _SRAM_END:
+        _add(int(base), score=0.62, reason="label_address")
+
+    binding_conf = _coerce_float((facts or {}).get("buffer_binding_confidence"))
+    explicit_cluster = _parse_hex(str((facts or {}).get("buffer_cluster", "") or ""))
+    if explicit_cluster > 0:
+        _add(explicit_cluster, score=max(0.55, binding_conf), reason="buffer_cluster")
+
+    for row in list((facts or {}).get("buffer_cluster_candidates", []) or []):
+        if isinstance(row, str):
+            cluster = _parse_hex(row)
+            score = binding_conf
+        else:
+            cluster = _parse_hex(str((row or {}).get("cluster", "") or ""))
+            score = _coerce_float((row or {}).get("confidence"))
+            if score <= 0.0:
+                raw_score = _coerce_float((row or {}).get("score"))
+                score = raw_score / 3.8 if raw_score > 1.0 else raw_score
+        if cluster > 0:
+            _add(cluster, score=max(0.2, score), reason="buffer_cluster_candidate")
+
+    if label == "ISR_FILLED_BUFFER":
+        isr_cluster = _parse_hex(str((facts or {}).get("buffer_cluster", "") or ""))
+        if isr_cluster > 0:
+            _add(isr_cluster, score=max(0.55, binding_conf or 0.55), reason="isr_buffer_cluster")
+
+    return sorted(rows.values(), key=lambda row: (-float(row.get("score", 0.0) or 0.0), int(row.get("cluster", 0) or 0)))
+
+
+def _merge_label_binding_targets(
+    object_nodes: List[Dict[str, Any]],
+    *,
+    label: str,
+    binding_targets: List[Dict[str, Any]],
+    fn: str,
+    refs: List[str],
+    facts: Dict[str, Any],
+) -> bool:
+    scored: List[Tuple[float, int, Dict[str, Any]]] = []
+    for idx, obj in enumerate(object_nodes):
+        start, end = _object_bounds(obj)
+        if end < start:
+            continue
+        for row in binding_targets:
+            cluster = int(row.get("cluster", 0) or 0)
+            if start <= cluster <= end:
+                score = float(row.get("score", 0.0) or 0.0)
+                scored.append((score, idx, row))
+                _annotate_object_binding_candidate(obj, label=label, row=row)
+                break
+
+    if not scored:
+        return False
+
+    scored.sort(key=lambda item: (-item[0], item[1]))
+    best_score, best_idx, best_row = scored[0]
+    second_score = scored[1][0] if len(scored) > 1 else -1.0
+    if len(scored) > 1 and best_score < 0.7 and best_score < second_score + 0.15:
+        return False
+    target_cluster = int(best_row.get("cluster", 0) or 0)
+    site_addr = _parse_hex(str((facts or {}).get("config_cluster", "") or ""))
+    if site_addr <= 0:
+        site_addr = target_cluster
+    return _merge_label_into_existing_object(
+        [object_nodes[best_idx]],
+        label,
+        target_cluster,
+        fn,
+        refs,
+        facts=facts,
+        site_addr=site_addr,
+    )
+
+
+def _annotate_object_binding_candidate(obj: Dict[str, Any], *, label: str, row: Dict[str, Any]) -> None:
+    tf = dict(obj.get("type_facts", {}) or {})
+    candidates = list(tf.get("source_binding_candidates", []) or [])
+    entry = {
+        "label": label,
+        "cluster": _hex_addr(row.get("cluster", 0)),
+        "score": round(float(row.get("score", 0.0) or 0.0), 4),
+        "reason": str(row.get("reason", "") or ""),
+    }
+    if entry not in candidates:
+        candidates.append(entry)
+    tf["source_binding_candidates"] = candidates[:6]
+    obj["type_facts"] = tf
+
+
+def _binding_type_facts(*, label: str, base: int, facts: Dict[str, Any]) -> Dict[str, Any]:
+    tf: Dict[str, Any] = {}
+    if label not in {"DMA_BACKED_BUFFER", "ISR_FILLED_BUFFER"}:
+        return tf
+    config_cluster = str((facts or {}).get("config_cluster", "") or "")
+    if config_cluster:
+        tf["config_cluster"] = config_cluster
+    buffer_cluster = str((facts or {}).get("buffer_cluster", "") or "")
+    if buffer_cluster:
+        tf["buffer_cluster"] = buffer_cluster
+    elif _SRAM_BASE <= int(base or 0) <= _SRAM_END:
+        tf["buffer_cluster"] = _hex_addr(base)
+    buffer_candidates = list((facts or {}).get("buffer_cluster_candidates", []) or [])
+    if buffer_candidates:
+        tf["buffer_cluster_candidates"] = buffer_candidates[:4]
+    readers = [str(v) for v in ((facts or {}).get("buffer_readers", []) or []) if str(v).strip()]
+    if readers:
+        tf["buffer_readers"] = readers[:8]
+    conf = _coerce_float((facts or {}).get("buffer_binding_confidence"))
+    if conf > 0.0:
+        tf["buffer_binding_confidence"] = round(conf, 4)
+    return tf
+
+
+def _buffer_reader_sites(*, base: int, facts: Optional[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    out: List[Dict[str, Any]] = []
+    for reader in list((facts or {}).get("buffer_readers", []) or []):
+        fn = str(reader or "").strip()
+        if not fn:
+            continue
+        out.append({
+            "context": _context_from_function_name(fn),
+            "fn": fn,
+            "fn_addr": _hex_addr(0),
+            "site_addr": _hex_addr(0),
+            "access_kind": "load",
+            "target_addr": _hex_addr(base),
+        })
+    return out[:8]
+
+
+def _finalize_object_metadata(object_nodes: List[Dict[str, Any]]) -> None:
+    for obj in object_nodes:
+        _refresh_object_metadata(obj)
+
+
+def _refresh_object_metadata(obj: Dict[str, Any]) -> None:
+    start, end = _object_bounds(obj)
+    observed = _observed_ranges(obj, start=start, end=end)
+    slice_facts = _slice_facts(observed, start=start, end=end)
+    quality = _object_quality(obj, slice_facts=slice_facts)
+
+    obj["slice_facts"] = slice_facts
+    obj["quality"] = quality
+
+    tf = dict(obj.get("type_facts", {}) or {})
+    tf["slice_count"] = int(slice_facts.get("slice_count", 0) or 0)
+    tf["coverage_ratio"] = float(slice_facts.get("coverage_ratio", 0.0) or 0.0)
+    tf["object_quality"] = {
+        "score": round(float(quality.get("score", 0.0) or 0.0), 4),
+        "specificity": round(float(quality.get("specificity", 0.0) or 0.0), 4),
+        "ambiguity_penalty": round(float(quality.get("ambiguity_penalty", 0.0) or 0.0), 4),
+    }
+    handoff = _shared_handoff_hint(obj, quality=quality)
+    if handoff:
+        tf["shared_handoff_hint"] = handoff
+    else:
+        tf.pop("shared_handoff_hint", None)
+    obj["type_facts"] = tf
+
+
+def _augment_object_overlays(object_nodes: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    overlays: List[Dict[str, Any]] = []
+    existing = {str(obj.get("object_id", "") or "") for obj in object_nodes}
+    for builder in (_build_slice_overlay_objects, _build_source_overlay_objects):
+        for obj in builder(object_nodes):
+            obj_id = str(obj.get("object_id", "") or "")
+            if not obj_id or obj_id in existing:
+                continue
+            existing.add(obj_id)
+            overlays.append(obj)
+    return overlays
+
+
+def _build_slice_overlay_objects(object_nodes: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    overlays: List[Dict[str, Any]] = []
+    for obj in object_nodes:
+        tf = dict(obj.get("type_facts", {}) or {})
+        if bool(tf.get("symbol_backed")) or bool(tf.get("slice_overlay")) or bool(tf.get("source_overlay")):
+            continue
+        quality = dict(obj.get("quality", {}) or {})
+        slice_facts = dict(obj.get("slice_facts", {}) or {})
+        slices = list(slice_facts.get("slices", []) or [])
+        if len(slices) < 2:
+            continue
+        if float(quality.get("ambiguity_penalty", 0.0) or 0.0) < 0.35 and int(quality.get("site_fn_count", 0) or 0) < 8:
+            continue
+        for row in slices[:2]:
+            rng = list(row.get("addr_range", []) or [])
+            if len(rng) != 2:
+                continue
+            writer_sites = _filter_sites_for_range(obj.get("writer_sites", []), rng)
+            reader_sites = _filter_sites_for_range(obj.get("reader_sites", []), rng)
+            if len(writer_sites) + len(reader_sites) < 2:
+                continue
+            overlays.append(_make_overlay_object(
+                parent=obj,
+                object_id=f"{obj.get('object_id', 'obj')}__{str(row.get('slice_id', 's')).lower()}",
+                addr_range=rng,
+                writer_sites=writer_sites,
+                reader_sites=reader_sites,
+                note_suffix="slice overlay",
+                extra_type_facts={"slice_overlay": True, "slice_id": str(row.get("slice_id", ""))},
+            ))
+    return overlays
+
+
+def _build_source_overlay_objects(object_nodes: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    overlays: List[Dict[str, Any]] = []
+    for obj in object_nodes:
+        tf = dict(obj.get("type_facts", {}) or {})
+        source_label = str(tf.get("source_label", "") or "").upper()
+        if source_label not in {"DMA_BACKED_BUFFER", "ISR_FILLED_BUFFER"}:
+            continue
+        if bool(tf.get("source_overlay")):
+            continue
+        quality = dict(obj.get("quality", {}) or {})
+        if float(quality.get("ambiguity_penalty", 0.0) or 0.0) < 0.4 and int(quality.get("site_fn_count", 0) or 0) < 10:
+            continue
+
+        readers_hint = {str(v).lower() for v in (tf.get("buffer_readers", []) or []) if str(v).strip()}
+        writer_sites = [
+            dict(site)
+            for site in (obj.get("writer_sites", []) or [])
+            if str(site.get("context", "")).upper() in {"DMA", "ISR"}
+        ] or list(obj.get("writer_sites", []) or [])[:4]
+        reader_sites = [
+            dict(site)
+            for site in (obj.get("reader_sites", []) or [])
+            if not readers_hint or str(site.get("fn", "")).lower() in readers_hint
+        ] or list(obj.get("reader_sites", []) or [])[:6]
+        if not writer_sites or not reader_sites:
+            continue
+        overlays.append(_make_overlay_object(
+            parent=obj,
+            object_id=f"{obj.get('object_id', 'obj')}__bound",
+            addr_range=list(obj.get("addr_range", []) or []),
+            writer_sites=writer_sites,
+            reader_sites=reader_sites,
+            note_suffix="source-bound overlay",
+            extra_type_facts={"source_overlay": True, "source_overlay_label": source_label},
+        ))
+    return overlays
+
+
+def _make_overlay_object(
+    *,
+    parent: Dict[str, Any],
+    object_id: str,
+    addr_range: List[str],
+    writer_sites: List[Dict[str, Any]],
+    reader_sites: List[Dict[str, Any]],
+    note_suffix: str,
+    extra_type_facts: Dict[str, Any],
+) -> Dict[str, Any]:
+    tf = dict(parent.get("type_facts", {}) or {})
+    tf.update(extra_type_facts)
+    return {
+        "object_id": object_id,
+        "parent_object_id": str(parent.get("object_id", "") or ""),
+        "region_kind": str(parent.get("region_kind", "") or "SRAM_CLUSTER"),
+        "addr_range": list(addr_range or []),
+        "producer_contexts": sorted({str(site.get("context", "") or "UNKNOWN") for site in writer_sites if str(site.get("context", "") or "").strip()}) or ["UNKNOWN"],
+        "consumer_contexts": sorted({str(site.get("context", "") or "UNKNOWN") for site in reader_sites if str(site.get("context", "") or "").strip()}) or ["UNKNOWN"],
+        "writer_sites": writer_sites[:24],
+        "reader_sites": reader_sites[:24],
+        "writers": sorted({str(site.get("fn", "") or "") for site in writer_sites if str(site.get("fn", "") or "").strip()}),
+        "readers": sorted({str(site.get("fn", "") or "") for site in reader_sites if str(site.get("fn", "") or "").strip()}),
+        "members": list(parent.get("members", []) or []),
+        "evidence_refs": list(parent.get("evidence_refs", []) or []),
+        "confidence": round(min(0.92, max(0.45, float(parent.get("confidence", 0.0) or 0.0) + 0.04)), 4),
+        "type_facts": tf,
+        "notes": f"{str(parent.get('notes', '') or '')}; {note_suffix}".strip("; "),
+    }
+
+
+def _filter_sites_for_range(rows: Iterable[Dict[str, Any]], addr_range: List[str]) -> List[Dict[str, Any]]:
+    start = _parse_hex(str((addr_range or ["0x0"])[0]))
+    end = _parse_hex(str((addr_range or ["0x0", "0x0"])[1]))
+    out: List[Dict[str, Any]] = []
+    for row in rows or []:
+        addr = _parse_hex(str((row or {}).get("target_addr", "") or "0x0"))
+        if start <= addr <= end:
+            out.append(dict(row))
+    return out[:24]
+
+
+def _shared_handoff_hint(obj: Dict[str, Any], *, quality: Dict[str, Any]) -> Dict[str, Any]:
+    tf = dict(obj.get("type_facts", {}) or {})
+    if bool(tf.get("symbol_backed")):
+        return {}
+    if str(obj.get("region_kind", "") or "").upper() not in {"SRAM_CLUSTER", "DMA_BUFFER"}:
+        return {}
+    writers = {str(fn).lower() for fn in (obj.get("writers", []) or []) if str(fn).strip()}
+    readers = {str(fn).lower() for fn in (obj.get("readers", []) or []) if str(fn).strip()}
+    if not writers or not readers:
+        return {}
+    shared = writers & readers
+    disjoint_writers = writers - readers
+    disjoint_readers = readers - writers
+    if not disjoint_writers or not disjoint_readers:
+        return {}
+
+    slice_count = int((obj.get("slice_facts", {}) or {}).get("slice_count", 0) or 0)
+    coverage_ratio = float((obj.get("slice_facts", {}) or {}).get("coverage_ratio", 0.0) or 0.0)
+    ambiguity = float(quality.get("ambiguity_penalty", 0.0) or 0.0)
+    quality_score = float(quality.get("score", 0.0) or 0.0)
+    kind_hint = str(tf.get("kind_hint", "") or "").lower()
+
+    score = 0.0
+    if kind_hint in {"payload", "payload_or_ctrl"}:
+        score += 0.12
+    if disjoint_writers and disjoint_readers:
+        score += 0.28
+    if len(disjoint_readers) >= max(2, len(disjoint_writers)):
+        score += 0.14
+    if slice_count <= 2:
+        score += 0.08
+    if quality_score >= 0.55:
+        score += 0.14
+    if ambiguity <= 0.4:
+        score += 0.12
+    if coverage_ratio <= 0.45:
+        score += 0.06
+    if any(_looks_stripped_function_name(fn) for fn in (writers | readers)):
+        score += 0.06
+    if len(shared) > 1:
+        score -= 0.08
+    if len(writers | readers) > 12:
+        score -= 0.10
+
+    score = round(max(0.0, min(1.0, score)), 4)
+    if score < 0.68:
+        return {}
+    return {
+        "edge": "MAIN->TASK",
+        "score": score,
+        "writer_functions": sorted(disjoint_writers)[:6],
+        "reader_functions": sorted(disjoint_readers)[:6],
+    }
+
+
+def _object_bounds(obj: Dict[str, Any]) -> Tuple[int, int]:
+    rng = obj.get("addr_range", [])
+    if not isinstance(rng, list) or len(rng) != 2:
+        return 0, 0
+    start = _parse_hex(str(rng[0]))
+    end = _parse_hex(str(rng[1]))
+    if end < start:
+        start, end = end, start
+    return start, end
+
+
+def _observed_ranges(obj: Dict[str, Any], *, start: int, end: int) -> List[Tuple[int, int]]:
+    ranges: List[Tuple[int, int]] = []
+    for site_key in ("writer_sites", "reader_sites"):
+        for row in (obj.get(site_key, []) or []):
+            addr = _parse_hex(str(row.get("target_addr", "") or "0x0"))
+            if addr <= 0:
+                continue
+            hi = addr
+            if start <= addr <= end:
+                hi = min(end, addr + 3)
+            ranges.append((addr, hi))
+    if not ranges and start <= end:
+        ranges.append((start, end))
+    return ranges
+
+
+def _slice_facts(
+    observed: List[Tuple[int, int]],
+    *,
+    start: int,
+    end: int,
+) -> Dict[str, Any]:
+    if not observed:
+        return {
+            "slice_count": 0,
+            "coverage_ratio": 0.0,
+            "dominant_slice_span": 0,
+            "slices": [],
+        }
+
+    ordered = sorted(
+        ((min(lo, hi), max(lo, hi)) for lo, hi in observed if max(lo, hi) >= 0),
+        key=lambda item: (item[0], item[1]),
+    )
+    merged: List[List[int]] = []
+    for lo, hi in ordered:
+        if not merged or lo > merged[-1][1] + _SLICE_MERGE_GAP:
+            merged.append([lo, hi])
+            continue
+        merged[-1][1] = max(merged[-1][1], hi)
+
+    total_span = max(1, end - start + 1) if end >= start else 1
+    slices: List[Dict[str, Any]] = []
+    covered = 0
+    for idx, (lo, hi) in enumerate(merged):
+        span = max(1, hi - lo + 1)
+        covered += span
+        slices.append({
+            "slice_id": f"S{idx}",
+            "addr_range": [_hex_addr(lo), _hex_addr(hi)],
+            "span": span,
+        })
+
+    dominant = max((row["span"] for row in slices), default=0)
+    return {
+        "slice_count": len(slices),
+        "coverage_ratio": round(min(1.0, covered / float(total_span)), 4),
+        "dominant_slice_span": dominant,
+        "slices": slices[:8],
+    }
+
+
+def _object_quality(obj: Dict[str, Any], *, slice_facts: Dict[str, Any]) -> Dict[str, Any]:
+    tf = dict(obj.get("type_facts", {}) or {})
+    producers = _normalize_contexts(obj.get("producer_contexts", []))
+    consumers = _normalize_contexts(obj.get("consumer_contexts", []))
+    writers = {str(fn) for fn in (obj.get("writers", []) or []) if str(fn).strip()}
+    readers = {str(fn) for fn in (obj.get("readers", []) or []) if str(fn).strip()}
+    members = [str(member).strip() for member in (obj.get("members", []) or []) if str(member).strip()]
+
+    site_fn_count = len(writers | readers)
+    producer_count = len([ctx for ctx in producers if ctx != "UNKNOWN"])
+    consumer_count = len([ctx for ctx in consumers if ctx != "UNKNOWN"])
+    slice_count = int(slice_facts.get("slice_count", 0) or 0)
+    coverage_ratio = float(slice_facts.get("coverage_ratio", 0.0) or 0.0)
+    region_kind = str(obj.get("region_kind", "") or "").upper()
+    kind_hint = str(tf.get("kind_hint", "") or "").lower()
+    symbol_backed = bool(tf.get("symbol_backed")) or bool(members)
+
+    specificity = 0.25
+    if symbol_backed:
+        specificity += 0.25
+    if region_kind in {"DMA_BUFFER", "RODATA_TABLE"}:
+        specificity += 0.10
+    if kind_hint == "payload":
+        specificity += 0.08
+    if slice_count == 1:
+        specificity += 0.12
+    elif slice_count == 2:
+        specificity += 0.06
+    specificity += max(0.0, 0.18 - 0.18 * coverage_ratio)
+    specificity += max(0.0, 0.10 - 0.02 * max(site_fn_count - 1, 0))
+
+    ambiguity = 0.0
+    ambiguity += 0.12 * max(producer_count - 1, 0)
+    ambiguity += 0.12 * max(consumer_count - 1, 0)
+    ambiguity += 0.08 * max(site_fn_count - 2, 0)
+    ambiguity += 0.06 * max(slice_count - 2, 0)
+    if not symbol_backed and kind_hint == "payload_or_ctrl":
+        ambiguity += 0.08
+    if coverage_ratio > 0.65:
+        ambiguity += min(0.18, (coverage_ratio - 0.65) * 0.5)
+
+    score = max(0.0, min(1.0, 0.35 + specificity - 0.45 * ambiguity))
+    return {
+        "score": round(score, 4),
+        "specificity": round(max(0.0, min(1.0, specificity)), 4),
+        "ambiguity_penalty": round(max(0.0, min(1.0, ambiguity)), 4),
+        "producer_count": producer_count,
+        "consumer_count": consumer_count,
+        "site_fn_count": site_fn_count,
+        "symbol_poor": not symbol_backed,
+    }
+
+
+def _object_quality_score(obj: Dict[str, Any]) -> float:
+    return float((obj.get("quality", {}) or {}).get("score", obj.get("confidence", 0.0)) or 0.0)
+
+
+def _object_ambiguity_penalty(obj: Dict[str, Any]) -> float:
+    return float((obj.get("quality", {}) or {}).get("ambiguity_penalty", 0.0) or 0.0)
+
+
 def _parse_hex(text: str) -> int:
     try:
         return int(str(text or "0"), 16)
@@ -714,3 +1264,10 @@ def _hex_addr(v: Any) -> str:
     except Exception:
         n = 0
     return f"0x{n:08x}"
+
+
+def _coerce_float(value: Any) -> float:
+    try:
+        return float(value or 0.0)
+    except Exception:
+        return 0.0

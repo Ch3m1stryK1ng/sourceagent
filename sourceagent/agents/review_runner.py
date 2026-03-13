@@ -10,12 +10,18 @@ from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Set, 
 
 from sourceagent.config.settings import get_settings
 from sourceagent.llm.llm import LLM
+from sourceagent.agents.review_context_ranker import (
+    KEY_CHAR_LIMITS,
+    build_review_context_plan,
+    expand_review_context_plan,
+    should_request_second_pass,
+)
 from sourceagent.llm.review_schema import parse_review_response
 from sourceagent.pipeline.review_reason_codes import PROMPT_REASON_CODES
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_REVIEW_TIMEOUT_SEC = 120
+DEFAULT_REVIEW_TIMEOUT_SEC = 300
 DEFAULT_REVIEW_TOOL_MODE = "prompt_only"
 REVIEW_TRANSCRIPT_SCHEMA_VERSION = "0.2"
 DEFAULT_MAX_REVIEW_PROMPT_CHARS = 180000
@@ -57,15 +63,16 @@ def _semantic_prompt(batch: Mapping[str, Any], *, review_mode: str, review_tool_
                             "reason_codes": ["CHECK_NOT_BINDING_ROOT"],
                             "summary": "brief explanation",
                             "evidence_map": {
-                                "summary": ["sink_function", "caller_bridge", "producer_function"]
+                                "summary": ["sink_function", "caller_bridge", "producer_function", "capacity_context", "guard_context"]
                             }
                         }
                     ],
                     "reason_codes": ["CHECK_NOT_BINDING_ROOT"],
                     "review_quality_flags": ["needs_more_context"],
                     "evidence_map": {
-                        "trigger_summary": ["sink_function", "caller_bridge", "producer_function"],
-                        "root_controllability": ["sink_function"]
+                        "trigger_summary": ["sink_function", "caller_bridge", "producer_function", "capacity_context"],
+                        "root_controllability": ["sink_function", "producer_function"],
+                        "capacity_reasoning": ["capacity_context", "guard_context", "object_context"]
                     },
                     "audit_flags": ["CHECK_NOT_BINDING_ROOT"],
                     "confidence": 0.0,
@@ -80,6 +87,7 @@ def _semantic_prompt(batch: Mapping[str, Any], *, review_mode: str, review_tool_
             "Inspect every chain segment and decide whether taint is preserved, weakened, cleansed, or unknown.",
             "Judge whether each visible check truly constrains the active root, not just nearby state.",
             "Only cite snippet keys listed in each item's available_snippet_keys.",
+            "Prefer capacity_context and guard_context when reasoning about bounds, extent, or whether a check binds the active root.",
             "Do not leave evidence_map empty.",
             "Do not invent facts absent from the provided items.",
             "If evidence is weak, prefer SUSPICIOUS over CONFIRMED.",
@@ -122,7 +130,12 @@ async def _call_mcp_json(
         if isinstance(result, list):
             for block in result:
                 if isinstance(block, dict) and block.get("type") == "text":
-                    return json.loads(block["text"])
+                    text = str(block.get("text", "") or "")
+                    try:
+                        return json.loads(text)
+                    except Exception:
+                        if text.strip():
+                            return {"decompiled_code": text}
         elif isinstance(result, dict):
             return result
     except Exception as exc:
@@ -226,68 +239,34 @@ def _render_blob(
 
 def _candidate_tool_functions(item: Mapping[str, Any]) -> Dict[str, List[str]]:
     sink_fn = str((item.get("sink", {}) or {}).get("function", "") or "")
-    snippet_index = dict(item.get("snippet_index", {}) or {})
-    chain_segments = list(item.get("chain_segments", []) or [])
-    derive_facts = list(item.get("derive_facts", []) or [])
-    check_facts = list(item.get("check_facts", []) or [])
-    guard_context = list(item.get("guard_context", []) or [])
-    channel_path = list(item.get("channel_path", []) or [])
+    plan = dict(item.get("review_context_plan", {}) or {})
+    if not plan:
+        plan = build_review_context_plan(item)
+    selected = {str(k): _uniq(v or []) for k, v in dict(plan.get("selected_functions", {}) or {}).items()}
 
-    source_functions: List[str] = []
-    bridge_functions: List[str] = list(snippet_index.get("caller_bridge", []) or [])
-    producer_functions: List[str] = list(snippet_index.get("producer_function", []) or [])
-    derive_functions: List[str] = []
-    check_functions: List[str] = []
+    if sink_fn and sink_fn not in selected.get("sink_function", []):
+        selected["sink_function"] = [sink_fn] + list(selected.get("sink_function", []) or [])
 
-    for row in chain_segments:
-        src = dict(row.get("src", {}) or {})
-        dst = dict(row.get("dst", {}) or {})
-        for key in ("function", "sink_function"):
-            if _looks_like_function_name(src.get(key)):
-                source_functions.append(str(src.get(key)))
-            if _looks_like_function_name(dst.get(key)):
-                bridge_functions.append(str(dst.get(key)))
-
-    for row in derive_facts:
-        site = row.get("site")
-        if _looks_like_function_name(site):
-            derive_functions.append(str(site))
-    for row in check_facts:
-        site = row.get("site")
-        if _looks_like_function_name(site):
-            check_functions.append(str(site))
-    for row in guard_context:
-        site = row.get("site")
-        if _looks_like_function_name(site):
-            check_functions.append(str(site))
-
-    if _looks_like_function_name(sink_fn):
-        pass
-    else:
-        sink_fn = ""
-
-    producer_functions.extend(source_functions)
-    related = _uniq([sink_fn] + source_functions + producer_functions + bridge_functions + derive_functions + check_functions)
-    bridge_functions = _uniq([fn for fn in bridge_functions if fn and fn != sink_fn])
-    producer_functions = _uniq([fn for fn in producer_functions if fn and fn != sink_fn])
-    source_functions = _uniq([fn for fn in source_functions if fn])
-    derive_functions = _uniq([fn for fn in derive_functions if fn])
-    check_functions = _uniq([fn for fn in check_functions if fn])
-
-    channel_functions = []
-    if channel_path:
-        channel_functions = _uniq(source_functions + producer_functions + bridge_functions)
+    producer = _uniq(selected.get("producer_context", []) or [])
+    bridges = _uniq(selected.get("caller_bridge", []) or [])
+    guards = _uniq(selected.get("guard_context", []) or [])
+    capacity = _uniq(selected.get("capacity_context", []) or [])
+    objects = _uniq(selected.get("object_context", []) or [])
+    channel_functions = _uniq(producer + bridges + objects) if list(item.get("channel_path", []) or []) else []
+    related = _uniq((selected.get("sink_function", []) or []) + producer + bridges + guards + capacity + objects)
 
     return {
-        "sink_function": [sink_fn] if sink_fn else [],
-        "caller_bridge": bridge_functions,
-        "producer_function": producer_functions,
-        "source_context": source_functions or producer_functions,
+        "sink_function": _uniq(selected.get("sink_function", []) or []),
+        "caller_bridge": bridges,
+        "producer_function": producer,
+        "source_context": producer,
         "channel_context": channel_functions,
-        "derive_context": derive_functions or bridge_functions or ([sink_fn] if sink_fn else []),
-        "check_context": check_functions or bridge_functions or ([sink_fn] if sink_fn else []),
-        "object_context": _uniq([fn for fn in related if fn and fn != sink_fn]),
-        "related_functions": _uniq([fn for fn in related if fn and fn != sink_fn]),
+        "derive_context": bridges or ([sink_fn] if sink_fn else []),
+        "check_context": guards or bridges or ([sink_fn] if sink_fn else []),
+        "capacity_context": capacity or objects or bridges or ([sink_fn] if sink_fn else []),
+        "guard_context": guards or bridges or ([sink_fn] if sink_fn else []),
+        "object_context": objects,
+        "related_functions": [fn for fn in related if fn and fn != sink_fn],
     }
 
 
@@ -300,21 +279,28 @@ def _merge_tool_snippets(
     updated = dict(item)
     snippets = dict(updated.get("decompiled_snippets", {}) or {})
     snippet_index = {str(k): list(v or []) for k, v in dict(updated.get("snippet_index", {}) or {}).items()}
+    context_plan = dict(updated.get("review_context_plan", {}) or {})
     candidate_map = _candidate_tool_functions(updated)
+    key_char_limits = dict(context_plan.get("key_char_limits", {}) or {})
     fetched_functions = 0
+    rejected_functions = {}
 
     for key, functions in candidate_map.items():
         existing_names = list(snippet_index.get(key, []) or [])
         merged_names = _uniq(existing_names + list(functions or []))
+        cap = int(key_char_limits.get(key, max_chars_per_key) or max_chars_per_key)
         text, final_names = _render_blob(
             merged_names,
             code_by_name,
-            max_chars=max_chars_per_key,
+            max_chars=cap,
         )
         if text:
             snippets[key] = text
             snippet_index[key] = final_names
             fetched_functions += max(0, len([fn for fn in final_names if fn in code_by_name and fn not in existing_names]))
+            rejected = [fn for fn in merged_names if fn not in final_names]
+            if rejected:
+                rejected_functions[key] = rejected
         else:
             snippets.setdefault(key, str(snippets.get(key, "") or ""))
             if key not in snippet_index:
@@ -327,6 +313,8 @@ def _merge_tool_snippets(
         "available_snippet_keys": list(updated.get("available_snippet_keys", []) or []),
         "snippet_index": snippet_index,
         "tool_added_function_count": fetched_functions,
+        "context_plan": context_plan,
+        "rejected_functions": rejected_functions,
     }
     return updated, summary
 
@@ -446,6 +434,43 @@ def _should_split_for_error(error_text: str) -> bool:
     )
 
 
+def _build_second_pass_batches(batch: Mapping[str, Any], decisions: Sequence[Mapping[str, Any]]) -> List[Dict[str, Any]]:
+    items_by_chain = {str(item.get("chain_id", "") or ""): dict(item) for item in (batch.get("items", []) or [])}
+    out: List[Dict[str, Any]] = []
+    base_id = str(batch.get("batch_id", "") or "batch")
+    for idx, decision in enumerate(decisions):
+        chain_id = str(decision.get("chain_id", "") or "")
+        if not chain_id:
+            continue
+        item = dict(items_by_chain.get(chain_id, {}) or {})
+        if not item:
+            continue
+        plan = dict(item.get("review_context_plan", {}) or {})
+        if bool(plan.get("expanded", False)):
+            continue
+        decision_with_item = {
+            **dict(decision),
+            "_feature_item": item,
+        }
+        if not should_request_second_pass(
+            decision_with_item,
+            review_priority=str(item.get("review_priority", "") or ""),
+            current_verdict=str(item.get("current_verdict", "") or ""),
+        ):
+            continue
+        new_item = dict(item)
+        new_item["review_context_plan"] = expand_review_context_plan(item)
+        out.append({
+            **dict(batch),
+            "batch_id": f"{base_id}_pass2_{idx:02d}",
+            "chain_ids": [chain_id],
+            "items": [new_item],
+            "estimated_prompt_chars": int(((new_item.get("review_context_plan", {}) or {}).get("estimated_prompt_chars", 0)) or 0),
+            "second_pass": True,
+        })
+    return out
+
+
 async def run_review_plan(
     review_plan: Mapping[str, Any],
     *,
@@ -551,6 +576,7 @@ async def run_review_plan(
     while pending_batches:
         batch = pending_batches.pop(0)
         batch_id = str(batch.get("batch_id", "") or "")
+        batch_tool_mode = str(batch.get("review_tool_mode", review_tool_mode) or review_tool_mode)
         chain_ids = [str(v) for v in (batch.get("chain_ids", []) or []) if str(v)]
         targets = []
         for item in batch.get("items", []) or []:
@@ -564,7 +590,7 @@ async def run_review_plan(
                 f"[Stage 10] Review batch {batch_id}: reviewing {len(chain_ids)} chains for "
                 f"{', '.join(targets[:4])}"
             )
-        prompt = _semantic_prompt(batch, review_mode=review_mode, review_tool_mode=review_tool_mode)
+        prompt = _semantic_prompt(batch, review_mode=review_mode, review_tool_mode=batch_tool_mode)
         prompt_len = len(prompt)
         if prompt_len > DEFAULT_MAX_REVIEW_PROMPT_CHARS and len(batch.get("items", []) or []) > 1:
             split_batches = _split_batch(batch)
@@ -576,9 +602,10 @@ async def run_review_plan(
         prompt_batches.append({
             "batch_id": batch_id,
             "chain_ids": chain_ids,
+            "second_pass": bool(batch.get("second_pass", False)),
             "created_at": _now_iso(),
             "model": chosen_model,
-            "review_tool_mode": review_tool_mode,
+            "review_tool_mode": batch_tool_mode,
             "system_prompt": _SYSTEM_PROMPT,
             "user_prompt": prompt,
             "tool_context": _jsonable(batch.get("tool_context", {})),
@@ -604,6 +631,29 @@ async def run_review_plan(
                 f"[Stage 10] Review batch {batch_id}: received {len(decisions)} parsed decisions "
                 f"(ok={bool(meta.get('ok', False))})"
             )
+            second_pass_batches = []
+            if decisions:
+                second_pass_batches = _build_second_pass_batches(batch, decisions)
+                if second_pass_batches:
+                    pass2_tool_mode = (
+                        "tool_assisted"
+                        if mcp_manager and ghidra_binary_name
+                        else batch_tool_mode
+                    )
+                    for second_pass_batch in second_pass_batches:
+                        second_pass_batch["review_tool_mode"] = pass2_tool_mode
+                    if pass2_tool_mode == "tool_assisted":
+                        second_pass_batches, pass2_tool_logs = await _augment_batches_for_tool_mode(
+                            second_pass_batches,
+                            review_tool_mode=pass2_tool_mode,
+                            mcp_manager=mcp_manager,
+                            ghidra_binary_name=ghidra_binary_name,
+                        )
+                        tool_logs.extend(pass2_tool_logs)
+                    print(
+                        f"[Stage 10] Review batch {batch_id}: scheduling {len(second_pass_batches)} second-pass review batches"
+                    )
+                    pending_batches = second_pass_batches + pending_batches
             if len(batch.get("items", []) or []) > 1 and (not bool(meta.get("ok", False)) or len(decisions) == 0):
                 split_batches = _split_batch(batch)
                 print(
@@ -613,10 +663,11 @@ async def run_review_plan(
             raw_response_batches.append({
                 "batch_id": batch_id,
                 "chain_ids": chain_ids,
+                "second_pass": bool(batch.get("second_pass", False)),
                 "created_at": _now_iso(),
                 "ok": bool(meta.get("ok", False)),
                 "model": str(response.model or chosen_model),
-                "review_tool_mode": review_tool_mode,
+                "review_tool_mode": batch_tool_mode,
                 "finish_reason": str(response.finish_reason or ""),
                 "usage": _jsonable(response.usage or {}),
                 "raw_text": text,
@@ -626,9 +677,10 @@ async def run_review_plan(
             session_batches.append({
                 "batch_id": batch_id,
                 "chain_ids": chain_ids,
+                "second_pass": bool(batch.get("second_pass", False)),
                 "ok": bool(meta.get("ok", False)),
                 "model": str(response.model or chosen_model),
-                "review_tool_mode": review_tool_mode,
+                "review_tool_mode": batch_tool_mode,
                 "finish_reason": str(response.finish_reason or ""),
                 "decision_count": len(decisions),
                 "parsed_decisions": decisions,
@@ -639,10 +691,11 @@ async def run_review_plan(
             trace_batches.append({
                 "batch_id": batch_id,
                 "chain_ids": chain_ids,
+                "second_pass": bool(batch.get("second_pass", False)),
                 "ok": bool(meta.get("ok", False)),
                 "decision_count": len(decisions),
                 "model": str(response.model or chosen_model),
-                "review_tool_mode": review_tool_mode,
+                "review_tool_mode": batch_tool_mode,
                 "raw_excerpt": str(text or "")[:4000],
                 "tool_context": _jsonable(batch.get("tool_context", {})),
                 "error": meta.get("error", ""),
@@ -659,10 +712,11 @@ async def run_review_plan(
             raw_response_batches.append({
                 "batch_id": batch_id,
                 "chain_ids": chain_ids,
+                "second_pass": bool(batch.get("second_pass", False)),
                 "created_at": _now_iso(),
                 "ok": False,
                 "model": chosen_model,
-                "review_tool_mode": review_tool_mode,
+                "review_tool_mode": batch_tool_mode,
                 "finish_reason": "error",
                 "usage": {},
                 "raw_text": "",
@@ -672,9 +726,10 @@ async def run_review_plan(
             session_batches.append({
                 "batch_id": batch_id,
                 "chain_ids": chain_ids,
+                "second_pass": bool(batch.get("second_pass", False)),
                 "ok": False,
                 "model": chosen_model,
-                "review_tool_mode": review_tool_mode,
+                "review_tool_mode": batch_tool_mode,
                 "finish_reason": "error",
                 "decision_count": 0,
                 "parsed_decisions": [],
@@ -685,10 +740,11 @@ async def run_review_plan(
             trace_batches.append({
                 "batch_id": batch_id,
                 "chain_ids": chain_ids,
+                "second_pass": bool(batch.get("second_pass", False)),
                 "ok": False,
                 "decision_count": 0,
                 "model": chosen_model,
-                "review_tool_mode": review_tool_mode,
+                "review_tool_mode": batch_tool_mode,
                 "raw_excerpt": "",
                 "tool_context": _jsonable(batch.get("tool_context", {})),
                 "error": str(exc),

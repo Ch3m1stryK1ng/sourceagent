@@ -1,0 +1,136 @@
+
+Discarded input sections
+
+ .text          0x00000000        0x0 /tmp/ccSvGQeC.o
+ .data          0x00000000        0x0 /tmp/ccSvGQeC.o
+ .bss           0x00000000        0x0 /tmp/ccSvGQeC.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+FLASH            0x08000000         0x00010000         xr
+RAM              0x20000000         0x00005000         xrw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD /tmp/ccSvGQeC.o
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m/nofp/libgcc.a
+START GROUP
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m/nofp/libgcc.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libg_nano.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a
+END GROUP
+START GROUP
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m/nofp/libgcc.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libnosys.a
+END GROUP
+START GROUP
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m/nofp/libgcc.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libnosys.a
+END GROUP
+                0x20005000                        _estack = (ORIGIN (RAM) + LENGTH (RAM))
+
+.isr_vector     0x08000000       0x40
+ *(.isr_vector)
+ .isr_vector    0x08000000       0x40 /tmp/ccSvGQeC.o
+                0x08000000                vector_table
+
+.text           0x08000040       0x4c
+ *(.text*)
+ .text.Default_Handler
+                0x08000040        0x2 /tmp/ccSvGQeC.o
+                0x08000040                Default_Handler
+ .text.fill_buffer
+                0x08000042       0x2c /tmp/ccSvGQeC.o
+                0x08000042                fill_buffer
+ *fill*         0x0800006e        0x2 
+ .text.main     0x08000070       0x14 /tmp/ccSvGQeC.o
+                0x08000070                main
+ .text.Reset_Handler
+                0x08000084        0x8 /tmp/ccSvGQeC.o
+                0x08000084                Reset_Handler
+ *(.rodata*)
+
+.glue_7         0x0800008c        0x0
+ .glue_7        0x0800008c        0x0 linker stubs
+
+.glue_7t        0x0800008c        0x0
+ .glue_7t       0x0800008c        0x0 linker stubs
+
+.vfp11_veneer   0x0800008c        0x0
+ .vfp11_veneer  0x0800008c        0x0 linker stubs
+
+.v4_bx          0x0800008c        0x0
+ .v4_bx         0x0800008c        0x0 linker stubs
+
+.iplt           0x0800008c        0x0
+ .iplt          0x0800008c        0x0 /tmp/ccSvGQeC.o
+
+.rel.dyn        0x0800008c        0x0
+ .rel.iplt      0x0800008c        0x0 /tmp/ccSvGQeC.o
+
+.ARM.extab
+ *(.ARM.extab*)
+
+.ARM.exidx
+ *(.ARM.exidx*)
+                0x0800008c                        _sidata = .
+
+.data           0x20000000        0x0 load address 0x0800008c
+                0x20000000                        _sdata = .
+ *(.data*)
+                0x20000000                        _edata = .
+
+.igot.plt       0x20000000        0x0
+ .igot.plt      0x20000000        0x0 /tmp/ccSvGQeC.o
+
+.bss            0x20000000       0x30
+                0x20000000                        _sbss = .
+ *(.bss*)
+ .bss.g_buf     0x20000000       0x30 /tmp/ccSvGQeC.o
+ *(COMMON)
+                0x20000030                        _ebss = .
+                0x20005000                        PROVIDE (__stack_top__ = _estack)
+                [!provide]                        PROVIDE (end = _ebss)
+                [!provide]                        PROVIDE (_end = _ebss)
+OUTPUT(/home/a347908610/sourceagent/firmware/microbench_autogen/loop_variant_10.elf elf32-littlearm)
+LOAD linker stubs
+
+.debug_info     0x00000000      0x1da
+ .debug_info    0x00000000      0x1da /tmp/ccSvGQeC.o
+
+.debug_abbrev   0x00000000      0x182
+ .debug_abbrev  0x00000000      0x182 /tmp/ccSvGQeC.o
+
+.debug_loc      0x00000000       0xb9
+ .debug_loc     0x00000000       0xb9 /tmp/ccSvGQeC.o
+
+.debug_aranges  0x00000000       0x38
+ .debug_aranges
+                0x00000000       0x38 /tmp/ccSvGQeC.o
+
+.debug_ranges   0x00000000       0x40
+ .debug_ranges  0x00000000       0x40 /tmp/ccSvGQeC.o
+
+.debug_line     0x00000000      0x240
+ .debug_line    0x00000000      0x240 /tmp/ccSvGQeC.o
+
+.debug_str      0x00000000      0x1cf
+ .debug_str     0x00000000      0x1cf /tmp/ccSvGQeC.o
+                                0x214 (size before relaxing)
+
+.comment        0x00000000       0x45
+ .comment       0x00000000       0x45 /tmp/ccSvGQeC.o
+                                 0x46 (size before relaxing)
+
+.ARM.attributes
+                0x00000000       0x2e
+ .ARM.attributes
+                0x00000000       0x2e /tmp/ccSvGQeC.o
+
+.debug_frame    0x00000000       0x60
+ .debug_frame   0x00000000       0x60 /tmp/ccSvGQeC.o

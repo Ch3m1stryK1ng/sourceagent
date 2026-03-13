@@ -265,10 +265,92 @@ Instead, make the output softer by adding side-band fields:
 - `llm_reviewed`
 - `audit_flags[]`
 
+Recommended extension for the current implementation:
+- keep the core verdict classes unchanged
+- add a final risk layer alongside the verdict:
+  - `final_risk_score`
+  - `final_risk_band`
+  - `final_confidence`
+  - `review_priority`
+  - `trigger_summary`
+  - `reason_codes`
+
+This preserves evaluator compatibility while giving downstream review systems a better sorting signal.
+
 Recommended policy:
 - `strict` output remains the canonical evaluator-facing verdict.
 - `soft` output carries richer review material for `BinAgent`.
 - `dual` writes both forms side by side.
+
+## Risk-Layer Reporting
+
+The calibrated risk layer should not stay buried inside per-chain JSON. It should be surfaced in both per-binary and suite-level summaries.
+
+### Per-binary summary
+
+Each binary summary should expose:
+- `final_verdict` distribution
+- `final_risk_band` distribution
+- `review_priority` distribution
+- top risky chains
+- top blockers
+- top reason codes
+- reviewer coverage
+- `semantic_only_applied` count
+
+Suggested outputs:
+- `summary/verdict_risk_summary.json`
+- `summary/verdict_risk_summary.md`
+
+### Suite-level report
+
+The suite report should add:
+- `High-Risk Suspicious Chains`
+- `Confirmed but Medium-Risk Chains`
+- `P0 review targets`
+- `Top reason codes across corpus`
+
+This is the layer that answers:
+- which chains are structurally matched but still worth escalation
+- which suspicious chains are the highest-value follow-up targets
+
+## Review Priority Semantics
+
+`P0/P1/P2` are review-priority labels, not pipeline stages.
+
+- `P0`
+  - highest-value follow-up
+  - typically `SUSPICIOUS + HIGH`, `CONFIRMED + HIGH`, or semantic-only chains blocked by a single structural gap
+- `P1`
+  - medium/high value follow-up
+  - typically `SUSPICIOUS + MEDIUM`
+- `P2`
+  - lower urgency
+  - typically `SAFE_OR_LOW_RISK + LOW`, or chains that remain structurally weak after review
+
+### What "deeper review" means
+
+Deeper review does not mean rebuilding the chain. It means spending more semantic budget on an already assembled chain:
+- more capacity/context evidence
+- helper body inspection
+- second-pass tool-assisted review
+- focused questions such as:
+  - does the visible check truly bind the active root?
+  - is the target object extent sufficient to rule out overflow?
+  - is taint preserved, weakened, or cleansed at a specific hop?
+  - why is the chain still only `SUSPICIOUS`?
+
+### What "manual review" means
+
+Manual review should focus on the minimum high-value set. A reviewer should inspect:
+- `verdict_soft_triage.json`
+- `verdict_calibration_decisions.json`
+- `verdict_review_session.json`
+
+The purpose is to decide:
+- whether a chain deserves stronger escalation
+- whether the reviewer was too conservative
+- whether the reviewer was too aggressive
 
 ## Fail-Closed Policy
 

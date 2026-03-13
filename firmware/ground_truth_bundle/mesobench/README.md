@@ -17,6 +17,8 @@ Current scope:
   examples or negative-control targets
 - `11` uSBS networking samples, anchored to STM32CubeF4 base sources plus uSBS
   overlay artifacts
+- these same `30` samples are the mesobench slice of the current
+  `44`-sample GT-backed baseline
 
 Per-sample GT files contain:
 - sample metadata
@@ -34,6 +36,8 @@ Notes:
   the current research scope; it does not claim perfect whole-program semantic
   completeness
 - use `index.json` to see which samples are primary chain drivers vs controls
+- a stripped-first eval manifest now exists at
+  `firmware/eval_suite/mesobench_stripped_elf_manifest.json`
 
 Build:
 
@@ -53,3 +57,5 @@ Related outputs:
 - `mesobench_inventory.json/csv`: operator-facing sample inventory
 - `global_inventory_patch.json`: entries injected into the global inventory
 - `firmware/eval_suite/mesobench_unstripped_elf_manifest.json`: batch-eval manifest
+- `firmware/eval_suite/mesobench_stripped_elf_manifest.json`: stripped-first batch-eval manifest
+- `firmware/ground_truth_bundle/gt_backed_suite/`: combined `microbench + mesobench` baseline

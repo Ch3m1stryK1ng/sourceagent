@@ -25,6 +25,11 @@ Thumbs.db
 # Local crash / temp
 hs_err_pid*
 *.log
+.tmp_*
+~$*.docx
+
+# Local usage/output scratch
+loot/
 
 # Local analysis/cache artifacts
 pyghidra_mcp_projects/
@@ -34,6 +39,8 @@ pyghidra_mcp_projects/
 firmware/*
 !firmware/microbench/
 !firmware/microbench/**
+!firmware/microbench_autogen/
+!firmware/microbench_autogen/**
 !firmware/ground_truth_bundle/
 firmware/ground_truth_bundle/*
 !firmware/ground_truth_bundle/*.json
@@ -41,6 +48,8 @@ firmware/ground_truth_bundle/*
 !firmware/ground_truth_bundle/*.md
 !firmware/ground_truth_bundle/microbench/
 !firmware/ground_truth_bundle/microbench/**
+!firmware/ground_truth_bundle/microbench_autogen/
+!firmware/ground_truth_bundle/microbench_autogen/**
 !firmware/ground_truth_bundle/mesobench/
 !firmware/ground_truth_bundle/mesobench/**
 !firmware/ground_truth_bundle/gt_backed_suite/
@@ -52,6 +61,8 @@ firmware/ground_truth_bundle/references/*
 !firmware/eval_suite/
 firmware/eval_suite/*
 !firmware/eval_suite/*manifest.json
+!firmware/eval_suite/sample_catalog.json
+!firmware/eval_suite/sample_catalog.csv
 
 # Ignore nested Git metadata if any path gets included
 **/.git

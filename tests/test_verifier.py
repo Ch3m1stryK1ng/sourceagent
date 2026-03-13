@@ -439,6 +439,24 @@ def test_copy_args_check_passes():
     assert ob2.status == ObligationStatus.SATISFIED
 
 
+def test_copy_loop_fallback_checks_pass_without_named_callee():
+    """Stripped loop-copy facts should satisfy O_COPY_1/O_COPY_2 via fallback."""
+    proposal = _make_proposal("COPY_SINK", addr=0x08001234, func="FUN_08001234", facts={
+        "promoted_from": "LOOP_WRITE_SINK",
+        "in_loop": True,
+        "store_expr": "param_1[i]",
+        "src_expr": "param_2[i]",
+        "loop_bound": "param_3",
+        "len_expr": "param_3",
+    })
+    obligations = _generate_obligations(proposal)
+    _check_obligations(obligations, proposal)
+
+    ob_map = {o.obligation_id: o for o in obligations}
+    assert ob_map["O_COPY_1"].status == ObligationStatus.SATISFIED
+    assert ob_map["O_COPY_2"].status == ObligationStatus.SATISFIED
+
+
 def test_copy_no_guard_check_satisfied():
     """Variable-length + no guard → O_COPY_3 satisfied (strengthening)."""
     proposal = _make_proposal("COPY_SINK", addr=0x08001234, func="handler", facts={
@@ -493,3 +511,22 @@ async def test_verify_copy_sink_no_callee_rejected():
 
     assert len(results) == 1
     assert results[0].verdict == VerificationVerdict.REJECTED
+
+
+@pytest.mark.asyncio
+async def test_verify_copy_sink_loop_fallback_verified():
+    """Stripped loop-copy fallback should survive verifier into COPY_SINK."""
+    proposal = _make_proposal("COPY_SINK", addr=0x08001234, func="FUN_08001234", facts={
+        "promoted_from": "LOOP_WRITE_SINK",
+        "in_loop": True,
+        "store_expr": "param_1[i]",
+        "dst_expr": "param_1[i]",
+        "src_expr": "param_2[i]",
+        "loop_bound": "param_3",
+        "len_expr": "param_3",
+    })
+    results = await verify_proposals([proposal])
+
+    assert len(results) == 1
+    assert results[0].verdict == VerificationVerdict.VERIFIED
+    assert results[0].final_label == "COPY_SINK"

@@ -1059,6 +1059,23 @@ def parse_loop_writes(code: str, function_name: str) -> List[SinkCandidate]:
         if _is_copy_idiom(body_lines):
             label = SinkLabel.COPY_SINK
             facts["promoted_from"] = "LOOP_WRITE_SINK"
+            facts["callee"] = "loop_copy_idiom"
+            facts["call_found"] = True
+            facts["copy_like_loop"] = True
+            if bound_info:
+                facts["len_expr"] = bound_info["bound"]
+            elif index_expr:
+                facts["len_expr"] = index_expr
+            facts["dst_expr"] = store_expr
+            copy_operands = _extract_loop_copy_operands(body_lines)
+            if copy_operands.get("src_expr"):
+                facts["src_expr"] = copy_operands["src_expr"]
+            if copy_operands.get("copy_line"):
+                evidence.append(EvidenceItem(
+                    evidence_id="E4",
+                    kind="DEF",
+                    text=f"copy-like loop idiom: {copy_operands['copy_line']}",
+                ))
             confidence = max(confidence, 0.50)
         else:
             lowered = function_name.lower()
@@ -1129,6 +1146,18 @@ def _fallback_loop_candidate(
     if _is_copy_idiom(lines):
         label = SinkLabel.COPY_SINK
         facts["promoted_from"] = "LOOP_WRITE_SINK"
+        facts["callee"] = "loop_copy_idiom"
+        facts["call_found"] = True
+        facts["copy_like_loop"] = True
+        facts["dst_expr"] = f"{target}[i]"
+        copy_operands = _extract_loop_copy_operands(lines)
+        if copy_operands.get("src_expr"):
+            facts["src_expr"] = copy_operands["src_expr"]
+        loop_bound = _extract_first_loop_bound(lines)
+        if loop_bound:
+            facts["loop_bound"] = loop_bound["bound"]
+            facts["bound_is_constant"] = loop_bound["is_constant"]
+            facts["len_expr"] = loop_bound["bound"]
         confidence = 0.50
 
     return SinkCandidate(
@@ -1169,6 +1198,60 @@ def _looks_bounded_string_reader(code: str) -> bool:
         or bool(re.search(r'==\s*(?:\'\\0\'|0)', code))
     )
     return has_minus_one_bound and has_terminator_write and has_string_stop
+
+
+def _extract_loop_copy_operands(body_lines: List[str]) -> Dict[str, str]:
+    """Recover dst/src expressions from a copy-like loop body."""
+    for i, line in enumerate(body_lines):
+        if i == 0:
+            continue
+        stripped = line.strip()
+
+        m = re.search(
+            r'(?P<dst>\w+\s*\[[^]]+\])\s*=\s*(?P<src>\w+\s*\[[^]]+\])',
+            stripped,
+        )
+        if m:
+            return {
+                "dst_expr": m.group("dst").strip(),
+                "src_expr": m.group("src").strip(),
+                "copy_line": stripped,
+            }
+
+        m = re.search(
+            r'(?P<dst>\*\s*\(\s*\w+\s*\+\s*[^)]+\))\s*=\s*(?P<src>\*\s*\(\s*\w+\s*\+\s*[^)]+\))',
+            stripped,
+        )
+        if m:
+            return {
+                "dst_expr": m.group("dst").strip(),
+                "src_expr": m.group("src").strip(),
+                "copy_line": stripped,
+            }
+
+        m = re.search(
+            r'(?P<dst>\*\s*\w+\s*(?:\+\+)?)\s*=\s*(?P<src>\*\s*\w+\s*(?:\+\+)?)',
+            stripped,
+        )
+        if m:
+            return {
+                "dst_expr": m.group("dst").strip(),
+                "src_expr": m.group("src").strip(),
+                "copy_line": stripped,
+            }
+
+    return {}
+
+
+def _extract_first_loop_bound(lines: List[str]) -> Optional[Dict[str, Any]]:
+    """Recover the first loop bound visible in a decompiled function."""
+    for line in lines:
+        stripped = line.strip()
+        if re.match(r'\b(for|while)\s*\(', stripped):
+            bound = _extract_loop_bound(stripped)
+            if bound:
+                return bound
+    return None
 
 
 def _find_loop_store(body_lines: List[str]) -> Optional[Tuple[int, str, str]]:

@@ -176,6 +176,78 @@ When a review suggestion is rejected by fail-closed checks, SourceAgent should s
 
 The rejection should only block application, not erase the semantic review.
 
+## 6.5 Risk Layer and Reporting
+
+The reviewer output is no longer only a verdict suggestion. It also feeds a final risk layer:
+
+- `final_risk_score`
+- `final_risk_band`
+- `final_confidence`
+- `review_priority`
+
+This layer does not replace `final_verdict`. It complements it.
+
+- `final_verdict` = evidence state
+- `final_risk_band` = risk intensity
+- `review_priority` = follow-up urgency
+
+This separation is important because:
+- a chain may remain `SUSPICIOUS` while still being `HIGH` risk
+- a chain may be `CONFIRMED` while only `MEDIUM` risk
+
+### Summary/report expectations
+
+The reviewer framework should surface this risk layer into:
+
+- per-binary summary:
+  - `verdict_risk_summary.json`
+  - `verdict_risk_summary.md`
+- suite-level reporting:
+  - high-risk suspicious chains
+  - P0 review targets
+  - top reason-code families
+
+## 6.6 P0/P1/P2 Follow-up Semantics
+
+`P0/P1/P2` are review-priority labels, not pipeline stages.
+
+- `P0`
+  - highest-value chains for deeper reviewer analysis or manual follow-up
+  - examples:
+    - `SUSPICIOUS + HIGH`
+    - `CONFIRMED + HIGH`
+    - semantic-only chains blocked by a single structural gap
+- `P1`
+  - medium/high value
+  - usually `SUSPICIOUS + MEDIUM`
+- `P2`
+  - lower urgency
+  - usually `SAFE_OR_LOW_RISK + LOW`
+
+### What deeper review means
+
+Deeper review should stay bounded and chain-centric:
+- give more capacity/context evidence
+- inspect more helper bodies
+- run second-pass tool-assisted review
+- ask targeted questions:
+  - does the check truly bind the active root?
+  - is the destination extent known strongly enough?
+  - is taint preserved, weakened, or cleansed at a specific hop?
+  - why is this chain still only `SUSPICIOUS`?
+
+### What manual review means
+
+Manual review should focus on the smallest high-value set, using:
+- `verdict_soft_triage.json`
+- `verdict_calibration_decisions.json`
+- `verdict_review_session.json`
+
+The goal is not to rebuild the chain, but to decide whether:
+- the chain deserves stronger escalation
+- the reviewer is too conservative
+- the reviewer is too aggressive
+
 ## 7. Detailed P1 Plan: Reviewer Schema v0.2
 
 ### Goal

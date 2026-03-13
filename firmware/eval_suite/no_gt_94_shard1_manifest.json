@@ -1,0 +1,436 @@
+{
+  "name": "no_gt_94_shard1",
+  "created_at": "2026-03-12T08:18:50+00:00",
+  "parent_manifest": "firmware/eval_suite/no_gt_94_manifest.json",
+  "count": 47,
+  "by_dataset": {
+    "monolithic-firmware-collection": 18,
+    "p2im-unit_tests": 24,
+    "uSBS": 5
+  },
+  "samples": [
+    {
+      "dataset": "monolithic-firmware-collection",
+      "sample_id": "monolithic_firmware_collection_armcortex_m_atmel_6lowpan_udp_tx_atmel_6lowpan_udp_tx",
+      "output_stem": "monolithic_firmware_collection_armcortex_m_atmel_6lowpan_udp_tx_atmel_6lowpan_udp_tx",
+      "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/atmel_6lowpan_udp_tx/atmel_6lowpan_udp_tx.elf",
+      "relative_binary_path": "monolithic-firmware-collection/ARMCortex-M/atmel_6lowpan_udp_tx/atmel_6lowpan_udp_tx.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "monolithic-firmware-collection",
+      "sample_id": "monolithic_firmware_collection_armcortex_m_blink_led_nucleo_blink_led",
+      "output_stem": "monolithic_firmware_collection_armcortex_m_blink_led_nucleo_blink_led",
+      "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/blink_led/Nucleo_blink_led.elf",
+      "relative_binary_path": "monolithic-firmware-collection/ARMCortex-M/blink_led/Nucleo_blink_led.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "monolithic-firmware-collection",
+      "sample_id": "monolithic_firmware_collection_armcortex_m_csaw_esc19_csb_csaw_esc19_csb",
+      "output_stem": "monolithic_firmware_collection_armcortex_m_csaw_esc19_csb_csaw_esc19_csb",
+      "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/csaw_esc19_csb/csaw_esc19_csb.elf",
+      "relative_binary_path": "monolithic-firmware-collection/ARMCortex-M/csaw_esc19_csb/csaw_esc19_csb.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "monolithic-firmware-collection",
+      "sample_id": "monolithic_firmware_collection_armcortex_m_csaw_esc19_csd_csaw_esc19_csd",
+      "output_stem": "monolithic_firmware_collection_armcortex_m_csaw_esc19_csd_csaw_esc19_csd",
+      "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/csaw_esc19_csd/csaw_esc19_csd.elf",
+      "relative_binary_path": "monolithic-firmware-collection/ARMCortex-M/csaw_esc19_csd/csaw_esc19_csd.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "monolithic-firmware-collection",
+      "sample_id": "monolithic_firmware_collection_armcortex_m_csaw_esc19_csf_csaw_esc19_csf",
+      "output_stem": "monolithic_firmware_collection_armcortex_m_csaw_esc19_csf_csaw_esc19_csf",
+      "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/csaw_esc19_csf/csaw_esc19_csf.elf",
+      "relative_binary_path": "monolithic-firmware-collection/ARMCortex-M/csaw_esc19_csf/csaw_esc19_csf.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "monolithic-firmware-collection",
+      "sample_id": "monolithic_firmware_collection_armcortex_m_d_fuzzware_pw_discovery_efm32gg_stk3700_basic_exercises",
+      "output_stem": "monolithic_firmware_collection_armcortex_m_d_fuzzware_pw_discovery_efm32gg_stk3700_basic_exercises",
+      "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/pw-discovery/EFM32GG_STK3700/basic_exercises.elf",
+      "relative_binary_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/pw-discovery/EFM32GG_STK3700/basic_exercises.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "monolithic-firmware-collection",
+      "sample_id": "monolithic_firmware_collection_armcortex_m_d_fuzzware_pw_discovery_lpc1549_basic_exercises",
+      "output_stem": "monolithic_firmware_collection_armcortex_m_d_fuzzware_pw_discovery_lpc1549_basic_exercises",
+      "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/pw-discovery/LPC1549/basic_exercises.elf",
+      "relative_binary_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/pw-discovery/LPC1549/basic_exercises.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "monolithic-firmware-collection",
+      "sample_id": "monolithic_firmware_collection_armcortex_m_d_fuzzware_pw_discovery_mote_l152rc_basic_exercises",
+      "output_stem": "monolithic_firmware_collection_armcortex_m_d_fuzzware_pw_discovery_mote_l152rc_basic_exercises",
+      "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/pw-discovery/MOTE_L152RC/basic_exercises.elf",
+      "relative_binary_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/pw-discovery/MOTE_L152RC/basic_exercises.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "monolithic-firmware-collection",
+      "sample_id": "monolithic_firmware_collection_armcortex_m_d_fuzzware_pw_discovery_nucleo_f207zg_basic_exercises",
+      "output_stem": "monolithic_firmware_collection_armcortex_m_d_fuzzware_pw_discovery_nucleo_f207zg_basic_exercises",
+      "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/pw-discovery/NUCLEO_F207ZG/basic_exercises.elf",
+      "relative_binary_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/pw-discovery/NUCLEO_F207ZG/basic_exercises.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "monolithic-firmware-collection",
+      "sample_id": "monolithic_firmware_collection_armcortex_m_d_fuzzware_pw_discovery_ublox_c027_basic_exercises",
+      "output_stem": "monolithic_firmware_collection_armcortex_m_d_fuzzware_pw_discovery_ublox_c027_basic_exercises",
+      "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/pw-discovery/UBLOX_C027/basic_exercises.elf",
+      "relative_binary_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/pw-discovery/UBLOX_C027/basic_exercises.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "monolithic-firmware-collection",
+      "sample_id": "monolithic_firmware_collection_armcortex_m_nucleo_blink_led_nucleo_blink_led",
+      "output_stem": "monolithic_firmware_collection_armcortex_m_nucleo_blink_led_nucleo_blink_led",
+      "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/nucleo_blink_led/Nucleo_blink_led.elf",
+      "relative_binary_path": "monolithic-firmware-collection/ARMCortex-M/nucleo_blink_led/Nucleo_blink_led.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "monolithic-firmware-collection",
+      "sample_id": "monolithic_firmware_collection_armcortex_m_nxp_lwip_http_nxp_lwip_http",
+      "output_stem": "monolithic_firmware_collection_armcortex_m_nxp_lwip_http_nxp_lwip_http",
+      "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/nxp_lwip_http/nxp_lwip_http.elf",
+      "relative_binary_path": "monolithic-firmware-collection/ARMCortex-M/nxp_lwip_http/nxp_lwip_http.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "monolithic-firmware-collection",
+      "sample_id": "monolithic_firmware_collection_armcortex_m_nxp_lwip_udpecho_nxp_lwip_udpecho",
+      "output_stem": "monolithic_firmware_collection_armcortex_m_nxp_lwip_udpecho_nxp_lwip_udpecho",
+      "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/nxp_lwip_udpecho/nxp_lwip_udpecho.elf",
+      "relative_binary_path": "monolithic-firmware-collection/ARMCortex-M/nxp_lwip_udpecho/nxp_lwip_udpecho.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "monolithic-firmware-collection",
+      "sample_id": "monolithic_firmware_collection_armcortex_m_p2im_car_controller_p2im_car_controller",
+      "output_stem": "monolithic_firmware_collection_armcortex_m_p2im_car_controller_p2im_car_controller",
+      "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/p2im_car_controller/p2im_car_controller.elf",
+      "relative_binary_path": "monolithic-firmware-collection/ARMCortex-M/p2im_car_controller/p2im_car_controller.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "monolithic-firmware-collection",
+      "sample_id": "monolithic_firmware_collection_armcortex_m_p2im_controllino_p2im_controllino",
+      "output_stem": "monolithic_firmware_collection_armcortex_m_p2im_controllino_p2im_controllino",
+      "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/p2im_controllino/p2im_controllino.elf",
+      "relative_binary_path": "monolithic-firmware-collection/ARMCortex-M/p2im_controllino/p2im_controllino.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "monolithic-firmware-collection",
+      "sample_id": "monolithic_firmware_collection_armcortex_m_p2im_drone_p2im_drone",
+      "output_stem": "monolithic_firmware_collection_armcortex_m_p2im_drone_p2im_drone",
+      "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/p2im_drone/p2im_drone.elf",
+      "relative_binary_path": "monolithic-firmware-collection/ARMCortex-M/p2im_drone/p2im_drone.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "monolithic-firmware-collection",
+      "sample_id": "monolithic_firmware_collection_armcortex_m_rf_door_lock_rf_door_lock",
+      "output_stem": "monolithic_firmware_collection_armcortex_m_rf_door_lock_rf_door_lock",
+      "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/rf_door_lock/rf_door_lock.elf",
+      "relative_binary_path": "monolithic-firmware-collection/ARMCortex-M/rf_door_lock/rf_door_lock.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "monolithic-firmware-collection",
+      "sample_id": "monolithic_firmware_collection_armcortex_m_st_plc_st_plc",
+      "output_stem": "monolithic_firmware_collection_armcortex_m_st_plc_st_plc",
+      "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/st-plc/st-plc.elf",
+      "relative_binary_path": "monolithic-firmware-collection/ARMCortex-M/st-plc/st-plc.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "p2im_unit_tests_arduino_adc_arduino_f103_adc",
+      "output_stem": "p2im_unit_tests_arduino_adc_arduino_f103_adc",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/Arduino/ADC/ARDUINO-F103-ADC.elf",
+      "relative_binary_path": "p2im-unit_tests/Arduino/ADC/ARDUINO-F103-ADC.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "p2im_unit_tests_arduino_dac_arduino_sam3_dac",
+      "output_stem": "p2im_unit_tests_arduino_dac_arduino_sam3_dac",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/Arduino/DAC/ARDUINO-SAM3-DAC.elf",
+      "relative_binary_path": "p2im-unit_tests/Arduino/DAC/ARDUINO-SAM3-DAC.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "p2im_unit_tests_arduino_gpio_arduino_sam3_gpio",
+      "output_stem": "p2im_unit_tests_arduino_gpio_arduino_sam3_gpio",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/Arduino/GPIO/ARDUINO-SAM3-GPIO.elf",
+      "relative_binary_path": "p2im-unit_tests/Arduino/GPIO/ARDUINO-SAM3-GPIO.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "p2im_unit_tests_arduino_gpio_int_arduino_sam3_gpio_int",
+      "output_stem": "p2im_unit_tests_arduino_gpio_int_arduino_sam3_gpio_int",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/Arduino/GPIO_INT/ARDUINO-SAM3-GPIO_INT.elf",
+      "relative_binary_path": "p2im-unit_tests/Arduino/GPIO_INT/ARDUINO-SAM3-GPIO_INT.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "p2im_unit_tests_arduino_i2c_arduino_sam3_i2c",
+      "output_stem": "p2im_unit_tests_arduino_i2c_arduino_sam3_i2c",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/Arduino/I2C/ARDUINO-SAM3-I2C.elf",
+      "relative_binary_path": "p2im-unit_tests/Arduino/I2C/ARDUINO-SAM3-I2C.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "p2im_unit_tests_arduino_pwm_arduino_sam3_pwm",
+      "output_stem": "p2im_unit_tests_arduino_pwm_arduino_sam3_pwm",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/Arduino/PWM/ARDUINO-SAM3-PWM.elf",
+      "relative_binary_path": "p2im-unit_tests/Arduino/PWM/ARDUINO-SAM3-PWM.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "p2im_unit_tests_arduino_spi_arduino_sam3_spi",
+      "output_stem": "p2im_unit_tests_arduino_spi_arduino_sam3_spi",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/Arduino/SPI/ARDUINO-SAM3-SPI.elf",
+      "relative_binary_path": "p2im-unit_tests/Arduino/SPI/ARDUINO-SAM3-SPI.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "p2im_unit_tests_arduino_usart_arduino_sam3_serial",
+      "output_stem": "p2im_unit_tests_arduino_usart_arduino_sam3_serial",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/Arduino/USART/ARDUINO-SAM3-Serial.elf",
+      "relative_binary_path": "p2im-unit_tests/Arduino/USART/ARDUINO-SAM3-Serial.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "p2im_unit_tests_nuttx_gpio_f103_nuttx_gpio",
+      "output_stem": "p2im_unit_tests_nuttx_gpio_f103_nuttx_gpio",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/NUTTX/GPIO/F103-NUTTX-GPIO.elf",
+      "relative_binary_path": "p2im-unit_tests/NUTTX/GPIO/F103-NUTTX-GPIO.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "p2im_unit_tests_nuttx_i2c_f103_nuttx_i2c",
+      "output_stem": "p2im_unit_tests_nuttx_i2c_f103_nuttx_i2c",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/NUTTX/I2C/F103-NUTTX-I2C.elf",
+      "relative_binary_path": "p2im-unit_tests/NUTTX/I2C/F103-NUTTX-I2C.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "p2im_unit_tests_nuttx_spi_f103_nuttx_spi",
+      "output_stem": "p2im_unit_tests_nuttx_spi_f103_nuttx_spi",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/NUTTX/SPI/F103-NUTTX-SPI.elf",
+      "relative_binary_path": "p2im-unit_tests/NUTTX/SPI/F103-NUTTX-SPI.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "p2im_unit_tests_riot_adc_k64f_riot_adc",
+      "output_stem": "p2im_unit_tests_riot_adc_k64f_riot_adc",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/RIOT/ADC/K64F-RIOT-ADC.elf",
+      "relative_binary_path": "p2im-unit_tests/RIOT/ADC/K64F-RIOT-ADC.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "p2im_unit_tests_riot_dac_sam3_riot_dac",
+      "output_stem": "p2im_unit_tests_riot_dac_sam3_riot_dac",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/RIOT/DAC/SAM3-RIOT-DAC.elf",
+      "relative_binary_path": "p2im-unit_tests/RIOT/DAC/SAM3-RIOT-DAC.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "p2im_unit_tests_riot_gpio_int_f103_riot_gpio_int",
+      "output_stem": "p2im_unit_tests_riot_gpio_int_f103_riot_gpio_int",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/RIOT/GPIO_INT/F103-RIOT-GPIO_INT.elf",
+      "relative_binary_path": "p2im-unit_tests/RIOT/GPIO_INT/F103-RIOT-GPIO_INT.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "p2im_unit_tests_riot_gpio_int_sam3_riot_gpio_int",
+      "output_stem": "p2im_unit_tests_riot_gpio_int_sam3_riot_gpio_int",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/RIOT/GPIO_INT/SAM3-RIOT-GPIO_INT.elf",
+      "relative_binary_path": "p2im-unit_tests/RIOT/GPIO_INT/SAM3-RIOT-GPIO_INT.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "p2im_unit_tests_riot_gpio_sam3_riot_gpio",
+      "output_stem": "p2im_unit_tests_riot_gpio_sam3_riot_gpio",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/RIOT/GPIO/SAM3-RIOT-GPIO.elf",
+      "relative_binary_path": "p2im-unit_tests/RIOT/GPIO/SAM3-RIOT-GPIO.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "p2im_unit_tests_riot_i2c_k64f_riot_i2c",
+      "output_stem": "p2im_unit_tests_riot_i2c_k64f_riot_i2c",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/RIOT/I2C/K64F-RIOT-I2C.elf",
+      "relative_binary_path": "p2im-unit_tests/RIOT/I2C/K64F-RIOT-I2C.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "p2im_unit_tests_riot_pwm_sam3_riot_pwm",
+      "output_stem": "p2im_unit_tests_riot_pwm_sam3_riot_pwm",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/RIOT/PWM/SAM3-RIOT-PWM.elf",
+      "relative_binary_path": "p2im-unit_tests/RIOT/PWM/SAM3-RIOT-PWM.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "p2im_unit_tests_riot_spi_k64f_riot_spi",
+      "output_stem": "p2im_unit_tests_riot_spi_k64f_riot_spi",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/RIOT/SPI/K64F-RIOT-SPI.elf",
+      "relative_binary_path": "p2im-unit_tests/RIOT/SPI/K64F-RIOT-SPI.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "p2im_unit_tests_riot_timer_f103_riot_timer",
+      "output_stem": "p2im_unit_tests_riot_timer_f103_riot_timer",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/RIOT/TIMER/F103-RIOT-TIMER.elf",
+      "relative_binary_path": "p2im-unit_tests/RIOT/TIMER/F103-RIOT-TIMER.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "p2im_unit_tests_riot_timer_sam3_riot_timer",
+      "output_stem": "p2im_unit_tests_riot_timer_sam3_riot_timer",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/RIOT/TIMER/SAM3-RIOT-TIMER.elf",
+      "relative_binary_path": "p2im-unit_tests/RIOT/TIMER/SAM3-RIOT-TIMER.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "p2im_unit_tests_riot_usart_f103_riot_usart_read",
+      "output_stem": "p2im_unit_tests_riot_usart_f103_riot_usart_read",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/RIOT/USART/F103-RIOT-USART-Read.elf",
+      "relative_binary_path": "p2im-unit_tests/RIOT/USART/F103-RIOT-USART-Read.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "p2im_unit_tests_riot_usart_k64f_riot_usart_read",
+      "output_stem": "p2im_unit_tests_riot_usart_k64f_riot_usart_read",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/RIOT/USART/K64F-RIOT-USART-Read.elf",
+      "relative_binary_path": "p2im-unit_tests/RIOT/USART/K64F-RIOT-USART-Read.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "p2im-unit_tests",
+      "sample_id": "p2im_unit_tests_riot_usart_sam3_riot_usart_read",
+      "output_stem": "p2im_unit_tests_riot_usart_sam3_riot_usart_read",
+      "binary_path": "/home/a347908610/sourceagent/firmware/p2im-unit_tests/RIOT/USART/SAM3-RIOT-USART-Read.elf",
+      "relative_binary_path": "p2im-unit_tests/RIOT/USART/SAM3-RIOT-USART-Read.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "uSBS",
+      "sample_id": "usbs_ground_truth_benchmark_fw_tcp_echo_client_vuln_off_by_one_crashes_always_stm32469i_eval_tcp_echo_base",
+      "output_stem": "usbs_ground_truth_benchmark_fw_tcp_echo_client_vuln_off_by_one_crashes_always_stm32469i_eval_tcp_echo_base",
+      "binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one/crashes_always/STM32469I_EVAL_tcp_echo_base.elf",
+      "relative_binary_path": "uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one/crashes_always/STM32469I_EVAL_tcp_echo_base.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "uSBS",
+      "sample_id": "usbs_ground_truth_benchmark_fw_udp_echo_server_bof_expl_patched_instrumented_patched_stm32469i_eval_stm32_udp_echo_server",
+      "output_stem": "usbs_ground_truth_benchmark_fw_udp_echo_server_bof_expl_patched_instrumented_patched_stm32469i_eval_stm32_udp_echo_server",
+      "binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_expl_patched_instrumented_patched/STM32469I_EVAL_stm32_udp_echo_server.elf",
+      "relative_binary_path": "uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_expl_patched_instrumented_patched/STM32469I_EVAL_stm32_udp_echo_server.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "uSBS",
+      "sample_id": "usbs_ground_truth_benchmark_fw_udp_echo_server_bof_expl_patched_stm32469i_eval_stm32_udp_echo_server",
+      "output_stem": "usbs_ground_truth_benchmark_fw_udp_echo_server_bof_expl_patched_stm32469i_eval_stm32_udp_echo_server",
+      "binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_expl_patched/STM32469I_EVAL_stm32_udp_echo_server.elf",
+      "relative_binary_path": "uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_expl_patched/STM32469I_EVAL_stm32_udp_echo_server.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "uSBS",
+      "sample_id": "usbs_ground_truth_benchmark_fw_udp_echo_server_off_by_one_other_versions_crash_if_payload_starts_with_p_stm32469i_eval_stm32_udp_echo_server",
+      "output_stem": "usbs_ground_truth_benchmark_fw_udp_echo_server_off_by_one_other_versions_crash_if_payload_starts_with_p_stm32469i_eval_stm32_udp_echo_server",
+      "binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_off_by_one/other_versions/crash_if_payload_starts_with_p/STM32469I_EVAL_stm32_udp_echo_server.elf",
+      "relative_binary_path": "uSBS/Ground-truth Benchmark/fw/udp_echo_server_off_by_one/other_versions/crash_if_payload_starts_with_p/STM32469I_EVAL_stm32_udp_echo_server.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    },
+    {
+      "dataset": "uSBS",
+      "sample_id": "usbs_ground_truth_benchmark_fw_udp_echo_server_uaf_stm32469i_eval_stm32_udp_echo_server",
+      "output_stem": "usbs_ground_truth_benchmark_fw_udp_echo_server_uaf_stm32469i_eval_stm32_udp_echo_server",
+      "binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_uaf/STM32469I_EVAL_stm32_udp_echo_server.elf",
+      "relative_binary_path": "uSBS/Ground-truth Benchmark/fw/udp_echo_server_uaf/STM32469I_EVAL_stm32_udp_echo_server.elf",
+      "has_gt": false,
+      "notes": "no_gt_canonical_20260309"
+    }
+  ]
+}

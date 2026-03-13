@@ -1,0 +1,144 @@
+
+Discarded input sections
+
+ .text          0x00000000        0x0 /tmp/ccDjTBPD.o
+ .data          0x00000000        0x0 /tmp/ccDjTBPD.o
+ .bss           0x00000000        0x0 /tmp/ccDjTBPD.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+FLASH            0x08000000         0x00010000         xr
+RAM              0x20000000         0x00005000         xrw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD /tmp/ccDjTBPD.o
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m/nofp/libgcc.a
+START GROUP
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m/nofp/libgcc.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libg_nano.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a
+END GROUP
+START GROUP
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m/nofp/libgcc.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libnosys.a
+END GROUP
+START GROUP
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m/nofp/libgcc.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libnosys.a
+END GROUP
+                0x20005000                        _estack = (ORIGIN (RAM) + LENGTH (RAM))
+
+.isr_vector     0x08000000       0x40
+ *(.isr_vector)
+ .isr_vector    0x08000000       0x40 /tmp/ccDjTBPD.o
+                0x08000000                vector_table
+
+.text           0x08000040       0x78
+ *(.text*)
+ .text.Default_Handler
+                0x08000040        0x2 /tmp/ccDjTBPD.o
+                0x08000040                Default_Handler
+ *fill*         0x08000042        0x2 
+ .text.cmd_0    0x08000044       0x10 /tmp/ccDjTBPD.o
+ .text.cmd_1    0x08000054       0x10 /tmp/ccDjTBPD.o
+ .text.dispatch_command
+                0x08000064       0x14 /tmp/ccDjTBPD.o
+                0x08000064                dispatch_command
+ .text.dispatch_wrapper_1
+                0x08000078        0x8 /tmp/ccDjTBPD.o
+ .text.dispatch_wrapper_2
+                0x08000080        0x8 /tmp/ccDjTBPD.o
+ .text.main     0x08000088       0x20 /tmp/ccDjTBPD.o
+                0x08000088                main
+ .text.Reset_Handler
+                0x080000a8        0x8 /tmp/ccDjTBPD.o
+                0x080000a8                Reset_Handler
+ *(.rodata*)
+ .rodata.cmd_table
+                0x080000b0        0x8 /tmp/ccDjTBPD.o
+
+.glue_7         0x080000b8        0x0
+ .glue_7        0x080000b8        0x0 linker stubs
+
+.glue_7t        0x080000b8        0x0
+ .glue_7t       0x080000b8        0x0 linker stubs
+
+.vfp11_veneer   0x080000b8        0x0
+ .vfp11_veneer  0x080000b8        0x0 linker stubs
+
+.v4_bx          0x080000b8        0x0
+ .v4_bx         0x080000b8        0x0 linker stubs
+
+.iplt           0x080000b8        0x0
+ .iplt          0x080000b8        0x0 /tmp/ccDjTBPD.o
+
+.rel.dyn        0x080000b8        0x0
+ .rel.iplt      0x080000b8        0x0 /tmp/ccDjTBPD.o
+
+.ARM.extab
+ *(.ARM.extab*)
+
+.ARM.exidx
+ *(.ARM.exidx*)
+                0x080000b8                        _sidata = .
+
+.data           0x20000000        0x0 load address 0x080000b8
+                0x20000000                        _sdata = .
+ *(.data*)
+                0x20000000                        _edata = .
+
+.igot.plt       0x20000000        0x0
+ .igot.plt      0x20000000        0x0 /tmp/ccDjTBPD.o
+
+.bss            0x20000000        0x4
+                0x20000000                        _sbss = .
+ *(.bss*)
+ .bss.g_state   0x20000000        0x4 /tmp/ccDjTBPD.o
+ *(COMMON)
+                0x20000004                        _ebss = .
+                0x20005000                        PROVIDE (__stack_top__ = _estack)
+                [!provide]                        PROVIDE (end = _ebss)
+                [!provide]                        PROVIDE (_end = _ebss)
+OUTPUT(/home/a347908610/sourceagent/firmware/microbench_autogen/funcptr_variant_12.elf elf32-littlearm)
+LOAD linker stubs
+
+.debug_info     0x00000000      0x2a9
+ .debug_info    0x00000000      0x2a9 /tmp/ccDjTBPD.o
+
+.debug_abbrev   0x00000000      0x1bf
+ .debug_abbrev  0x00000000      0x1bf /tmp/ccDjTBPD.o
+
+.debug_loc      0x00000000       0xbd
+ .debug_loc     0x00000000       0xbd /tmp/ccDjTBPD.o
+
+.debug_aranges  0x00000000       0x58
+ .debug_aranges
+                0x00000000       0x58 /tmp/ccDjTBPD.o
+
+.debug_ranges   0x00000000       0x48
+ .debug_ranges  0x00000000       0x48 /tmp/ccDjTBPD.o
+
+.debug_line     0x00000000      0x282
+ .debug_line    0x00000000      0x282 /tmp/ccDjTBPD.o
+
+.debug_str      0x00000000      0x22b
+ .debug_str     0x00000000      0x22b /tmp/ccDjTBPD.o
+                                0x270 (size before relaxing)
+
+.comment        0x00000000       0x45
+ .comment       0x00000000       0x45 /tmp/ccDjTBPD.o
+                                 0x46 (size before relaxing)
+
+.ARM.attributes
+                0x00000000       0x2e
+ .ARM.attributes
+                0x00000000       0x2e /tmp/ccDjTBPD.o
+
+.debug_frame    0x00000000       0xb8
+ .debug_frame   0x00000000       0xb8 /tmp/ccDjTBPD.o

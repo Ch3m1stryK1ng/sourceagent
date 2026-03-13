@@ -929,6 +929,47 @@ async def test_strategy4_heuristic_adds_missing_type():
 
 
 @pytest.mark.asyncio
+async def test_strategy4_heuristic_scans_beyond_first_50_fun_symbols():
+    """Stripped fallback should keep scanning until later FUN_ candidates."""
+    mcp = QueryMatchMCPManager()
+    for name in COPY_FUNCTION_NAMES:
+        mcp.add_query_response(name, [])
+    for q in ("cpy", "mov", "cat", "printf", "memset"):
+        mcp.add_query_response(q, [])
+    for intr in ("__aeabi_memcpy", "__aeabi_memcpy4", "__aeabi_memcpy8",
+                  "__aeabi_memmove", "__aeabi_memmove4", "__aeabi_memmove8",
+                  "__aeabi_memset", "__aeabi_memset4", "__aeabi_memset8",
+                  "__rt_memcpy", "__rt_memmove", "__rt_memset",
+                  "__memcpy_r4", "__memcpy_r7"):
+        mcp.add_query_response(intr, [])
+
+    fun_symbols = [
+        {"name": f"FUN_0800{i:04x}", "address": f"0800{i:04x}", "type": "Function"}
+        for i in range(60)
+    ]
+    target_symbol = fun_symbols[55]
+    mcp.add_query_response("FUN_", fun_symbols)
+
+    async def extended_call(server, tool_name, args):
+        if tool_name == "decompile_function":
+            name = args.get("name_or_address")
+            code = "void dummy(void) { return; }"
+            if name == target_symbol["name"]:
+                code = (
+                    "void FUN_08000037(char *param_1,char *param_2){"
+                    "while(*param_2!=0){*param_1=*param_2;param_1++;param_2++;}"
+                    "*param_1=0;}"
+                )
+            return [{"type": "text", "text": json.dumps({"decompiled_code": code})}]
+        return await QueryMatchMCPManager.call_tool(mcp, server, tool_name, args)
+
+    mcp.call_tool = extended_call
+
+    found = await _find_copy_symbols(mcp, "test-abc123")
+    assert any(row["name"] == "strcpy" for row in found)
+
+
+@pytest.mark.asyncio
 async def test_strategy2_substring_fallback():
     """When Strategy 1 finds nothing, Strategy 2 substring search finds variants."""
     mcp = QueryMatchMCPManager()

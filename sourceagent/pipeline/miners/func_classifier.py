@@ -94,7 +94,7 @@ async def identify_library_functions(
     mcp_manager: object,
     binary_name: str,
     target_types: Set[str],
-    max_candidates: int = 50,
+    max_candidates: int = 120,
 ) -> List[Dict[str, Any]]:
     """Identify library functions by decompiled code patterns.
 
@@ -114,7 +114,7 @@ async def identify_library_functions(
     resp = await _call_mcp_json(mcp_manager, "search_symbols_by_name", {
         "binary_name": binary_name,
         "query": "FUN_",
-        "limit": 200,
+        "limit": max(200, max_candidates * 2),
     })
 
     if resp is None:
@@ -145,7 +145,7 @@ async def identify_library_functions(
     if not candidates:
         return []
 
-    # Limit to avoid excessive MCP calls
+    candidates.sort(key=lambda row: row[2])
     candidates = candidates[:max_candidates]
 
     logger.info(
@@ -180,7 +180,6 @@ async def identify_library_functions(
             })
             found_types.add(classification)
 
-            # Stop early if we found all target types
             if found_types == target_types:
                 break
 

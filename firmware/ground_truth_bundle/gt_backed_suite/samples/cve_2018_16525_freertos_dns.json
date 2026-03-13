@@ -357,7 +357,12 @@
       "notes": "DNS label walk reads attacker-controlled step sizes with no bounds.",
       "optional_object_ids": [
         "O2_g_rx_buffer"
-      ]
+      ],
+      "expected_final_verdict": "CONFIRMED",
+      "expected_final_risk_band": "HIGH",
+      "expected_review_priority": "P0",
+      "risk_gt_provenance": "manual_anchor_chain_v1",
+      "risk_gt_notes": "Canonical DNS-name walk bug: attacker-controlled label steps remain unbounded and should be scored as confirmed P0 high risk."
     },
     {
       "chain_id": "C3_llmnr_copy_overflow",
@@ -382,7 +387,12 @@
       "optional_object_ids": [
         "O1_g_net_buf",
         "O2_g_rx_buffer"
-      ]
+      ],
+      "expected_final_verdict": "CONFIRMED",
+      "expected_final_risk_band": "HIGH",
+      "expected_review_priority": "P0",
+      "risk_gt_provenance": "manual_anchor_chain_v1",
+      "risk_gt_notes": "Canonical downstream memcpy overflow: corrupted xDataLength reaches memcpy into response[128] and should remain confirmed P0 high risk."
     }
   ],
   "negative_expectations": [

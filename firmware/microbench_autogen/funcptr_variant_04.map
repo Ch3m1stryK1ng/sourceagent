@@ -1,0 +1,144 @@
+
+Discarded input sections
+
+ .text          0x00000000        0x0 /tmp/ccdsgclg.o
+ .data          0x00000000        0x0 /tmp/ccdsgclg.o
+ .bss           0x00000000        0x0 /tmp/ccdsgclg.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+FLASH            0x08000000         0x00010000         xr
+RAM              0x20000000         0x00005000         xrw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD /tmp/ccdsgclg.o
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m/nofp/libgcc.a
+START GROUP
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m/nofp/libgcc.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libg_nano.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a
+END GROUP
+START GROUP
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m/nofp/libgcc.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libnosys.a
+END GROUP
+START GROUP
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m/nofp/libgcc.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libnosys.a
+END GROUP
+                0x20005000                        _estack = (ORIGIN (RAM) + LENGTH (RAM))
+
+.isr_vector     0x08000000       0x40
+ *(.isr_vector)
+ .isr_vector    0x08000000       0x40 /tmp/ccdsgclg.o
+                0x08000000                vector_table
+
+.text           0x08000040       0xb4
+ *(.text*)
+ .text.Default_Handler
+                0x08000040        0x2 /tmp/ccdsgclg.o
+                0x08000040                Default_Handler
+ *fill*         0x08000042        0x2 
+ .text.cmd_0    0x08000044       0x10 /tmp/ccdsgclg.o
+ .text.cmd_1    0x08000054       0x10 /tmp/ccdsgclg.o
+ .text.cmd_2    0x08000064       0x10 /tmp/ccdsgclg.o
+ .text.cmd_3    0x08000074       0x10 /tmp/ccdsgclg.o
+ .text.cmd_4    0x08000084       0x10 /tmp/ccdsgclg.o
+ .text.cmd_5    0x08000094       0x10 /tmp/ccdsgclg.o
+ .text.dispatch_command
+                0x080000a4       0x10 /tmp/ccdsgclg.o
+                0x080000a4                dispatch_command
+ .text.main     0x080000b4       0x20 /tmp/ccdsgclg.o
+                0x080000b4                main
+ .text.Reset_Handler
+                0x080000d4        0x8 /tmp/ccdsgclg.o
+                0x080000d4                Reset_Handler
+ *(.rodata*)
+ .rodata.cmd_table
+                0x080000dc       0x18 /tmp/ccdsgclg.o
+
+.glue_7         0x080000f4        0x0
+ .glue_7        0x080000f4        0x0 linker stubs
+
+.glue_7t        0x080000f4        0x0
+ .glue_7t       0x080000f4        0x0 linker stubs
+
+.vfp11_veneer   0x080000f4        0x0
+ .vfp11_veneer  0x080000f4        0x0 linker stubs
+
+.v4_bx          0x080000f4        0x0
+ .v4_bx         0x080000f4        0x0 linker stubs
+
+.iplt           0x080000f4        0x0
+ .iplt          0x080000f4        0x0 /tmp/ccdsgclg.o
+
+.rel.dyn        0x080000f4        0x0
+ .rel.iplt      0x080000f4        0x0 /tmp/ccdsgclg.o
+
+.ARM.extab
+ *(.ARM.extab*)
+
+.ARM.exidx
+ *(.ARM.exidx*)
+                0x080000f4                        _sidata = .
+
+.data           0x20000000        0x0 load address 0x080000f4
+                0x20000000                        _sdata = .
+ *(.data*)
+                0x20000000                        _edata = .
+
+.igot.plt       0x20000000        0x0
+ .igot.plt      0x20000000        0x0 /tmp/ccdsgclg.o
+
+.bss            0x20000000        0x4
+                0x20000000                        _sbss = .
+ *(.bss*)
+ .bss.g_state   0x20000000        0x4 /tmp/ccdsgclg.o
+ *(COMMON)
+                0x20000004                        _ebss = .
+                0x20005000                        PROVIDE (__stack_top__ = _estack)
+                [!provide]                        PROVIDE (end = _ebss)
+                [!provide]                        PROVIDE (_end = _ebss)
+OUTPUT(/home/a347908610/sourceagent/firmware/microbench_autogen/funcptr_variant_04.elf elf32-littlearm)
+LOAD linker stubs
+
+.debug_info     0x00000000      0x26b
+ .debug_info    0x00000000      0x26b /tmp/ccdsgclg.o
+
+.debug_abbrev   0x00000000      0x18e
+ .debug_abbrev  0x00000000      0x18e /tmp/ccdsgclg.o
+
+.debug_loc      0x00000000       0x81
+ .debug_loc     0x00000000       0x81 /tmp/ccdsgclg.o
+
+.debug_aranges  0x00000000       0x68
+ .debug_aranges
+                0x00000000       0x68 /tmp/ccdsgclg.o
+
+.debug_ranges   0x00000000       0x58
+ .debug_ranges  0x00000000       0x58 /tmp/ccdsgclg.o
+
+.debug_line     0x00000000      0x2b7
+ .debug_line    0x00000000      0x2b7 /tmp/ccdsgclg.o
+
+.debug_str      0x00000000      0x21d
+ .debug_str     0x00000000      0x21d /tmp/ccdsgclg.o
+                                0x262 (size before relaxing)
+
+.comment        0x00000000       0x45
+ .comment       0x00000000       0x45 /tmp/ccdsgclg.o
+                                 0x46 (size before relaxing)
+
+.ARM.attributes
+                0x00000000       0x2e
+ .ARM.attributes
+                0x00000000       0x2e /tmp/ccdsgclg.o
+
+.debug_frame    0x00000000       0xc8
+ .debug_frame   0x00000000       0xc8 /tmp/ccdsgclg.o

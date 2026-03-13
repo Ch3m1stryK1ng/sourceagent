@@ -1,0 +1,872 @@
+{
+  "name": "microbench_autogen_unstripped",
+  "created_at": "2026-03-12T08:18:42+00:00",
+  "count": 108,
+  "description": "Auto-generated L1 microbench variant corpus (unstripped).",
+  "samples": [
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "copy_variant_00",
+      "gt_stem": "copy_variant_00",
+      "output_stem": "copy_variant_00",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/copy_variant_00.elf",
+      "notes": "copy"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "copy_variant_01",
+      "gt_stem": "copy_variant_01",
+      "output_stem": "copy_variant_01",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/copy_variant_01.elf",
+      "notes": "copy"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "copy_variant_02",
+      "gt_stem": "copy_variant_02",
+      "output_stem": "copy_variant_02",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/copy_variant_02.elf",
+      "notes": "copy"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "copy_variant_03",
+      "gt_stem": "copy_variant_03",
+      "output_stem": "copy_variant_03",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/copy_variant_03.elf",
+      "notes": "copy"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "copy_variant_04",
+      "gt_stem": "copy_variant_04",
+      "output_stem": "copy_variant_04",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/copy_variant_04.elf",
+      "notes": "copy"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "copy_variant_05",
+      "gt_stem": "copy_variant_05",
+      "output_stem": "copy_variant_05",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/copy_variant_05.elf",
+      "notes": "copy"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "copy_variant_06",
+      "gt_stem": "copy_variant_06",
+      "output_stem": "copy_variant_06",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/copy_variant_06.elf",
+      "notes": "copy"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "copy_variant_07",
+      "gt_stem": "copy_variant_07",
+      "output_stem": "copy_variant_07",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/copy_variant_07.elf",
+      "notes": "copy"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "copy_variant_08",
+      "gt_stem": "copy_variant_08",
+      "output_stem": "copy_variant_08",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/copy_variant_08.elf",
+      "notes": "copy"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "copy_variant_09",
+      "gt_stem": "copy_variant_09",
+      "output_stem": "copy_variant_09",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/copy_variant_09.elf",
+      "notes": "copy"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "copy_variant_10",
+      "gt_stem": "copy_variant_10",
+      "output_stem": "copy_variant_10",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/copy_variant_10.elf",
+      "notes": "copy"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "copy_variant_11",
+      "gt_stem": "copy_variant_11",
+      "output_stem": "copy_variant_11",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/copy_variant_11.elf",
+      "notes": "copy"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "copy_variant_12",
+      "gt_stem": "copy_variant_12",
+      "output_stem": "copy_variant_12",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/copy_variant_12.elf",
+      "notes": "copy"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "copy_variant_13",
+      "gt_stem": "copy_variant_13",
+      "output_stem": "copy_variant_13",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/copy_variant_13.elf",
+      "notes": "copy"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "copy_variant_14",
+      "gt_stem": "copy_variant_14",
+      "output_stem": "copy_variant_14",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/copy_variant_14.elf",
+      "notes": "copy"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "copy_variant_15",
+      "gt_stem": "copy_variant_15",
+      "output_stem": "copy_variant_15",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/copy_variant_15.elf",
+      "notes": "copy"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "copy_variant_16",
+      "gt_stem": "copy_variant_16",
+      "output_stem": "copy_variant_16",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/copy_variant_16.elf",
+      "notes": "copy"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "copy_variant_17",
+      "gt_stem": "copy_variant_17",
+      "output_stem": "copy_variant_17",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/copy_variant_17.elf",
+      "notes": "copy"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "format_variant_00",
+      "gt_stem": "format_variant_00",
+      "output_stem": "format_variant_00",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/format_variant_00.elf",
+      "notes": "format"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "format_variant_01",
+      "gt_stem": "format_variant_01",
+      "output_stem": "format_variant_01",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/format_variant_01.elf",
+      "notes": "format"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "format_variant_02",
+      "gt_stem": "format_variant_02",
+      "output_stem": "format_variant_02",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/format_variant_02.elf",
+      "notes": "format"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "format_variant_03",
+      "gt_stem": "format_variant_03",
+      "output_stem": "format_variant_03",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/format_variant_03.elf",
+      "notes": "format"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "format_variant_04",
+      "gt_stem": "format_variant_04",
+      "output_stem": "format_variant_04",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/format_variant_04.elf",
+      "notes": "format"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "format_variant_05",
+      "gt_stem": "format_variant_05",
+      "output_stem": "format_variant_05",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/format_variant_05.elf",
+      "notes": "format"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "format_variant_06",
+      "gt_stem": "format_variant_06",
+      "output_stem": "format_variant_06",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/format_variant_06.elf",
+      "notes": "format"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "format_variant_07",
+      "gt_stem": "format_variant_07",
+      "output_stem": "format_variant_07",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/format_variant_07.elf",
+      "notes": "format"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "format_variant_08",
+      "gt_stem": "format_variant_08",
+      "output_stem": "format_variant_08",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/format_variant_08.elf",
+      "notes": "format"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "format_variant_09",
+      "gt_stem": "format_variant_09",
+      "output_stem": "format_variant_09",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/format_variant_09.elf",
+      "notes": "format"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "format_variant_10",
+      "gt_stem": "format_variant_10",
+      "output_stem": "format_variant_10",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/format_variant_10.elf",
+      "notes": "format"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "format_variant_11",
+      "gt_stem": "format_variant_11",
+      "output_stem": "format_variant_11",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/format_variant_11.elf",
+      "notes": "format"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "format_variant_12",
+      "gt_stem": "format_variant_12",
+      "output_stem": "format_variant_12",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/format_variant_12.elf",
+      "notes": "format"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "format_variant_13",
+      "gt_stem": "format_variant_13",
+      "output_stem": "format_variant_13",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/format_variant_13.elf",
+      "notes": "format"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "format_variant_14",
+      "gt_stem": "format_variant_14",
+      "output_stem": "format_variant_14",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/format_variant_14.elf",
+      "notes": "format"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "format_variant_15",
+      "gt_stem": "format_variant_15",
+      "output_stem": "format_variant_15",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/format_variant_15.elf",
+      "notes": "format"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "format_variant_16",
+      "gt_stem": "format_variant_16",
+      "output_stem": "format_variant_16",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/format_variant_16.elf",
+      "notes": "format"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "format_variant_17",
+      "gt_stem": "format_variant_17",
+      "output_stem": "format_variant_17",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/format_variant_17.elf",
+      "notes": "format"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "funcptr_variant_00",
+      "gt_stem": "funcptr_variant_00",
+      "output_stem": "funcptr_variant_00",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/funcptr_variant_00.elf",
+      "notes": "func_ptr"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "funcptr_variant_01",
+      "gt_stem": "funcptr_variant_01",
+      "output_stem": "funcptr_variant_01",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/funcptr_variant_01.elf",
+      "notes": "func_ptr"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "funcptr_variant_02",
+      "gt_stem": "funcptr_variant_02",
+      "output_stem": "funcptr_variant_02",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/funcptr_variant_02.elf",
+      "notes": "func_ptr"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "funcptr_variant_03",
+      "gt_stem": "funcptr_variant_03",
+      "output_stem": "funcptr_variant_03",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/funcptr_variant_03.elf",
+      "notes": "func_ptr"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "funcptr_variant_04",
+      "gt_stem": "funcptr_variant_04",
+      "output_stem": "funcptr_variant_04",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/funcptr_variant_04.elf",
+      "notes": "func_ptr"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "funcptr_variant_05",
+      "gt_stem": "funcptr_variant_05",
+      "output_stem": "funcptr_variant_05",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/funcptr_variant_05.elf",
+      "notes": "func_ptr"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "funcptr_variant_06",
+      "gt_stem": "funcptr_variant_06",
+      "output_stem": "funcptr_variant_06",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/funcptr_variant_06.elf",
+      "notes": "func_ptr"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "funcptr_variant_07",
+      "gt_stem": "funcptr_variant_07",
+      "output_stem": "funcptr_variant_07",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/funcptr_variant_07.elf",
+      "notes": "func_ptr"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "funcptr_variant_08",
+      "gt_stem": "funcptr_variant_08",
+      "output_stem": "funcptr_variant_08",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/funcptr_variant_08.elf",
+      "notes": "func_ptr"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "funcptr_variant_09",
+      "gt_stem": "funcptr_variant_09",
+      "output_stem": "funcptr_variant_09",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/funcptr_variant_09.elf",
+      "notes": "func_ptr"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "funcptr_variant_10",
+      "gt_stem": "funcptr_variant_10",
+      "output_stem": "funcptr_variant_10",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/funcptr_variant_10.elf",
+      "notes": "func_ptr"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "funcptr_variant_11",
+      "gt_stem": "funcptr_variant_11",
+      "output_stem": "funcptr_variant_11",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/funcptr_variant_11.elf",
+      "notes": "func_ptr"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "funcptr_variant_12",
+      "gt_stem": "funcptr_variant_12",
+      "output_stem": "funcptr_variant_12",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/funcptr_variant_12.elf",
+      "notes": "func_ptr"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "funcptr_variant_13",
+      "gt_stem": "funcptr_variant_13",
+      "output_stem": "funcptr_variant_13",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/funcptr_variant_13.elf",
+      "notes": "func_ptr"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "funcptr_variant_14",
+      "gt_stem": "funcptr_variant_14",
+      "output_stem": "funcptr_variant_14",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/funcptr_variant_14.elf",
+      "notes": "func_ptr"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "funcptr_variant_15",
+      "gt_stem": "funcptr_variant_15",
+      "output_stem": "funcptr_variant_15",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/funcptr_variant_15.elf",
+      "notes": "func_ptr"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "funcptr_variant_16",
+      "gt_stem": "funcptr_variant_16",
+      "output_stem": "funcptr_variant_16",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/funcptr_variant_16.elf",
+      "notes": "func_ptr"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "funcptr_variant_17",
+      "gt_stem": "funcptr_variant_17",
+      "output_stem": "funcptr_variant_17",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/funcptr_variant_17.elf",
+      "notes": "func_ptr"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "loop_variant_00",
+      "gt_stem": "loop_variant_00",
+      "output_stem": "loop_variant_00",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/loop_variant_00.elf",
+      "notes": "loop_write"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "loop_variant_01",
+      "gt_stem": "loop_variant_01",
+      "output_stem": "loop_variant_01",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/loop_variant_01.elf",
+      "notes": "loop_write"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "loop_variant_02",
+      "gt_stem": "loop_variant_02",
+      "output_stem": "loop_variant_02",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/loop_variant_02.elf",
+      "notes": "loop_write"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "loop_variant_03",
+      "gt_stem": "loop_variant_03",
+      "output_stem": "loop_variant_03",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/loop_variant_03.elf",
+      "notes": "loop_write"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "loop_variant_04",
+      "gt_stem": "loop_variant_04",
+      "output_stem": "loop_variant_04",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/loop_variant_04.elf",
+      "notes": "loop_write"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "loop_variant_05",
+      "gt_stem": "loop_variant_05",
+      "output_stem": "loop_variant_05",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/loop_variant_05.elf",
+      "notes": "loop_write"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "loop_variant_06",
+      "gt_stem": "loop_variant_06",
+      "output_stem": "loop_variant_06",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/loop_variant_06.elf",
+      "notes": "loop_write"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "loop_variant_07",
+      "gt_stem": "loop_variant_07",
+      "output_stem": "loop_variant_07",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/loop_variant_07.elf",
+      "notes": "loop_write"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "loop_variant_08",
+      "gt_stem": "loop_variant_08",
+      "output_stem": "loop_variant_08",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/loop_variant_08.elf",
+      "notes": "loop_write"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "loop_variant_09",
+      "gt_stem": "loop_variant_09",
+      "output_stem": "loop_variant_09",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/loop_variant_09.elf",
+      "notes": "loop_write"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "loop_variant_10",
+      "gt_stem": "loop_variant_10",
+      "output_stem": "loop_variant_10",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/loop_variant_10.elf",
+      "notes": "loop_write"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "loop_variant_11",
+      "gt_stem": "loop_variant_11",
+      "output_stem": "loop_variant_11",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/loop_variant_11.elf",
+      "notes": "loop_write"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "loop_variant_12",
+      "gt_stem": "loop_variant_12",
+      "output_stem": "loop_variant_12",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/loop_variant_12.elf",
+      "notes": "loop_write"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "loop_variant_13",
+      "gt_stem": "loop_variant_13",
+      "output_stem": "loop_variant_13",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/loop_variant_13.elf",
+      "notes": "loop_write"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "loop_variant_14",
+      "gt_stem": "loop_variant_14",
+      "output_stem": "loop_variant_14",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/loop_variant_14.elf",
+      "notes": "loop_write"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "loop_variant_15",
+      "gt_stem": "loop_variant_15",
+      "output_stem": "loop_variant_15",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/loop_variant_15.elf",
+      "notes": "loop_write"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "loop_variant_16",
+      "gt_stem": "loop_variant_16",
+      "output_stem": "loop_variant_16",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/loop_variant_16.elf",
+      "notes": "loop_write"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "loop_variant_17",
+      "gt_stem": "loop_variant_17",
+      "output_stem": "loop_variant_17",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/loop_variant_17.elf",
+      "notes": "loop_write"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "memset_variant_00",
+      "gt_stem": "memset_variant_00",
+      "output_stem": "memset_variant_00",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/memset_variant_00.elf",
+      "notes": "memset"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "memset_variant_01",
+      "gt_stem": "memset_variant_01",
+      "output_stem": "memset_variant_01",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/memset_variant_01.elf",
+      "notes": "memset"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "memset_variant_02",
+      "gt_stem": "memset_variant_02",
+      "output_stem": "memset_variant_02",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/memset_variant_02.elf",
+      "notes": "memset"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "memset_variant_03",
+      "gt_stem": "memset_variant_03",
+      "output_stem": "memset_variant_03",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/memset_variant_03.elf",
+      "notes": "memset"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "memset_variant_04",
+      "gt_stem": "memset_variant_04",
+      "output_stem": "memset_variant_04",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/memset_variant_04.elf",
+      "notes": "memset"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "memset_variant_05",
+      "gt_stem": "memset_variant_05",
+      "output_stem": "memset_variant_05",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/memset_variant_05.elf",
+      "notes": "memset"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "memset_variant_06",
+      "gt_stem": "memset_variant_06",
+      "output_stem": "memset_variant_06",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/memset_variant_06.elf",
+      "notes": "memset"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "memset_variant_07",
+      "gt_stem": "memset_variant_07",
+      "output_stem": "memset_variant_07",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/memset_variant_07.elf",
+      "notes": "memset"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "memset_variant_08",
+      "gt_stem": "memset_variant_08",
+      "output_stem": "memset_variant_08",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/memset_variant_08.elf",
+      "notes": "memset"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "memset_variant_09",
+      "gt_stem": "memset_variant_09",
+      "output_stem": "memset_variant_09",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/memset_variant_09.elf",
+      "notes": "memset"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "memset_variant_10",
+      "gt_stem": "memset_variant_10",
+      "output_stem": "memset_variant_10",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/memset_variant_10.elf",
+      "notes": "memset"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "memset_variant_11",
+      "gt_stem": "memset_variant_11",
+      "output_stem": "memset_variant_11",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/memset_variant_11.elf",
+      "notes": "memset"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "memset_variant_12",
+      "gt_stem": "memset_variant_12",
+      "output_stem": "memset_variant_12",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/memset_variant_12.elf",
+      "notes": "memset"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "memset_variant_13",
+      "gt_stem": "memset_variant_13",
+      "output_stem": "memset_variant_13",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/memset_variant_13.elf",
+      "notes": "memset"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "memset_variant_14",
+      "gt_stem": "memset_variant_14",
+      "output_stem": "memset_variant_14",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/memset_variant_14.elf",
+      "notes": "memset"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "memset_variant_15",
+      "gt_stem": "memset_variant_15",
+      "output_stem": "memset_variant_15",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/memset_variant_15.elf",
+      "notes": "memset"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "memset_variant_16",
+      "gt_stem": "memset_variant_16",
+      "output_stem": "memset_variant_16",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/memset_variant_16.elf",
+      "notes": "memset"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "memset_variant_17",
+      "gt_stem": "memset_variant_17",
+      "output_stem": "memset_variant_17",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/memset_variant_17.elf",
+      "notes": "memset"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "store_variant_00",
+      "gt_stem": "store_variant_00",
+      "output_stem": "store_variant_00",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/store_variant_00.elf",
+      "notes": "store"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "store_variant_01",
+      "gt_stem": "store_variant_01",
+      "output_stem": "store_variant_01",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/store_variant_01.elf",
+      "notes": "store"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "store_variant_02",
+      "gt_stem": "store_variant_02",
+      "output_stem": "store_variant_02",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/store_variant_02.elf",
+      "notes": "store"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "store_variant_03",
+      "gt_stem": "store_variant_03",
+      "output_stem": "store_variant_03",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/store_variant_03.elf",
+      "notes": "store"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "store_variant_04",
+      "gt_stem": "store_variant_04",
+      "output_stem": "store_variant_04",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/store_variant_04.elf",
+      "notes": "store"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "store_variant_05",
+      "gt_stem": "store_variant_05",
+      "output_stem": "store_variant_05",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/store_variant_05.elf",
+      "notes": "store"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "store_variant_06",
+      "gt_stem": "store_variant_06",
+      "output_stem": "store_variant_06",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/store_variant_06.elf",
+      "notes": "store"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "store_variant_07",
+      "gt_stem": "store_variant_07",
+      "output_stem": "store_variant_07",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/store_variant_07.elf",
+      "notes": "store"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "store_variant_08",
+      "gt_stem": "store_variant_08",
+      "output_stem": "store_variant_08",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/store_variant_08.elf",
+      "notes": "store"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "store_variant_09",
+      "gt_stem": "store_variant_09",
+      "output_stem": "store_variant_09",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/store_variant_09.elf",
+      "notes": "store"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "store_variant_10",
+      "gt_stem": "store_variant_10",
+      "output_stem": "store_variant_10",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/store_variant_10.elf",
+      "notes": "store"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "store_variant_11",
+      "gt_stem": "store_variant_11",
+      "output_stem": "store_variant_11",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/store_variant_11.elf",
+      "notes": "store"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "store_variant_12",
+      "gt_stem": "store_variant_12",
+      "output_stem": "store_variant_12",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/store_variant_12.elf",
+      "notes": "store"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "store_variant_13",
+      "gt_stem": "store_variant_13",
+      "output_stem": "store_variant_13",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/store_variant_13.elf",
+      "notes": "store"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "store_variant_14",
+      "gt_stem": "store_variant_14",
+      "output_stem": "store_variant_14",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/store_variant_14.elf",
+      "notes": "store"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "store_variant_15",
+      "gt_stem": "store_variant_15",
+      "output_stem": "store_variant_15",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/store_variant_15.elf",
+      "notes": "store"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "store_variant_16",
+      "gt_stem": "store_variant_16",
+      "output_stem": "store_variant_16",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/store_variant_16.elf",
+      "notes": "store"
+    },
+    {
+      "dataset": "microbench_autogen",
+      "sample_id": "store_variant_17",
+      "gt_stem": "store_variant_17",
+      "output_stem": "store_variant_17",
+      "binary_path": "/home/a347908610/sourceagent/firmware/microbench_autogen/store_variant_17.elf",
+      "notes": "store"
+    }
+  ]
+}

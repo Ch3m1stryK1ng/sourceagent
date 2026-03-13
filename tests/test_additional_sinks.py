@@ -365,6 +365,10 @@ def test_loop_write_for_array_index():
     assert c.preliminary_label == SinkLabel.COPY_SINK
     assert c.facts["in_loop"] is True
     assert c.facts.get("promoted_from") == "LOOP_WRITE_SINK"
+    assert c.facts.get("callee") == "loop_copy_idiom"
+    assert c.facts.get("len_expr") == "n"
+    assert c.facts.get("dst_expr") == "dst[i]"
+    assert c.facts.get("src_expr") == "src[i]"
     assert "dst[i]" in c.facts["store_expr"]
 
 
@@ -542,6 +546,12 @@ async def test_mine_additional_sinks_loop_write():
                     if s.preliminary_label in (SinkLabel.LOOP_WRITE_SINK, SinkLabel.COPY_SINK)
                     and s.facts.get("in_loop")]
     assert len(copy_or_loop) >= 1
+    copy_like = next(
+        s for s in copy_or_loop
+        if s.preliminary_label == SinkLabel.COPY_SINK and s.facts.get("callee") == "loop_copy_idiom"
+    )
+    assert copy_like.facts.get("len_expr") == "n"
+    assert copy_like.facts.get("src_expr") == "src[i]"
 
 
 # ══════════════════════════════════════════════════════════════════════════════

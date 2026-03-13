@@ -136,7 +136,73 @@ def test_validate_sample_schema_requires_known_references():
         "sinks": [{"sink_id": "S1", "label": "COPY_SINK", "function_name": "g", "site_kind": "copy_call_or_copy_idiom", "status": "complete"}],
         "sink_roots": [{"root_id": "SR1", "sink_id": "S1", "root_role": "len", "expr": "n", "status": "complete"}],
         "derive_checks": [{"derive_check_id": "D1", "sink_id": "S1", "root_id": "SR1", "derive_facts": [], "check_facts": [], "status": "complete"}],
-        "chains": [{"chain_id": "CH1", "sink_id": "S1", "expected_verdict": "CONFIRMED", "required_source_ids": ["R1"], "required_object_ids": ["O1"], "required_channel_ids": ["C1"], "required_root_ids": ["SR1"], "required_derive_check_ids": ["D1"]}],
+        "chains": [{
+            "chain_id": "CH1",
+            "sink_id": "S1",
+            "expected_verdict": "CONFIRMED",
+            "expected_final_verdict": "CONFIRMED",
+            "expected_final_risk_band": "HIGH",
+            "expected_review_priority": "P0",
+            "required_source_ids": ["R1"],
+            "required_object_ids": ["O1"],
+            "required_channel_ids": ["C1"],
+            "required_root_ids": ["SR1"],
+            "required_derive_check_ids": ["D1"],
+        }],
         "negative_expectations": [{"negative_id": "N1", "target_kind": "source", "target_id": "R1", "expected_verdict": "DROP", "reason": "demo"}],
     }
     assert validate_sample_schema(sample, strict=True) == []
+
+
+def test_validate_sample_schema_rejects_partial_chain_risk_gt():
+    sample = {
+        "schema_version": SCHEMA_VERSION,
+        "binary_stem": "demo",
+        "binary_paths": {
+            "source_file": "a.c",
+            "map_file": "a.map",
+            "elf_file": "a.elf",
+            "bin_file": "a.bin",
+        },
+        "sample_meta": {
+            "title": "demo",
+            "mechanism_group": "same_context_direct",
+            "runtime_style": "baremetal_polling",
+            "inspiration": "toy",
+            "arch": "ARM_CORTEX_M",
+            "expected_channel_mode": "none",
+            "chain_shape": "same_context_direct_call",
+        },
+        "annotation_status": {
+            "sources": "complete",
+            "objects": "complete",
+            "channels": "complete",
+            "sinks": "complete",
+            "sink_roots": "complete",
+            "derive_checks": "complete",
+            "chains": "complete",
+            "negative_expectations": "complete",
+            "overall": "complete",
+        },
+        "sources": [{"source_id": "R1", "label": "MMIO_READ", "function_name": "f", "site_kind": "mmio_read", "context": "MAIN", "status": "complete"}],
+        "objects": [{"object_id": "O1", "region_kind": "SRAM_CLUSTER", "producer_contexts": ["MAIN"], "consumer_contexts": ["MAIN"]}],
+        "channels": [{"channel_id": "C1", "src_context": "MAIN", "object_id": "O1", "dst_context": "MAIN", "edge_kind": "DATA", "constraints": [], "evidence_refs": []}],
+        "sinks": [{"sink_id": "S1", "label": "COPY_SINK", "function_name": "g", "site_kind": "copy_call_or_copy_idiom", "status": "complete"}],
+        "sink_roots": [{"root_id": "SR1", "sink_id": "S1", "root_role": "len", "expr": "n", "status": "complete"}],
+        "derive_checks": [{"derive_check_id": "D1", "sink_id": "S1", "root_id": "SR1", "derive_facts": [], "check_facts": [], "status": "complete"}],
+        "chains": [{
+            "chain_id": "CH1",
+            "sink_id": "S1",
+            "expected_verdict": "CONFIRMED",
+            "expected_final_verdict": "CONFIRMED",
+            "required_source_ids": ["R1"],
+            "required_object_ids": ["O1"],
+            "required_channel_ids": ["C1"],
+            "required_root_ids": ["SR1"],
+            "required_derive_check_ids": ["D1"],
+        }],
+        "negative_expectations": [{"negative_id": "N1", "target_kind": "source", "target_id": "R1", "expected_verdict": "DROP", "reason": "demo"}],
+    }
+    errors = validate_sample_schema(sample, strict=True)
+    assert any("expected_final_risk_band" in err for err in errors)
+    assert any("expected_review_priority" in err for err in errors)

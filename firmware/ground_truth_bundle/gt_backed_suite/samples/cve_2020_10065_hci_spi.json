@@ -305,7 +305,12 @@
         "D1_evt_len"
       ],
       "must_use_channel": false,
-      "notes": "Event-path overflow chain from SPI1_DR into rxmsg-derived copy length."
+      "notes": "Event-path overflow chain from SPI1_DR into rxmsg-derived copy length.",
+      "expected_final_verdict": "CONFIRMED",
+      "expected_final_risk_band": "HIGH",
+      "expected_review_priority": "P0",
+      "risk_gt_provenance": "manual_anchor_chain_v1",
+      "risk_gt_notes": "Canonical HCI event-path overflow: SPI-fed rxmsg length reaches the vulnerable copy sink and should remain a confirmed P0 high-risk chain."
     },
     {
       "chain_id": "C2_acl_overflow",
@@ -326,7 +331,12 @@
         "D2_acl_len"
       ],
       "must_use_channel": false,
-      "notes": "ACL-path overflow chain from SPI1_DR into acl_hdr.len-controlled copy size."
+      "notes": "ACL-path overflow chain from SPI1_DR into acl_hdr.len-controlled copy size.",
+      "expected_final_verdict": "CONFIRMED",
+      "expected_final_risk_band": "HIGH",
+      "expected_review_priority": "P0",
+      "risk_gt_provenance": "manual_anchor_chain_v1",
+      "risk_gt_notes": "Canonical HCI ACL overflow: attacker-controlled acl_hdr.len drives the copy size and should remain a confirmed P0 high-risk chain."
     }
   ],
   "negative_expectations": [

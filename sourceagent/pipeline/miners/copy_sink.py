@@ -294,12 +294,13 @@ async def _find_copy_symbols(
     # Strategy 4: Heuristic function classification (stripped binaries)
     from .func_classifier import identify_library_functions
     # Only ask heuristic classifier for still-missing high-value copy types.
-    missing_types = {"memcpy", "strcpy"} - set(found_by_name.keys())
+    missing_types = {"memcpy", "memmove", "strcpy"} - set(found_by_name.keys())
     if not missing_types:
         return list(found_by_name.values())
     found_heuristic = await identify_library_functions(
         mcp_manager, binary_name,
         target_types=missing_types,
+        max_candidates=120,
     )
     if found_heuristic:
         for sym in found_heuristic:

@@ -141,3 +141,86 @@ def test_build_channel_graph_merges_dma_label_into_symbol_backed_cluster_and_rec
         e["src_context"] == "DMA" and e["dst_context"] == "MAIN"
         for e in graph["channel_edges"]
     )
+
+
+def test_build_channel_graph_populates_slice_and_quality_metadata():
+    mai = MemoryAccessIndex(binary_path="/tmp/fw.elf")
+    mai.accesses = [
+        MemoryAccess(
+            address=0x08001010,
+            kind="store",
+            width=1,
+            target_addr=0x20000010,
+            function_name="FUN_08000100",
+            function_addr=0x08001000,
+            in_isr=False,
+        ),
+        MemoryAccess(
+            address=0x08001014,
+            kind="store",
+            width=1,
+            target_addr=0x20000018,
+            function_name="FUN_08000100",
+            function_addr=0x08001000,
+            in_isr=False,
+        ),
+        MemoryAccess(
+            address=0x08002020,
+            kind="load",
+            width=1,
+            target_addr=0x20000080,
+            function_name="FUN_08000200",
+            function_addr=0x08002000,
+            in_isr=False,
+        ),
+    ]
+
+    graph = build_channel_graph(mai, verified_labels=[], memory_map=None)
+
+    obj = graph["object_nodes"][0]
+    assert obj["slice_facts"]["slice_count"] >= 2
+    assert obj["quality"]["score"] > 0.0
+    assert "object_quality" in obj["type_facts"]
+
+
+def test_build_channel_graph_merges_dma_label_by_buffer_cluster_without_symbols():
+    mai = MemoryAccessIndex(binary_path="/tmp/fw.elf")
+    mai.accesses = [
+        MemoryAccess(
+            address=0x08001010,
+            kind="load",
+            width=1,
+            target_addr=0x20001020,
+            function_name="FUN_08001234",
+            function_addr=0x08001234,
+            in_isr=False,
+        ),
+    ]
+    labels = [
+        {
+            "label": "DMA_BACKED_BUFFER",
+            "address": 0x40020000,
+            "function_name": "FUN_08000080",
+            "evidence_refs": ["E_DMA"],
+            "facts": {
+                "config_cluster": "0x40020000",
+                "buffer_cluster": "0x20001000",
+                "buffer_binding_confidence": 0.82,
+                "buffer_readers": ["FUN_08001234"],
+            },
+        },
+    ]
+
+    graph = build_channel_graph(mai, verified_labels=labels, memory_map=None)
+
+    obj = next(o for o in graph["object_nodes"] if o["object_id"] == "obj_sram_20001000_200010ff")
+    assert obj["region_kind"] == "DMA_BUFFER"
+    assert obj["type_facts"]["source_label"] == "DMA_BACKED_BUFFER"
+    assert obj["type_facts"]["buffer_cluster"] == "0x20001000"
+    assert "DMA" in obj["producer_contexts"]
+    assert "FUN_08001234" in obj["readers"]
+    assert not any(o["object_id"].startswith("obj_dma_40020000") for o in graph["object_nodes"])
+    assert any(
+        e["src_context"] == "DMA" and e["dst_context"] == "MAIN" and e["object_id"] == obj["object_id"]
+        for e in graph["channel_edges"]
+    )

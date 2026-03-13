@@ -311,7 +311,12 @@
       "notes": "Attacker-controlled wTotalLength drives descriptor walk past the 512-byte raw buffer.",
       "optional_object_ids": [
         "O1_g_usbh_host"
-      ]
+      ],
+      "expected_final_verdict": "CONFIRMED",
+      "expected_final_risk_band": "HIGH",
+      "expected_review_priority": "P0",
+      "risk_gt_provenance": "manual_anchor_chain_v1",
+      "risk_gt_notes": "Canonical USB configuration-descriptor overwalk: wTotalLength drives parsing beyond the fixed raw descriptor buffer and should score as confirmed P0 high risk."
     },
     {
       "chain_id": "C2_endpoint_count_overflow",
@@ -334,7 +339,12 @@
       "notes": "Attacker-controlled bNumEndpoints expands endpoint loop beyond Ep_Desc[2].",
       "optional_object_ids": [
         "O1_g_usbh_host"
-      ]
+      ],
+      "expected_final_verdict": "CONFIRMED",
+      "expected_final_risk_band": "HIGH",
+      "expected_review_priority": "P0",
+      "risk_gt_provenance": "manual_anchor_chain_v1",
+      "risk_gt_notes": "Canonical endpoint-count overflow: bNumEndpoints expands the endpoint loop past Ep_Desc[2] and should remain confirmed P0 high risk."
     },
     {
       "chain_id": "C3_ep_packet_size_risky_state",

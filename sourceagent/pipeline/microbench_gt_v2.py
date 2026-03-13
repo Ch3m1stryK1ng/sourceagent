@@ -11,6 +11,14 @@ from typing import Any, Dict, Iterable, List, Tuple
 SCHEMA_VERSION = "2.0-seed"
 DEFAULT_REL_DIR = Path("firmware/ground_truth_bundle/microbench")
 SAMPLE_REL_DIR = DEFAULT_REL_DIR / "samples"
+_ALLOWED_CHAIN_VERDICTS = {"DROP", "SAFE_OR_LOW_RISK", "SUSPICIOUS", "CONFIRMED"}
+_ALLOWED_RISK_BANDS = {"LOW", "MEDIUM", "HIGH"}
+_ALLOWED_REVIEW_PRIORITIES = {"P0", "P1", "P2"}
+_CHAIN_RISK_GT_FIELDS = (
+    "expected_final_verdict",
+    "expected_final_risk_band",
+    "expected_review_priority",
+)
 
 
 @dataclass(frozen=True)
@@ -454,6 +462,24 @@ def _require_type(value: Any, expected: type | Tuple[type, ...], where: str, err
         errors.append(f"{where}: expected {expect}, got {type(value).__name__}")
 
 
+def _validate_optional_chain_risk_gt(row: dict, where: str, errors: List[str]) -> None:
+    present = [key for key in _CHAIN_RISK_GT_FIELDS if key in row]
+    if not present:
+        return
+    missing = [key for key in _CHAIN_RISK_GT_FIELDS if key not in row]
+    for key in missing:
+        errors.append(f"{where}: missing required key '{key}' when chain-level risk GT is present")
+    verdict = row.get("expected_final_verdict")
+    if verdict is not None and verdict not in _ALLOWED_CHAIN_VERDICTS:
+        errors.append(f"{where}: unknown expected_final_verdict '{verdict}'")
+    risk_band = row.get("expected_final_risk_band")
+    if risk_band is not None and risk_band not in _ALLOWED_RISK_BANDS:
+        errors.append(f"{where}: unknown expected_final_risk_band '{risk_band}'")
+    priority = row.get("expected_review_priority")
+    if priority is not None and priority not in _ALLOWED_REVIEW_PRIORITIES:
+        errors.append(f"{where}: unknown expected_review_priority '{priority}'")
+
+
 def validate_sample_schema(sample: dict, *, strict: bool = False) -> List[str]:
     errors: List[str] = []
     _require_keys(
@@ -621,6 +647,7 @@ def validate_sample_schema(sample: dict, *, strict: bool = False) -> List[str]:
         for did in row.get("required_derive_check_ids", []):
             if did not in derive_ids:
                 errors.append(f"{where}: unknown derive_check id '{did}'")
+        _validate_optional_chain_risk_gt(row, where, errors)
 
     for i, row in enumerate(sample["negative_expectations"]):
         where = f"negative_expectations[{i}]"

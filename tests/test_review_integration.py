@@ -272,6 +272,7 @@ def test_build_review_plan_includes_available_snippet_keys():
             {
                 "chain_id": "c1",
                 "risk_score": 0.8,
+                "review_priority": "P0",
                 "sink": {},
                 "root": {},
                 "derive_facts": [],
@@ -294,6 +295,7 @@ def test_build_review_plan_includes_available_snippet_keys():
     assert plan["review_tool_mode"] == "tool_assisted"
     assert set(plan["items"][0]["available_snippet_keys"]) == {"sink_function", "check_context"}
     assert plan["items"][0]["snippet_index"]["sink_function"] == ["copy_fn"]
+    assert plan["items"][0]["review_priority"] == "P0"
 
 
 def test_review_runner_tool_assisted_augments_snippets(monkeypatch):
@@ -357,3 +359,161 @@ def test_review_runner_tool_assisted_augments_snippets(monkeypatch):
     assert out["review_trace"]["status"] == "ok"
     assert out["review_trace"]["tool_logs"][0]["decompiled_function_count"] >= 1
     assert out["review_prompt"]["batches"][0]["tool_context"]["summary"][0]["available_snippet_keys"]
+
+
+def test_review_runner_prompt_only_can_auto_schedule_tool_assisted_second_pass(monkeypatch):
+    call_prompts = []
+
+    class _FakeLLM:
+        def __init__(self, model=None):
+            self.model = model
+
+        async def generate(self, system_prompt, messages, tools=None, metadata=None, stream=False):
+            prompt = messages[0]["content"]
+            call_prompts.append(prompt)
+            return SimpleNamespace(
+                content='{"decisions": [{"chain_id": "c2", "suggested_semantic_verdict": "SUSPICIOUS", "trigger_summary": "producer evidence still indirect", "preconditions": {"root_constraints": ["len > cap"]}, "reason_codes": [], "review_quality_flags": [], "evidence_map": {"trigger_summary": ["sink_function"]}, "review_mode": "semantic_review"}]}',
+                usage={"prompt_tokens": 10, "completion_tokens": 20, "total_tokens": 30},
+                model=self.model,
+                finish_reason="stop",
+            )
+
+    class _FakeMCP:
+        async def call_tool(self, server_name, tool_name, arguments):
+            fn = arguments["name_or_address"]
+            return [{"type": "text", "text": '{"decompiled_code": "void %s(void) { /* fetched */ }"}' % fn}]
+
+    monkeypatch.setattr("sourceagent.agents.review_runner.LLM", _FakeLLM)
+    plan = {
+        "items": [{"chain_id": "c2"}],
+        "batches": [{
+            "batch_id": "b1",
+            "chain_ids": ["c2"],
+            "items": [{
+                "chain_id": "c2",
+                "current_verdict": "SUSPICIOUS",
+                "review_priority": "P0",
+                "soft_candidate": False,
+                "sink": {"function": "copy_fn"},
+                "root": {"family": "length", "expr": "payload_len"},
+                "derive_facts": [{"site": "parse_packet"}],
+                "check_facts": [{"site": "guard_fn"}],
+                "object_path": [{
+                    "object_id": "obj_rx",
+                    "writers": ["uart_receive"],
+                    "readers": ["copy_fn"],
+                    "writer_sites": [{"context": "ISR", "fn": "uart_receive"}],
+                    "reader_sites": [{"context": "MAIN", "fn": "copy_fn"}],
+                    "producer_contexts": ["ISR"],
+                    "consumer_contexts": ["MAIN"],
+                    "type_facts": {"kind_hint": "payload"},
+                }],
+                "channel_path": [{"edge": "ISR->MAIN", "object_id": "obj_rx"}],
+                "chain_segments": [{"segment_id": "source_to_object", "src": {}, "dst": {}, "snippet_keys": ["producer_function"]}],
+                "sink_semantics_hints": {},
+                "guard_context": [{"site": "guard_fn"}],
+                "capacity_evidence": [{"site": "obj_rx", "expr": "128", "kind": "object_extent_bytes"}],
+                "deterministic_constraints": {
+                    "source_reached": False,
+                    "source_proxy_ok": False,
+                    "source_reached_or_proxy": False,
+                    "object_bound": True,
+                    "root_bound": True,
+                    "channel_satisfied": True,
+                },
+                "decision_basis": {"source_resolve_mode": "object_source_proxy"},
+                "decompiled_snippets": {"sink_function": "void copy_fn(void) {}", "producer_function": "", "source_context": "", "channel_context": ""},
+                "snippet_index": {"sink_function": ["copy_fn"], "producer_function": ["uart_receive"], "source_context": ["uart_receive"], "channel_context": ["uart_receive", "parse_packet"]},
+                "available_snippet_keys": ["sink_function"],
+                "review_context_plan": {
+                    "selected_functions": {
+                        "sink_function": ["copy_fn"],
+                        "producer_context": ["uart_receive"],
+                        "caller_bridge": ["parse_packet"],
+                    },
+                    "estimated_prompt_chars": 8000,
+                    "expanded": False,
+                    "key_char_limits": {},
+                },
+            }],
+        }],
+    }
+    out = asyncio.run(
+        run_review_plan(
+            plan,
+            model="mock-model",
+            review_tool_mode="prompt_only",
+            mcp_manager=_FakeMCP(),
+            ghidra_binary_name="fw.elf-deadbeef",
+        )
+    )
+    assert len(call_prompts) == 2
+    assert '"review_tool_mode": "prompt_only"' in call_prompts[0]
+    assert '"review_tool_mode": "tool_assisted"' in call_prompts[1]
+    assert any(batch.get("second_pass") for batch in out["review_prompt"]["batches"])
+    assert any(log.get("decompiled_function_count", 0) >= 1 for log in out["review_trace"]["tool_logs"])
+
+
+def test_review_runner_tool_assisted_accepts_plain_text_mcp_payload(monkeypatch):
+    class _FakeLLM:
+        def __init__(self, model=None):
+            self.model = model
+
+        async def generate(self, system_prompt, messages, tools=None, metadata=None, stream=False):
+            return SimpleNamespace(
+                content='{"decisions": [{"chain_id": "c3", "suggested_semantic_verdict": "SUSPICIOUS", "trigger_summary": "plain text snippets loaded", "preconditions": {}, "evidence_map": {"trigger_summary": ["sink_function"]}, "review_mode": "semantic_review"}]}',
+                usage={"prompt_tokens": 10, "completion_tokens": 20, "total_tokens": 30},
+                model=self.model,
+                finish_reason="stop",
+            )
+
+    class _FakeMCP:
+        async def call_tool(self, server_name, tool_name, arguments):
+            fn = arguments["name_or_address"]
+            return [{"type": "text", "text": f"void {fn}(void) {{ /* plain */ }}"}]
+
+    monkeypatch.setattr("sourceagent.agents.review_runner.LLM", _FakeLLM)
+    plan = {
+        "items": [{"chain_id": "c3"}],
+        "batches": [{
+            "batch_id": "b2",
+            "chain_ids": ["c3"],
+            "items": [{
+                "chain_id": "c3",
+                "current_verdict": "SUSPICIOUS",
+                "review_priority": "P1",
+                "sink": {"function": "copy_fn"},
+                "root": {"family": "length", "expr": "n"},
+                "derive_facts": [],
+                "check_facts": [],
+                "object_path": [],
+                "channel_path": [],
+                "chain_segments": [],
+                "sink_semantics_hints": {},
+                "guard_context": [],
+                "capacity_evidence": [],
+                "deterministic_constraints": {"source_reached": True, "source_reached_or_proxy": True, "object_bound": True, "root_bound": True},
+                "decision_basis": {},
+                "decompiled_snippets": {"sink_function": "", "caller_bridge": "", "producer_function": ""},
+                "snippet_index": {"sink_function": ["copy_fn"]},
+                "available_snippet_keys": [],
+                "review_context_plan": {
+                    "selected_functions": {"sink_function": ["copy_fn"]},
+                    "estimated_prompt_chars": 4000,
+                    "expanded": False,
+                    "key_char_limits": {},
+                },
+            }],
+        }],
+    }
+    out = asyncio.run(
+        run_review_plan(
+            plan,
+            model="mock-model",
+            review_tool_mode="tool_assisted",
+            mcp_manager=_FakeMCP(),
+            ghidra_binary_name="fw.elf-deadbeef",
+        )
+    )
+    summary = out["review_prompt"]["batches"][0]["tool_context"]["summary"][0]
+    assert "sink_function" in summary["available_snippet_keys"]

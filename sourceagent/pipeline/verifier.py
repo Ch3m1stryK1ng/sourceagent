@@ -496,6 +496,12 @@ def _check_copy_callsite(
     callee = facts.get("callee", "")
     if callee:
         return True, f"Callsite to recognized copy function: {callee}"
+    if (
+        str(facts.get("promoted_from", "") or "").startswith("LOOP_WRITE_SINK")
+        and facts.get("in_loop")
+        and facts.get("store_expr")
+    ):
+        return True, "Copy-like loop store recovered from stripped fallback"
     return False, "No recognized copy function callsite"
 
 
@@ -510,6 +516,17 @@ def _check_copy_args(
     # Callsite confirmed but args not recovered — still pass with partial evidence
     if facts.get("call_found") or facts.get("callee"):
         return True, "Callsite confirmed but argument extraction failed (partial evidence)"
+    if (
+        facts.get("in_loop")
+        and facts.get("store_expr")
+        and (
+            facts.get("len_expr")
+            or facts.get("loop_bound")
+            or facts.get("index_expr")
+            or facts.get("src_expr")
+        )
+    ):
+        return True, "Loop-copy structure recovered with dst/src/len fallback facts"
     if facts.get("decompile_failed"):
         return False, "Decompile failed — cannot extract arguments"
     return False, "No arguments extracted from callsite"

@@ -130,13 +130,23 @@ EXPECTED_MMIO_FUNCTIONS = {
 }
 
 FIRMWARE_DIR = Path(__file__).parent.parent / "firmware"
-ELF_PATH = FIRMWARE_DIR / "p2im_controllino.elf"
-BIN_PATH = FIRMWARE_DIR / "p2im_controllino.bin"
+FIRMWARE_DEMO_DIR = FIRMWARE_DIR / "demo"
+
+
+def _resolve_demo_sample(name: str) -> Path:
+    for path in (FIRMWARE_DIR / name, FIRMWARE_DEMO_DIR / name):
+        if path.exists():
+            return path
+    return FIRMWARE_DIR / name
+
+
+ELF_PATH = _resolve_demo_sample("p2im_controllino.elf")
+BIN_PATH = _resolve_demo_sample("p2im_controllino.bin")
 
 # Skip all tests if firmware files don't exist
 pytestmark = pytest.mark.skipif(
     not ELF_PATH.exists() or not BIN_PATH.exists(),
-    reason="Firmware files not found in firmware/",
+    reason="Firmware files not found in firmware/ or firmware/demo/",
 )
 
 

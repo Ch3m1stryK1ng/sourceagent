@@ -1,0 +1,205 @@
+{
+  "name": "negative_patched_candidates",
+  "created_at": "2026-03-12T07:56:25+00:00",
+  "description": "Phase 4 verdict-calibration set built from patched/instrumented uSBS variants plus negative-control GT-backed samples.",
+  "count": 8,
+  "samples": [
+    {
+      "dataset": "uSBS",
+      "sample_id": "udp_echo_server_bof_expl_patched",
+      "aliases": [
+        "udp_echo_server_bof_expl_patched"
+      ],
+      "binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_expl_patched/STM32469I_EVAL_stm32_udp_echo_server_stripped.elf",
+      "unstripped_binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_expl_patched/STM32469I_EVAL_stm32_udp_echo_server.elf",
+      "stripped_binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_expl_patched/STM32469I_EVAL_stm32_udp_echo_server_stripped.elf",
+      "stripped_status": "ready",
+      "stripped_origin": "generated",
+      "category": "patched_variant",
+      "tags": [
+        "patched"
+      ],
+      "in_gt_backed_suite": false,
+      "notes": [
+        "uSBS benchmark case with injected bug family + replay/fuzz inputs"
+      ],
+      "source_kinds": [
+        "inventory"
+      ]
+    },
+    {
+      "dataset": "uSBS",
+      "sample_id": "udp_echo_server_bof_expl_patched_instrumented",
+      "aliases": [
+        "udp_echo_server_bof_expl_patched_instrumented"
+      ],
+      "binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_expl_patched_instrumented/STM32469I_EVAL_stm32_udp_echo_server_stripped.elf",
+      "unstripped_binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_expl_patched_instrumented/STM32469I_EVAL_stm32_udp_echo_server.elf",
+      "stripped_binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_expl_patched_instrumented/STM32469I_EVAL_stm32_udp_echo_server_stripped.elf",
+      "stripped_status": "ready",
+      "stripped_origin": "generated",
+      "category": "patched_instrumented_variant",
+      "tags": [
+        "instrumented",
+        "patched"
+      ],
+      "in_gt_backed_suite": false,
+      "notes": [
+        "uSBS benchmark case with injected bug family + replay/fuzz inputs"
+      ],
+      "source_kinds": [
+        "inventory"
+      ]
+    },
+    {
+      "dataset": "uSBS",
+      "sample_id": "udp_echo_server_bof_expl_patched_instrumented_patched",
+      "aliases": [
+        "udp_echo_server_bof_expl_patched_instrumented_patched"
+      ],
+      "binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_expl_patched_instrumented_patched/STM32469I_EVAL_stm32_udp_echo_server_stripped.elf",
+      "unstripped_binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_expl_patched_instrumented_patched/STM32469I_EVAL_stm32_udp_echo_server.elf",
+      "stripped_binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_expl_patched_instrumented_patched/STM32469I_EVAL_stm32_udp_echo_server_stripped.elf",
+      "stripped_status": "ready",
+      "stripped_origin": "generated",
+      "category": "patched_instrumented_variant",
+      "tags": [
+        "instrumented",
+        "patched"
+      ],
+      "in_gt_backed_suite": false,
+      "notes": [
+        "uSBS benchmark case with injected bug family + replay/fuzz inputs"
+      ],
+      "source_kinds": [
+        "inventory"
+      ]
+    },
+    {
+      "dataset": "uSBS",
+      "sample_id": "usbs_test_printf_fw",
+      "aliases": [
+        "test_printf_fw",
+        "usbs_test_printf_fw"
+      ],
+      "binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/test_printf_fw/STM32469I_EVAL_stm32_udp_echo_server_stripped.elf",
+      "unstripped_binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/test_printf_fw/STM32469I_EVAL_stm32_udp_echo_server.elf",
+      "stripped_binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/test_printf_fw/STM32469I_EVAL_stm32_udp_echo_server_stripped.elf",
+      "stripped_status": "ready",
+      "stripped_origin": "existing",
+      "category": "negative_only",
+      "tags": [
+        "negative_only"
+      ],
+      "in_gt_backed_suite": true,
+      "notes": [
+        "This sample is a full-GT negative control for control-only trigger paths into an injected sprintf-based overflow.",
+        "addr2line maps bof() to udp_echoserver.c:76 and udp_echoserver_receive_callback() to udp_echoserver.c:246 in the STM32Cube/uSBS build.",
+        "uSBS benchmark case with injected bug family + replay/fuzz inputs"
+      ],
+      "source_kinds": [
+        "gt_backed_suite",
+        "inventory"
+      ]
+    },
+    {
+      "dataset": "uSBS",
+      "sample_id": "usbs_udp_echo_server_bof_instrumented",
+      "aliases": [
+        "udp_echo_server_bof_instrumented"
+      ],
+      "binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_instrumented/STM32469I_EVAL_stm32_udp_echo_server_stripped.elf",
+      "unstripped_binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_instrumented/STM32469I_EVAL_stm32_udp_echo_server.elf",
+      "stripped_binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_instrumented/STM32469I_EVAL_stm32_udp_echo_server_stripped.elf",
+      "stripped_status": "ready",
+      "stripped_origin": "existing",
+      "category": "instrumented_variant",
+      "tags": [
+        "instrumented"
+      ],
+      "in_gt_backed_suite": true,
+      "notes": [
+        "uSBS benchmark case with injected bug family + replay/fuzz inputs"
+      ],
+      "source_kinds": [
+        "inventory"
+      ]
+    },
+    {
+      "dataset": "uSBS",
+      "sample_id": "usbs_udp_echo_server_bof_instrumented_patched",
+      "aliases": [
+        "udp_echo_server_bof_instrumented_patched",
+        "usbs_udp_echo_server_bof_instrumented_patched"
+      ],
+      "binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_instrumented_patched/STM32469I_EVAL_stm32_udp_echo_server_stripped.elf",
+      "unstripped_binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_instrumented_patched/STM32469I_EVAL_stm32_udp_echo_server.elf",
+      "stripped_binary_path": "/home/a347908610/sourceagent/firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_instrumented_patched/STM32469I_EVAL_stm32_udp_echo_server_stripped.elf",
+      "stripped_status": "ready",
+      "stripped_origin": "existing",
+      "category": "patched_instrumented_variant",
+      "tags": [
+        "instrumented",
+        "patched"
+      ],
+      "in_gt_backed_suite": true,
+      "notes": [
+        "Auto-promoted to full_gt from current pipeline eval outputs; exhaustive within declared pipeline_scope.",
+        "Patched instrumented sample is kept target-scope: two representative copy chains plus the current DMA proxy object.",
+        "uSBS benchmark case with injected bug family + replay/fuzz inputs"
+      ],
+      "source_kinds": [
+        "gt_backed_suite",
+        "inventory"
+      ]
+    },
+    {
+      "dataset": "monolithic-firmware-collection",
+      "sample_id": "zephyr_false_positive_rf_size_check",
+      "aliases": [
+        "zephyr_false_positive_rf_size_check"
+      ],
+      "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-no-CVE-false-positive-rf-size-check/zephyr-CVE-no-CVE-false-positive-rf-size-check_stripped.elf",
+      "unstripped_binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-no-CVE-false-positive-rf-size-check/zephyr-CVE-no-CVE-false-positive-rf-size-check.elf",
+      "stripped_binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-no-CVE-false-positive-rf-size-check/zephyr-CVE-no-CVE-false-positive-rf-size-check_stripped.elf",
+      "stripped_status": "ready",
+      "stripped_origin": "existing",
+      "category": "negative_control",
+      "tags": [
+        "negative_control"
+      ],
+      "in_gt_backed_suite": true,
+      "notes": [
+        "Auto-promoted to full_gt from current pipeline eval outputs; exhaustive within declared pipeline_scope.",
+        "This sample should help suppress over-generated chains and over-promoted verdicts."
+      ],
+      "source_kinds": [
+        "gt_backed_suite"
+      ]
+    },
+    {
+      "dataset": "monolithic-firmware-collection",
+      "sample_id": "zephyr_false_positive_watchdog_callback",
+      "aliases": [
+        "zephyr_false_positive_watchdog_callback"
+      ],
+      "binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-no-CVE-false-positive-watchdog-callback/zephyr-CVE-no-CVE-false-positive-watchdog-callback_stripped.elf",
+      "unstripped_binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-no-CVE-false-positive-watchdog-callback/zephyr-CVE-no-CVE-false-positive-watchdog-callback.elf",
+      "stripped_binary_path": "/home/a347908610/sourceagent/firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-no-CVE-false-positive-watchdog-callback/zephyr-CVE-no-CVE-false-positive-watchdog-callback_stripped.elf",
+      "stripped_status": "ready",
+      "stripped_origin": "existing",
+      "category": "negative_control",
+      "tags": [
+        "negative_control"
+      ],
+      "in_gt_backed_suite": true,
+      "notes": [
+        "Auto-promoted to full_gt from current pipeline eval outputs; exhaustive within declared pipeline_scope.",
+        "Negative-control GT: spurious watchdog feed/store chains should be dropped."
+      ],
+      "source_kinds": [
+        "gt_backed_suite"
+      ]
+    }
+  ]
+}

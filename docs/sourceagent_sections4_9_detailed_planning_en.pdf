@@ -1,0 +1,904 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Length 3593 >>
+stream
+BT
+/F1 10 Tf
+40 800 Td
+(DETAILED PLANNING MEMO) Tj
+0 -12 Td (Async Context Communication, ChannelGraph Recovery, and Sink-to-Source Tunnel Detection) Tj
+0 -12 Td (\(Code-Level Implementation\)) Tj
+0 -12 Td () Tj
+0 -12 Td (Executive Summary) Tj
+0 -12 Td (The current SourceAgent RQ1 layer is usable: source/sink labeling is largely in place. The next) Tj
+0 -12 Td (phase is not about adding more isolated labels; it is about connecting labels into verifiable,) Tj
+0 -12 Td (explainable, reproducible chains.) Tj
+0 -12 Td () Tj
+0 -12 Td (This document defines:) Tj
+0 -12 Td (* A unified JSON contract for ChannelGraph and Chain artifacts.) Tj
+0 -12 Td (* Module-level inputs/outputs, dependencies, and failure modes.) Tj
+0 -12 Td (* Concrete case studies on microbench and CVE-2020-10065.) Tj
+0 -12 Td () Tj
+0 -12 Td (---) Tj
+0 -12 Td () Tj
+0 -12 Td (3. Architecture Overview \(Pipeline + Artifacts\)) Tj
+0 -12 Td () Tj
+0 -12 Td (3.1 Logical Module View) Tj
+0 -12 Td () Tj
+0 -12 Td (+---------------------------------------------------------------+) Tj
+0 -12 Td (| Stage 1/2/2.5: Loader + MAI + Interprocedural                |) Tj
+0 -12 Td (+---------------------------------------------------------------+) Tj
+0 -12 Td (                            |) Tj
+0 -12 Td (                            v) Tj
+0 -12 Td (+---------------------------------------------------------------+) Tj
+0 -12 Td (| Stage 3/4: Source/Sink Miners                                 |) Tj
+0 -12 Td (| - Sources: MMIO_READ / ISR_* / DMA_BACKED_BUFFER             |) Tj
+0 -12 Td (| - Sinks: COPY / MEMSET / STORE / LOOP_WRITE / FUNC_PTR / FMT |) Tj
+0 -12 Td (+---------------------------------------------------------------+) Tj
+0 -12 Td (                            |) Tj
+0 -12 Td (                            v) Tj
+0 -12 Td (+---------------------------------------------------------------+) Tj
+0 -12 Td (| Stage 5/6/7: Evidence Pack -> Proposal -> Verifier           |) Tj
+0 -12 Td (| Output: verified labels                                      |) Tj
+0 -12 Td (+---------------------------------------------------------------+) Tj
+0 -12 Td (                            |) Tj
+0 -12 Td (                            v) Tj
+0 -12 Td (+---------------------------------------------------------------+) Tj
+0 -12 Td (| M8.5/M8.6: ChannelGraph + Object Boundary Refinement         |) Tj
+0 -12 Td (| Output: channel_graph.json / refined_objects.json            |) Tj
+0 -12 Td (+---------------------------------------------------------------+) Tj
+0 -12 Td (                            |) Tj
+0 -12 Td (                            v) Tj
+0 -12 Td (+---------------------------------------------------------------+) Tj
+0 -12 Td (| M9/M9.1/M9.2: Sink Roots -> Tunnel Linker -> Derive/Check    |) Tj
+0 -12 Td (| Output: sink_roots.json / chains.json / chain_eval.json      |) Tj
+0 -12 Td (+---------------------------------------------------------------+) Tj
+0 -12 Td (                            |) Tj
+0 -12 Td (                            v) Tj
+0 -12 Td (+---------------------------------------------------------------+) Tj
+0 -12 Td (| M9.3: Suspicious Queue Export                                |) Tj
+0 -12 Td (| Output: low_conf_sinks.json / triage_queue.json              |) Tj
+0 -12 Td (+---------------------------------------------------------------+) Tj
+0 -12 Td () Tj
+0 -12 Td () Tj
+0 -12 Td (3.2 Artifact Flow) Tj
+0 -12 Td () Tj
+0 -12 Td (MAI) Tj
+0 -12 Td ( |- source_candidates.json) Tj
+0 -12 Td ( |- sink_candidates.json) Tj
+0 -12 Td ( `- verified_labels.json) Tj
+0 -12 Td (      |- channel_graph.json       \(M8.5\)) Tj
+ET
+endstream
+endobj
+2 0 obj
+<< /Type /Page /Parent 26 0 R /MediaBox [0 0 595 842] /Contents 1 0 R /Resources << /Font << /F1 25 0 R >> >> >>
+endobj
+3 0 obj
+<< /Length 3178 >>
+stream
+BT
+/F1 10 Tf
+40 800 Td
+(      |- refined_objects.json     \(M8.6\)) Tj
+0 -12 Td (      |- sink_roots.json          \(M9\)) Tj
+0 -12 Td (      |- chains.json              \(M9.1, primary output\)) Tj
+0 -12 Td (      |- chain_eval.json          \(M9.2 summary\)) Tj
+0 -12 Td (      |- low_conf_sinks.json      \(M9.3 input-side snapshot\)) Tj
+0 -12 Td (      `- triage_queue.json        \(M9.3 top-K queue\)) Tj
+0 -12 Td () Tj
+0 -12 Td () Tj
+0 -12 Td (---) Tj
+0 -12 Td () Tj
+0 -12 Td (4. Async Context Communication and ChannelGraph \(Definitions and Spec\)) Tj
+0 -12 Td () Tj
+0 -12 Td (4.1 Terms and Boundaries) Tj
+0 -12 Td () Tj
+0 -12 Td (4.1.1 MAI) Tj
+0 -12 Td (`MAI = MemoryAccessIndex` from Stage 2:) Tj
+0 -12 Td (* Per access fields: `address/kind\(load|store\)/target_addr/base_provenance/function/in_isr`.) Tj
+0 -12 Td (* Subset: `mmio_accesses`.) Tj
+0 -12 Td (* Cache: `decompiled_cache` \(function-level decompilation text\).) Tj
+0 -12 Td () Tj
+0 -12 Td (4.1.2 `src_context` / `dst_context`) Tj
+0 -12 Td (These are context boundaries, not caller/callee:) Tj
+0 -12 Td (* `src_context`: producer context \(`ISR/TASK/MAIN/DMA/UNKNOWN`\).) Tj
+0 -12 Td (* `dst_context`: consumer context.) Tj
+0 -12 Td () Tj
+0 -12 Td (Examples:) Tj
+0 -12 Td (* ISR writes `g_rx_buf`, MAIN reads `g_rx_buf` -> `ISR -> MAIN`.) Tj
+0 -12 Td (* DMA writes `dma_rx_buf`, TASK reads it -> `DMA -> TASK`.) Tj
+0 -12 Td () Tj
+0 -12 Td (4.1.3 Where constraints should live) Tj
+0 -12 Td (Two kinds of constraints:) Tj
+0 -12 Td (* Channel enable constraints: in `ChannelEdge.constraints` \(for example `tail!=head`,) Tj
+0 -12 Td (`dma_done!=0`\).) Tj
+0 -12 Td (* Sink safety constraints: in chain `check_facts` \(for example whether `len<=MAX` dominates the) Tj
+0 -12 Td (sink\).) Tj
+0 -12 Td () Tj
+0 -12 Td (Both must be modeled, but at different layers.) Tj
+0 -12 Td () Tj
+0 -12 Td (4.1.4 Producer / Consumer) Tj
+0 -12 Td (* Producer: context that writes/assigns an object.) Tj
+0 -12 Td (* Consumer: context that reads the object and uses it for data/control flow.) Tj
+0 -12 Td () Tj
+0 -12 Td (These define edges even without direct callgraph links.) Tj
+0 -12 Td () Tj
+0 -12 Td (4.1.5 Sink root) Tj
+0 -12 Td (A sink root is the risk-carrying value expression to track.) Tj
+0 -12 Td (* COPY_SINK typical root: `len`.) Tj
+0 -12 Td (* FUNC_PTR_SINK typical root: dispatch index.) Tj
+0 -12 Td () Tj
+0 -12 Td (Root is value-centric; object is memory-centric. They connect when root tracing maps to an) Tj
+0 -12 Td (object range.) Tj
+0 -12 Td () Tj
+0 -12 Td (4.1.6 `derive_facts` / `check_facts`) Tj
+0 -12 Td (* `derive_facts`: how dangerous arguments are derived from input/shared objects.) Tj
+0 -12 Td (* `check_facts`: whether guards are `effective/weak/absent` before sink.) Tj
+0 -12 Td () Tj
+0 -12 Td (4.1.7 Chain verdict) Tj
+0 -12 Td (* `CONFIRMED`: source reached + controllable root + missing/weak key check.) Tj
+0 -12 Td (* `SUSPICIOUS`: strong sink signal but chain is incomplete or uncertain.) Tj
+0 -12 Td (* `SAFE_OR_LOW_RISK`: effective upper-bound check exists.) Tj
+0 -12 Td (* `DROP`: contradictory or insufficient evidence.) Tj
+0 -12 Td () Tj
+0 -12 Td (4.2 Unified ChannelGraph Contract) Tj
+ET
+endstream
+endobj
+4 0 obj
+<< /Type /Page /Parent 26 0 R /MediaBox [0 0 595 842] /Contents 3 0 R /Resources << /Font << /F1 25 0 R >> >> >>
+endobj
+5 0 obj
+<< /Length 2589 >>
+stream
+BT
+/F1 10 Tf
+40 800 Td
+() Tj
+0 -12 Td (4.2.1 ObjectNode schema) Tj
+0 -12 Td (Use one main schema for all object kinds, with optional `type_facts` per kind.) Tj
+0 -12 Td () Tj
+0 -12 Td () Tj
+0 -12 Td ({) Tj
+0 -12 Td (  "object_id": "obj_rx_buf_20000000_2000007f",) Tj
+0 -12 Td (  "region_kind": "SRAM_CLUSTER",) Tj
+0 -12 Td (  "addr_range": ["0x20000000", "0x2000007f"],) Tj
+0 -12 Td (  "writers": ["USART1_IRQHandler"],) Tj
+0 -12 Td (  "readers": ["process_packet"],) Tj
+0 -12 Td (  "producer_contexts": ["ISR"],) Tj
+0 -12 Td (  "consumer_contexts": ["MAIN"],) Tj
+0 -12 Td (  "evidence_refs": ["E_ISR_STORE_1", "E_MAIN_LOAD_3"],) Tj
+0 -12 Td (  "confidence": 0.82,) Tj
+0 -12 Td (  "type_facts": {) Tj
+0 -12 Td (    "index_vars": ["g_rx_head", "g_rx_tail"],) Tj
+0 -12 Td (    "is_ring_like": true) Tj
+0 -12 Td (  },) Tj
+0 -12 Td (  "notes": "ring payload") Tj
+0 -12 Td (}) Tj
+0 -12 Td () Tj
+0 -12 Td () Tj
+0 -12 Td (4.2.2 ChannelEdge schema) Tj
+0 -12 Td () Tj
+0 -12 Td ({) Tj
+0 -12 Td (  "src_context": "ISR",) Tj
+0 -12 Td (  "object_id": "obj_rx_buf_20000000_2000007f",) Tj
+0 -12 Td (  "dst_context": "MAIN",) Tj
+0 -12 Td (  "edge_kind": "DATA",) Tj
+0 -12 Td (  "constraints": [) Tj
+0 -12 Td (    {"kind": "ring_guard", "expr": "g_rx_tail != g_rx_head", "site": "process_packet"}) Tj
+0 -12 Td (  ],) Tj
+0 -12 Td (  "evidence_refs": ["E_ISR_STORE_1", "E_LOOP_COND_2"],) Tj
+0 -12 Td (  "score": 0.79) Tj
+0 -12 Td (}) Tj
+0 -12 Td () Tj
+0 -12 Td () Tj
+0 -12 Td (4.3 M8.5 ChannelGraph Builder \(new\)) Tj
+0 -12 Td (* Target file: `sourceagent/pipeline/channel_graph.py`) Tj
+0 -12 Td (* Input: `MAI + verified source labels + MemoryMap`) Tj
+0 -12 Td (* Output: `channel_graph.json`) Tj
+0 -12 Td () Tj
+0 -12 Td (Interface:) Tj
+0 -12 Td () Tj
+0 -12 Td (def build_channel_graph\(mai, verified_labels, memory_map, *, top_k=3\) -> dict:) Tj
+0 -12 Td (    ...) Tj
+0 -12 Td () Tj
+0 -12 Td () Tj
+0 -12 Td (Logic:) Tj
+0 -12 Td (1. Extract SRAM/DMA/flag candidates from MAI.) Tj
+0 -12 Td (2. Build writer/reader/context sets.) Tj
+0 -12 Td (3. Keep only cross-context objects.) Tj
+0 -12 Td (4. Collect edge constraints and evidence refs.) Tj
+0 -12 Td (5. Keep top-K conflicting candidates instead of forcing one explanation.) Tj
+0 -12 Td () Tj
+0 -12 Td (Failure modes:) Tj
+0 -12 Td (* No cross-context object -> emit empty graph \(valid\).) Tj
+0 -12 Td (* Unknown context -> keep as `UNKNOWN` and downscore.) Tj
+0 -12 Td () Tj
+0 -12 Td (4.4 M8.6 Object Boundary Refiner \(new\)) Tj
+0 -12 Td (* Target file: `sourceagent/pipeline/object_refine.py`) Tj
+0 -12 Td (* Input: `raw_objects + access_traces`) Tj
+ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 26 0 R /MediaBox [0 0 595 842] /Contents 5 0 R /Resources << /Font << /F1 25 0 R >> >> >>
+endobj
+7 0 obj
+<< /Length 2514 >>
+stream
+BT
+/F1 10 Tf
+40 800 Td
+(* Output: `refined_objects.json`) Tj
+0 -12 Td () Tj
+0 -12 Td (Interface:) Tj
+0 -12 Td () Tj
+0 -12 Td (def refine_object_boundaries\(raw_objects, access_traces\) -> list[dict]:) Tj
+0 -12 Td (    ...) Tj
+0 -12 Td () Tj
+0 -12 Td () Tj
+0 -12 Td (Split rules:) Tj
+0 -12 Td (1. Dense indexed array accesses -> payload object.) Tj
+0 -12 Td (2. Scalar values used in `if/while` conditions -> flag/control object.) Tj
+0 -12 Td (3. `head/tail/index` update vars split from payload.) Tj
+0 -12 Td () Tj
+0 -12 Td (4.5 Why M8.6 is needed if objects already exist) Tj
+0 -12 Td (* M8.5 emits coarse objects \(recall-oriented\).) Tj
+0 -12 Td (* M8.6 refines/splits/merges them \(precision and explainability\).) Tj
+0 -12 Td () Tj
+0 -12 Td (Before \(coarse\):) Tj
+0 -12 Td () Tj
+0 -12 Td ({) Tj
+0 -12 Td (  "object_id": "obj_cluster_20000000_200000ff",) Tj
+0 -12 Td (  "members": ["g_rx_buf", "g_rx_head", "g_rx_tail", "g_mode_flag"],) Tj
+0 -12 Td (  "region_kind": "SRAM_CLUSTER") Tj
+0 -12 Td (}) Tj
+0 -12 Td () Tj
+0 -12 Td () Tj
+0 -12 Td (After \(refined\):) Tj
+0 -12 Td () Tj
+0 -12 Td ([) Tj
+0 -12 Td (  {"object_id":"obj_rx_payload","members":["g_rx_buf"],"region_kind":"SRAM_CLUSTER"},) Tj
+0 -12 Td (  {"object_id":"obj_rx_ctrl","members":["g_rx_head","g_rx_tail"],"region_kind":"FLAG"},) Tj
+0 -12 Td (  {"object_id":"obj_mode_flag","members":["g_mode_flag"],"region_kind":"FLAG"}) Tj
+0 -12 Td (]) Tj
+0 -12 Td () Tj
+0 -12 Td () Tj
+0 -12 Td (Without M8.6, DATA and CONTROL edges are mixed, root-to-object mapping becomes noisy, and) Tj
+0 -12 Td (tunnel jumps become error-prone.) Tj
+0 -12 Td () Tj
+0 -12 Td (---) Tj
+0 -12 Td () Tj
+0 -12 Td (5. Sink Roots, Linker, and Chain Artifacts) Tj
+0 -12 Td () Tj
+0 -12 Td (5.0 Module DAG) Tj
+0 -12 Td () Tj
+0 -12 Td (M8.5 ChannelGraph Builder) Tj
+0 -12 Td (  -> M8.6 Object Boundary Refiner) Tj
+0 -12 Td (  -> M9 Sink Root Extractor) Tj
+0 -12 Td (  -> M9.1 Tunnel-Aware Backward Linker) Tj
+0 -12 Td (  -> M9.2 Derive+Check Summarizer) Tj
+0 -12 Td (  -> M9.3 Suspicious Queue + Chain Verdict Export) Tj
+0 -12 Td () Tj
+0 -12 Td () Tj
+0 -12 Td (5.1 M9 Sink Root Extractor \(new\)) Tj
+0 -12 Td (* Target file: `sourceagent/pipeline/linker/sink_roots.py`) Tj
+0 -12 Td (* Input: `verified sinks + decompiled code + sink facts`) Tj
+0 -12 Td (* Output: `sink_roots.json`) Tj
+0 -12 Td () Tj
+0 -12 Td (Interface:) Tj
+0 -12 Td () Tj
+0 -12 Td (def extract_sink_roots\(verified_sinks, decompiled_cache\) -> list[dict]:) Tj
+0 -12 Td (    ...) Tj
+0 -12 Td () Tj
+0 -12 Td () Tj
+ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 26 0 R /MediaBox [0 0 595 842] /Contents 7 0 R /Resources << /Font << /F1 25 0 R >> >> >>
+endobj
+9 0 obj
+<< /Length 2609 >>
+stream
+BT
+/F1 10 Tf
+40 800 Td
+(Root mapping:) Tj
+0 -12 Td (* COPY_SINK: primary `len`, secondary `dst`.) Tj
+0 -12 Td (* LOOP_WRITE_SINK: loop bound/index.) Tj
+0 -12 Td (* MEMSET_SINK: length.) Tj
+0 -12 Td (* FUNC_PTR_SINK: dispatch index/target pointer.) Tj
+0 -12 Td (* FORMAT_STRING_SINK: format argument.) Tj
+0 -12 Td () Tj
+0 -12 Td (Example output:) Tj
+0 -12 Td () Tj
+0 -12 Td ([) Tj
+0 -12 Td (  {) Tj
+0 -12 Td (    "sink_id": "SINK_t0_copy_1",) Tj
+0 -12 Td (    "sink_label": "COPY_SINK",) Tj
+0 -12 Td (    "sink_function": "process_packet",) Tj
+0 -12 Td (    "sink_site": "0x08000120",) Tj
+0 -12 Td (    "roots": [) Tj
+0 -12 Td (      {"role": "primary", "expr": "count", "kind": "length"},) Tj
+0 -12 Td (      {"role": "secondary", "expr": "out", "kind": "dst_ptr"}) Tj
+0 -12 Td (    ],) Tj
+0 -12 Td (    "evidence_refs": ["E_COPY_CALL", "E_ARG_PARSE"],) Tj
+0 -12 Td (    "confidence": 0.78) Tj
+0 -12 Td (  }) Tj
+0 -12 Td (]) Tj
+0 -12 Td () Tj
+0 -12 Td () Tj
+0 -12 Td (Relationship between roots and objects:) Tj
+0 -12 Td (* Roots are value expressions.) Tj
+0 -12 Td (* Objects are cross-context storage carriers.) Tj
+0 -12 Td (* They connect when backward tracing maps root expressions to object ranges.) Tj
+0 -12 Td () Tj
+0 -12 Td (5.2 M9.1 Tunnel-Aware Backward Linker \(new\)) Tj
+0 -12 Td (* Target file: `sourceagent/pipeline/linker/tunnel_linker.py`) Tj
+0 -12 Td (* Input: `sink_roots.json + channel_graph.json + MAI/decompiled_cache + sources`) Tj
+0 -12 Td (* Output: `chains.json`) Tj
+0 -12 Td () Tj
+0 -12 Td (Interface:) Tj
+0 -12 Td () Tj
+0 -12 Td (def link_chains\(sink_roots, channel_graph, mai, sources, *, budget=200\) -> list[dict]:) Tj
+0 -12 Td (    ...) Tj
+0 -12 Td () Tj
+0 -12 Td () Tj
+0 -12 Td (Tunnel jump is not function-call jump. It is context switch along object edges after root) Tj
+0 -12 Td (tracing reaches an object node.) Tj
+0 -12 Td () Tj
+0 -12 Td (5.3 M9.2 Derive + Check Summarizer \(new\)) Tj
+0 -12 Td (* Target file: `sourceagent/pipeline/linker/derive_check.py`) Tj
+0 -12 Td (* Input: slice path \(SSA nodes / expression edges\)) Tj
+0 -12 Td (* Output: `derive_facts` and `check_facts`) Tj
+0 -12 Td () Tj
+0 -12 Td (Purpose:) Tj
+0 -12 Td (* Linker gives a path.) Tj
+0 -12 Td (* This module turns path into security-meaningful explanation.) Tj
+0 -12 Td () Tj
+0 -12 Td (Input \(example\):) Tj
+0 -12 Td () Tj
+0 -12 Td ({) Tj
+0 -12 Td (  "slice_nodes": [) Tj
+0 -12 Td (    "payload_len = \(rxmsg[2] | rxmsg[3]<<8\)",) Tj
+0 -12 Td (    "if \(payload_len > 0\)",) Tj
+0 -12 Td (    "net_buf_add_mem\(buf, rxmsg+5, payload_len\)") Tj
+0 -12 Td (  ]) Tj
+0 -12 Td (}) Tj
+0 -12 Td () Tj
+ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 26 0 R /MediaBox [0 0 595 842] /Contents 9 0 R /Resources << /Font << /F1 25 0 R >> >> >>
+endobj
+11 0 obj
+<< /Length 2853 >>
+stream
+BT
+/F1 10 Tf
+40 800 Td
+() Tj
+0 -12 Td (Output \(example\):) Tj
+0 -12 Td () Tj
+0 -12 Td ({) Tj
+0 -12 Td (  "derive_facts": [) Tj
+0 -12 Td (    {"expr":"payload_len = rxmsg[2] | \(rxmsg[3] << 8\)", "kind":"len_from_header",) Tj
+0 -12 Td ("site":"bt_spi_rx_thread"}) Tj
+0 -12 Td (  ],) Tj
+0 -12 Td (  "check_facts": [) Tj
+0 -12 Td (    {"expr":"payload_len > 0", "strength":"weak", "reason":"non-upper-bound",) Tj
+0 -12 Td ("site":"bt_spi_rx_thread"},) Tj
+0 -12 Td (    {"expr":"payload_len <= NET_BUF_DATA_SIZE", "strength":"absent",) Tj
+0 -12 Td ("site":"bt_spi_rx_thread"}) Tj
+0 -12 Td (  ]) Tj
+0 -12 Td (}) Tj
+0 -12 Td () Tj
+0 -12 Td () Tj
+0 -12 Td (5.4 M9.3 Suspicious Triage Queue \(new\)) Tj
+0 -12 Td (* Target file: `sourceagent/pipeline/triage_queue.py`) Tj
+0 -12 Td (* Input: low-confidence sinks, unclosed chains, contradictory checks) Tj
+0 -12 Td (* Output: `triage_queue.json` \(top-K\)) Tj
+0 -12 Td () Tj
+0 -12 Td (Low-confidence sources:) Tj
+0 -12 Td (1. Miner confidence `< T_low`.) Tj
+0 -12 Td (2. Verifier status is `PARTIAL/UNKNOWN`.) Tj
+0 -12 Td (3. Root extraction fails or root-object mapping fails.) Tj
+0 -12 Td (4. Sink reached but source not reached.) Tj
+0 -12 Td () Tj
+0 -12 Td (Persist both:) Tj
+0 -12 Td (* `low_conf_sinks.json` \(full snapshot\)) Tj
+0 -12 Td (* `triage_queue.json` \(ranked top-K\)) Tj
+0 -12 Td () Tj
+0 -12 Td (---) Tj
+0 -12 Td () Tj
+0 -12 Td (6. Sink-First Tunnel Detection \(Algorithm, Complexity, Heuristics\)) Tj
+0 -12 Td () Tj
+0 -12 Td (6.1 How Section 5 modules compose) Tj
+0 -12 Td (* Section 5 artifacts are intermediate outputs.) Tj
+0 -12 Td (* Section 6 algorithm consumes those artifacts to produce final chain verdicts.) Tj
+0 -12 Td () Tj
+0 -12 Td (Mapping:) Tj
+0 -12 Td (* `sink_roots.json` -> root selection.) Tj
+0 -12 Td (* `channel_graph.json` -> tunnel jump.) Tj
+0 -12 Td (* `derive/check` -> semantic decision inputs.) Tj
+0 -12 Td (* `chains.json` -> final linker output from M9.1.) Tj
+0 -12 Td () Tj
+0 -12 Td (6.2 Pseudocode) Tj
+0 -12 Td () Tj
+0 -12 Td (for sink in sink_roots:) Tj
+0 -12 Td (    for root in sink.roots:) Tj
+0 -12 Td (        path = backward_slice\(root, budget=B\)) Tj
+0 -12 Td (        while path.hit_object_node\(\):) Tj
+0 -12 Td (            producers = topk_producers\(path.object_id, K\)) Tj
+0 -12 Td (            path = tunnel_jump_and_continue\(path, producers, budget=B\)) Tj
+0 -12 Td (        derive = summarize_derive\(path\)) Tj
+0 -12 Td (        checks = summarize_checks\(path, sink.site\)) Tj
+0 -12 Td (        verdict = score_and_decide\(path, derive, checks\)) Tj
+0 -12 Td (        emit_chain\(sink, root, path, derive, checks, verdict\)) Tj
+0 -12 Td () Tj
+0 -12 Td () Tj
+0 -12 Td (6.3 Complexity and why heuristics are necessary) Tj
+0 -12 Td (Without sink-first \(`source x sink`\):) Tj
+0 -12 Td (* Approx complexity: `O\(|Src| * |Sink| * C_slice\)`.) Tj
+ET
+endstream
+endobj
+12 0 obj
+<< /Type /Page /Parent 26 0 R /MediaBox [0 0 595 842] /Contents 11 0 R /Resources << /Font << /F1 25 0 R >> >> >>
+endobj
+13 0 obj
+<< /Length 2921 >>
+stream
+BT
+/F1 10 Tf
+40 800 Td
+() Tj
+0 -12 Td (With sink-first and bounded search:) Tj
+0 -12 Td (* Approx complexity: `O\(|Sink| * R * B * K^d\)`.) Tj
+0 -12 Td (  - `R`: roots per sink \(typically 1-2\)) Tj
+0 -12 Td (  - `B`: backward slice budget) Tj
+0 -12 Td (  - `K`: top-K producers on tunnel jump) Tj
+0 -12 Td (  - `d`: tunnel depth \(small\)) Tj
+0 -12 Td () Tj
+0 -12 Td (Heuristics are needed because static recovery is incomplete in stripped/optimized binaries) Tj
+0 -12 Td (\(aliasing, boundary precision, callsite recovery\).) Tj
+0 -12 Td () Tj
+0 -12 Td (6.4 M9.1 `chains.json` example output) Tj
+0 -12 Td () Tj
+0 -12 Td ({) Tj
+0 -12 Td (  "chain_id": "chain_cve2020_10065_evt_1",) Tj
+0 -12 Td (  "sink": {) Tj
+0 -12 Td (    "sink_id": "SINK_evt_add_mem",) Tj
+0 -12 Td (    "label": "COPY_SINK",) Tj
+0 -12 Td (    "function": "bt_spi_rx_thread",) Tj
+0 -12 Td (    "root_expr": "rxmsg[2] + 2") Tj
+0 -12 Td (  },) Tj
+0 -12 Td (  "steps": [) Tj
+0 -12 Td (    {"kind":"DERIVE", "expr":"payload_len = rxmsg[2] + 2", "site":"bt_spi_rx_thread"},) Tj
+0 -12 Td (    {"kind":"CHANNEL", "object_id":"obj_rxmsg", "edge":"DMA->TASK",) Tj
+0 -12 Td ("evidence_refs":["E_CH_1"]},) Tj
+0 -12 Td (    {"kind":"SOURCE", "label":"MMIO_READ", "site":"SPI1_DR", "evidence_refs":["E_SRC_2"]}) Tj
+0 -12 Td (  ],) Tj
+0 -12 Td (  "checks": [) Tj
+0 -12 Td (    {"expr":"payload_len <= NET_BUF_DATA_SIZE", "strength":"absent",) Tj
+0 -12 Td ("site":"bt_spi_rx_thread"}) Tj
+0 -12 Td (  ],) Tj
+0 -12 Td (  "verdict": "CONFIRMED",) Tj
+0 -12 Td (  "score": 0.93,) Tj
+0 -12 Td (  "evidence_refs": ["E1","E2","E7"]) Tj
+0 -12 Td (}) Tj
+0 -12 Td () Tj
+0 -12 Td () Tj
+0 -12 Td (---) Tj
+0 -12 Td () Tj
+0 -12 Td (7. SourceAgent and BinAgent Split) Tj
+0 -12 Td (* SourceAgent: deterministic rule implementation, structured facts, graph/chain preflight.) Tj
+0 -12 Td (* BinAgent: runtime validation, deep checks, execution-side prioritization.) Tj
+0 -12 Td () Tj
+0 -12 Td (Plan:) Tj
+0 -12 Td (1. Near-term: SourceAgent ships `channel_graph + chains` baseline.) Tj
+0 -12 Td (2. Mid-term: migrate minimal stable linker back into SourceAgent for single-repo) Tj
+0 -12 Td (reproducibility.) Tj
+0 -12 Td (3. Long-term: shared schema and evaluation scripts across both repos.) Tj
+0 -12 Td () Tj
+0 -12 Td (---) Tj
+0 -12 Td () Tj
+0 -12 Td (8. Roadmap and Evaluation \(No LLM in this version\)) Tj
+0 -12 Td () Tj
+0 -12 Td (8.1 Roadmap \(P0-P3\)) Tj
+0 -12 Td (* P0: ContextIndex MVP + ChannelGraph\(SRAM/DMA\) + baseline linker.) Tj
+0 -12 Td (* P1: object boundary refinement + DMA consumer binding + multi-callsite completeness.) Tj
+0 -12 Td (* P2: stronger derive/check and chain-level evaluation.) Tj
+0 -12 Td (* P3: RTOS queue strong-evidence recovery + schema convergence.) Tj
+0 -12 Td () Tj
+0 -12 Td (8.2 Evaluation metrics \(label -> chain\)) Tj
+0 -12 Td (1. Label-level: TP/FP/FN.) Tj
+0 -12 Td (2. Chain-level:) Tj
+0 -12 Td (* Reachability \(sink to source\)) Tj
+ET
+endstream
+endobj
+14 0 obj
+<< /Type /Page /Parent 26 0 R /MediaBox [0 0 595 842] /Contents 13 0 R /Resources << /Font << /F1 25 0 R >> >> >>
+endobj
+15 0 obj
+<< /Length 2640 >>
+stream
+BT
+/F1 10 Tf
+40 800 Td
+(* Derive correctness) Tj
+0 -12 Td (* Check consistency) Tj
+0 -12 Td (* Verdict stability) Tj
+0 -12 Td () Tj
+0 -12 Td (8.3 Success criteria) Tj
+0 -12 Td (1. At least one real CVE full chain + two microbench full chains.) Tj
+0 -12 Td (2. No source x sink exhaustive pairing.) Tj
+0 -12 Td (3. Every step traceable by evidence refs.) Tj
+0 -12 Td (4. Outputs remain explainable and auditable.) Tj
+0 -12 Td () Tj
+0 -12 Td (---) Tj
+0 -12 Td () Tj
+0 -12 Td (9. Case Studies with Target Chains) Tj
+0 -12 Td () Tj
+0 -12 Td (9.1 Case A: `t0_isr_filled_buffer.c`) Tj
+0 -12 Td () Tj
+0 -12 Td (void USART1_IRQHandler\(void\) {) Tj
+0 -12 Td (    uint8_t b = \(uint8_t\)\(USART1_DR & 0xFFu\);) Tj
+0 -12 Td (    g_rx_buf[g_rx_head] = b;) Tj
+0 -12 Td (}) Tj
+0 -12 Td () Tj
+0 -12 Td (void process_packet\(char *out, unsigned int max_len\) {) Tj
+0 -12 Td (    while \(g_rx_tail != g_rx_head\) {) Tj
+0 -12 Td (        tmp[count++] = g_rx_buf[g_rx_tail];) Tj
+0 -12 Td (    }) Tj
+0 -12 Td (    memcpy\(out, tmp, count\);) Tj
+0 -12 Td (}) Tj
+0 -12 Td () Tj
+0 -12 Td (Target chain:) Tj
+0 -12 Td (`MMIO_READ\(USART1_DR\) -> obj\(g_rx_buf\) -> derive\(count\) -> check\(count<max_len?\) ->) Tj
+0 -12 Td (COPY_SINK\(memcpy\)`) Tj
+0 -12 Td () Tj
+0 -12 Td (9.2 Case B: `t0_dma_backed_buffer.c`) Tj
+0 -12 Td () Tj
+0 -12 Td (DMA1_CH5_CPAR  = USART1_DR_ADDR;) Tj
+0 -12 Td (DMA1_CH5_CMAR  = \(uint32_t\)g_dma_rx_buf;) Tj
+0 -12 Td (DMA1_CH5_CNDTR = sizeof\(g_dma_rx_buf\);) Tj
+0 -12 Td () Tj
+0 -12 Td (if \(g_dma_rx_buf[0] != 0\) {) Tj
+0 -12 Td (    parse_frame\(g_dma_rx_buf, 256\);) Tj
+0 -12 Td (}) Tj
+0 -12 Td () Tj
+0 -12 Td (Requirements:) Tj
+0 -12 Td (* Bind `CMAR` to `g_dma_rx_buf`.) Tj
+0 -12 Td (* Consumer must read the same object/range.) Tj
+0 -12 Td () Tj
+0 -12 Td (Positive match: `parse_frame\(g_dma_rx_buf, ...\)`.) Tj
+0 -12 Td (Negative match: reading `g_cfg_buf` should not count as this DMA consumer.) Tj
+0 -12 Td () Tj
+0 -12 Td (DMA-style target chain output:) Tj
+0 -12 Td () Tj
+0 -12 Td ({) Tj
+0 -12 Td (  "chain_id": "chain_dma_rxbuf_parse_1",) Tj
+0 -12 Td (  "source": {"label":"DMA_BACKED_BUFFER", "site":"dma_uart_rx_init",) Tj
+0 -12 Td ("object_id":"obj_dma_rx_buf"},) Tj
+0 -12 Td (  "steps": [) Tj
+0 -12 Td (    {"kind":"CHANNEL", "edge":"DMA->MAIN", "object_id":"obj_dma_rx_buf"},) Tj
+0 -12 Td (    {"kind":"DERIVE", "expr":"frame_tag = g_dma_rx_buf[0]", "site":"main"}) Tj
+0 -12 Td (  ],) Tj
+0 -12 Td (  "sink": {"label":"STORE_SINK", "function":"parse_frame", "root_expr":"buf[idx]"},) Tj
+0 -12 Td (  "checks": [) Tj
+0 -12 Td (    {"expr":"idx < len", "strength":"effective", "site":"parse_frame"}) Tj
+0 -12 Td (  ],) Tj
+ET
+endstream
+endobj
+16 0 obj
+<< /Type /Page /Parent 26 0 R /MediaBox [0 0 595 842] /Contents 15 0 R /Resources << /Font << /F1 25 0 R >> >> >>
+endobj
+17 0 obj
+<< /Length 2846 >>
+stream
+BT
+/F1 10 Tf
+40 800 Td
+(  "verdict": "SAFE_OR_LOW_RISK") Tj
+0 -12 Td (}) Tj
+0 -12 Td () Tj
+0 -12 Td () Tj
+0 -12 Td (9.3 Case C: `cve_2020_10065_hci_spi.c` \(Full marking\)) Tj
+0 -12 Td () Tj
+0 -12 Td (Source site:) Tj
+0 -12 Td () Tj
+0 -12 Td (while \(!\(SPI1_SR & 0x01u\)\) {}) Tj
+0 -12 Td (dst[i] = \(uint8_t\)\(SPI1_DR & 0xFFu\);   // MMIO_READ\(SPI1_DR\)) Tj
+0 -12 Td () Tj
+0 -12 Td () Tj
+0 -12 Td (Sink trigger sites:) Tj
+0 -12 Td () Tj
+0 -12 Td (net_buf_add_mem\(buf, &rxmsg[1], rxmsg[EVT_HEADER_SIZE] + 2\);  // EVT sink) Tj
+0 -12 Td (net_buf_add_mem\(buf, &rxmsg[5], sys_le16_to_cpu\(acl_hdr.len\)\); // ACL sink) Tj
+0 -12 Td () Tj
+0 -12 Td () Tj
+0 -12 Td (Semantic sink inside helper:) Tj
+0 -12 Td () Tj
+0 -12 Td (memcpy\(dst, mem, len\); // inside net_buf_add_mem) Tj
+0 -12 Td () Tj
+0 -12 Td () Tj
+0 -12 Td (Required chains:) Tj
+0 -12 Td (* Chain-1 EVT root: `rxmsg[2]+2`, missing upper bound, up to ~257 into 76-byte buffer.) Tj
+0 -12 Td (* Chain-2 ACL root: `acl_hdr.len`, missing tailroom bound, potentially huge overflow.) Tj
+0 -12 Td () Tj
+0 -12 Td (Why this is CVE-2020-10065:) Tj
+0 -12 Td (1. Input-controlled length fields from MMIO stream.) Tj
+0 -12 Td (2. Length flows directly into copy size.) Tj
+0 -12 Td (3. No effective upper bound before copy.) Tj
+0 -12 Td () Tj
+0 -12 Td (Both chains should be `CONFIRMED` with sufficient static evidence.) Tj
+0 -12 Td () Tj
+0 -12 Td (---) Tj
+0 -12 Td () Tj
+0 -12 Td (10. Frozen Implementation Spec \(Pre-coding\)) Tj
+0 -12 Td () Tj
+0 -12 Td (This section is the coding baseline \(`v1`\).) Tj
+0 -12 Td () Tj
+0 -12 Td (10.1 Final field-level contracts for 6 JSON artifacts) Tj
+0 -12 Td () Tj
+0 -12 Td (10.1.1 `channel_graph.json`) Tj
+0 -12 Td (* Required top-level: `schema_version`, `binary`, `object_nodes`, `channel_edges`.) Tj
+0 -12 Td (* Optional top-level: `build_meta`.) Tj
+0 -12 Td () Tj
+0 -12 Td (`object_nodes[]` required fields:) Tj
+0 -12 Td (* `object_id`\(string\), `region_kind`\(enum\), `addr_range`\([hex,hex]\),) Tj
+0 -12 Td (* `writers`\(string[]\), `readers`\(string[]\),) Tj
+0 -12 Td (* `producer_contexts`\(enum[]\), `consumer_contexts`\(enum[]\),) Tj
+0 -12 Td (* `evidence_refs`\(string[]\), `confidence`\(float\).) Tj
+0 -12 Td () Tj
+0 -12 Td (`channel_edges[]` required fields:) Tj
+0 -12 Td (* `src_context`, `object_id`, `dst_context`, `edge_kind`,) Tj
+0 -12 Td (* `constraints`\(object[]\), `evidence_refs`\(string[]\), `score`\(float\).) Tj
+0 -12 Td () Tj
+0 -12 Td (10.1.2 `refined_objects.json`) Tj
+0 -12 Td (* Required top-level: `schema_version`, `binary`, `objects`.) Tj
+0 -12 Td (* Optional top-level: `refine_meta`.) Tj
+0 -12 Td (* `objects[]` follows ObjectNode schema; optional `members` and `source_raw_object_ids`.) Tj
+0 -12 Td () Tj
+0 -12 Td (10.1.3 `sink_roots.json`) Tj
+0 -12 Td (* Required top-level: `schema_version`, `binary`, `sink_roots`.) Tj
+ET
+endstream
+endobj
+18 0 obj
+<< /Type /Page /Parent 26 0 R /MediaBox [0 0 595 842] /Contents 17 0 R /Resources << /Font << /F1 25 0 R >> >> >>
+endobj
+19 0 obj
+<< /Length 2930 >>
+stream
+BT
+/F1 10 Tf
+40 800 Td
+(* `sink_roots[]` required: `sink_id`, `sink_label`, `sink_function`, `sink_site`, `roots`,) Tj
+0 -12 Td (`evidence_refs`, `confidence`, `status`.) Tj
+0 -12 Td (* Optional: `failure_code`, `failure_detail`.) Tj
+0 -12 Td () Tj
+0 -12 Td (10.1.4 `chains.json`) Tj
+0 -12 Td (* Required top-level: `schema_version`, `binary`, `chains`.) Tj
+0 -12 Td (* `chains[]` required: `chain_id`, `sink`, `steps`, `checks`, `derive_facts`, `verdict`,) Tj
+0 -12 Td (`score`, `status`, `evidence_refs`.) Tj
+0 -12 Td (* Optional: `source`, `failure_code`, `failure_detail`, `fallback_action`.) Tj
+0 -12 Td () Tj
+0 -12 Td (10.1.5 `chain_eval.json`) Tj
+0 -12 Td (* Required: `schema_version`, `binary`, `stats`, `by_verdict`.) Tj
+0 -12 Td (* Optional: `timing_ms`.) Tj
+0 -12 Td () Tj
+0 -12 Td (10.1.6 `low_conf_sinks.json`) Tj
+0 -12 Td (* Required top-level: `schema_version`, `binary`, `items`.) Tj
+0 -12 Td (* `items[]` required: `sink_id`, `sink_label`, `function`, `site`, `confidence`,) Tj
+0 -12 Td (`reason_codes`, `evidence_refs`.) Tj
+0 -12 Td () Tj
+0 -12 Td (10.2 Verdict decision table \(looser suspicious, stricter confirmed\)) Tj
+0 -12 Td () Tj
+0 -12 Td (Inputs:) Tj
+0 -12 Td (* `source_reached` \(bool\)) Tj
+0 -12 Td (* `root_controllable` \(bool\)) Tj
+0 -12 Td (* `check_strength` \(`effective/weak/absent/unknown`\)) Tj
+0 -12 Td (* `chain_complete` \(bool\)) Tj
+0 -12 Td (* `has_contradiction` \(bool\)) Tj
+0 -12 Td (* `endpoint_in_app` \(bool\)) Tj
+0 -12 Td (* `chain_score` \(0..1\)) Tj
+0 -12 Td () Tj
+0 -12 Td (Rules:) Tj
+0 -12 Td (* `CONFIRMED`:) Tj
+0 -12 Td (  - `source_reached=true`) Tj
+0 -12 Td (  - `root_controllable=true`) Tj
+0 -12 Td (  - `check_strength in {weak, absent}`) Tj
+0 -12 Td (  - `chain_complete=true`) Tj
+0 -12 Td (  - `has_contradiction=false`) Tj
+0 -12 Td (  - `endpoint_in_app=true`) Tj
+0 -12 Td (  - `chain_score >= 0.80`) Tj
+0 -12 Td (* `SUSPICIOUS`:) Tj
+0 -12 Td (  - sink/root evidence exists, but confirmed conditions not fully met;) Tj
+0 -12 Td (  - recommended `chain_score >= 0.35`.) Tj
+0 -12 Td (* `SAFE_OR_LOW_RISK`:) Tj
+0 -12 Td (  - `check_strength=effective` and chain is explainable.) Tj
+0 -12 Td (* `DROP`:) Tj
+0 -12 Td (  - contradiction, or very weak evidence \(`chain_score < 0.35`\), or both endpoints in library) Tj
+0 -12 Td (code without app anchor.) Tj
+0 -12 Td () Tj
+0 -12 Td (Policy:) Tj
+0 -12 Td (* Be conservative for `CONFIRMED`.) Tj
+0 -12 Td (* Keep `SUSPICIOUS` broad to avoid losing potentially valid cases.) Tj
+0 -12 Td () Tj
+0 -12 Td (10.3 Default global parameters \(speed first\)) Tj
+0 -12 Td (* `T_low = 0.45`) Tj
+0 -12 Td (* `top_k = 3`) Tj
+0 -12 Td (* `B = 160` \(slice budget\)) Tj
+0 -12 Td (* `K = 2` \(tunnel producer top-K\)) Tj
+0 -12 Td (* `max_depth d = 2`) Tj
+0 -12 Td (* `max_chains_per_sink = 4`) Tj
+0 -12 Td (* `max_chains_per_binary = 200`) Tj
+0 -12 Td () Tj
+0 -12 Td (10.4 Context classification rules) Tj
+0 -12 Td (Priority order:) Tj
+ET
+endstream
+endobj
+20 0 obj
+<< /Type /Page /Parent 26 0 R /MediaBox [0 0 595 842] /Contents 19 0 R /Resources << /Font << /F1 25 0 R >> >> >>
+endobj
+21 0 obj
+<< /Length 2780 >>
+stream
+BT
+/F1 10 Tf
+40 800 Td
+(1. `ISR`: `in_isr=true` from MAI.) Tj
+0 -12 Td (2. `TASK`: symbol/name pattern \(`*task*/*thread*`\) or RTOS-create trace.) Tj
+0 -12 Td (3. `MAIN`: `main` or reset-path non-ISR/non-task function.) Tj
+0 -12 Td (4. `UNKNOWN`: if uncertain.) Tj
+0 -12 Td () Tj
+0 -12 Td (Never force hard classification when uncertain.) Tj
+0 -12 Td () Tj
+0 -12 Td (10.5 Multi-callsite strategy) Tj
+0 -12 Td (Goal: collect more, not less.) Tj
+0 -12 Td () Tj
+0 -12 Td (Sink ID format:) Tj
+0 -12 Td () Tj
+0 -12 Td ({label}@{function}@{callsite_hex}@{root_kind}:{hash8}) Tj
+0 -12 Td () Tj
+0 -12 Td () Tj
+0 -12 Td (Dedup key:) Tj
+0 -12 Td () Tj
+0 -12 Td (\(label, function, callsite_hex, normalized_root_expr\)) Tj
+0 -12 Td () Tj
+0 -12 Td () Tj
+0 -12 Td (Policy:) Tj
+0 -12 Td (* Keep different callsites in same function.) Tj
+0 -12 Td (* Keep multiple roots on same callsite.) Tj
+0 -12 Td (* Only cap by per-sink/per-binary limits.) Tj
+0 -12 Td () Tj
+0 -12 Td (10.6 Unified fallback format) Tj
+0 -12 Td (Common fields in `sink_roots/chains`:) Tj
+0 -12 Td (* `status` \(`ok/partial/failed`\)) Tj
+0 -12 Td (* `failure_code`) Tj
+0 -12 Td (* optional `failure_detail`, `fallback_action`) Tj
+0 -12 Td () Tj
+0 -12 Td (Recommended failure codes:) Tj
+0 -12 Td (* `ROOT_UNRESOLVED`) Tj
+0 -12 Td (* `OBJECT_MAP_MISS`) Tj
+0 -12 Td (* `BUDGET_EXCEEDED`) Tj
+0 -12 Td (* `NO_SOURCE_REACH`) Tj
+0 -12 Td (* `CONTRADICTION`) Tj
+0 -12 Td (* `LIB_BARRIER`) Tj
+0 -12 Td () Tj
+0 -12 Td (Fallback behavior:) Tj
+0 -12 Td (1. Root extraction fails -> `partial`, `SUSPICIOUS`.) Tj
+0 -12 Td (2. Object mapping fails -> `partial`, `SUSPICIOUS` with local path kept.) Tj
+0 -12 Td (3. Budget exceeded -> `SUSPICIOUS` if sink/root evidence is strong; otherwise `DROP`.) Tj
+0 -12 Td (4. Contradictory evidence -> `DROP`.) Tj
+0 -12 Td () Tj
+0 -12 Td (10.7 What to do when backward tracing enters library internals) Tj
+0 -12 Td (This is not auto-canceled; explicit handling is required.) Tj
+0 -12 Td () Tj
+0 -12 Td (Policy:) Tj
+0 -12 Td (1. `summary mode`: for known APIs \(`memcpy/memset/strcpy/...`\), use semantic summaries, no deep) Tj
+0 -12 Td (in-library tracing.) Tj
+0 -12 Td (2. `barrier mode`: for unknown library internals, set strict step cap; if exceeded ->) Tj
+0 -12 Td (`LIB_BARRIER`.) Tj
+0 -12 Td (3. `endpoint policy`: if both endpoints are in library code and no app object anchor exists ->) Tj
+0 -12 Td (`DROP`.) Tj
+0 -12 Td (4. `app-anchor exception`: if sink is in library code but root is anchored to app object) Tj
+0 -12 Td (evidence -> keep as `SUSPICIOUS`.) Tj
+0 -12 Td () Tj
+0 -12 Td (Reason:) Tj
+0 -12 Td (* Deep library tracing increases runtime and noise.) Tj
+0 -12 Td (* App anchors keep chain relevance focused.) Tj
+0 -12 Td () Tj
+0 -12 Td (10.8 Minimal open items before coding) Tj
+ET
+endstream
+endobj
+22 0 obj
+<< /Type /Page /Parent 26 0 R /MediaBox [0 0 595 842] /Contents 21 0 R /Resources << /Font << /F1 25 0 R >> >> >>
+endobj
+23 0 obj
+<< /Length 1058 >>
+stream
+BT
+/F1 10 Tf
+40 800 Td
+(* Keep label name `SAFE_OR_LOW_RISK` as-is, or rename to `SAFE`.) Tj
+0 -12 Td (* Finalize `chain_score` formula \(start linear; calibrate later\).) Tj
+0 -12 Td () Tj
+0 -12 Td (---) Tj
+0 -12 Td () Tj
+0 -12 Td (References and Source Documents) Tj
+0 -12 Td (* [I1] RQ1 Detailed Planning: Semantic Recovery v1.3 \(internal\)) Tj
+0 -12 Td (* [I2] SourceAgent `update_0305.md` \(internal\)) Tj
+0 -12 Td (* [I3] `eval_suite_unstripped_elf_report_en.md` \(internal\)) Tj
+0 -12 Td (* [R1] Operation Mango, USENIX Security 2024) Tj
+0 -12 Td (* [R2] KARONTE, IEEE S&P 2020) Tj
+0 -12 Td (* [R3] Sharing More and Checking Less, USENIX Security 2021) Tj
+0 -12 Td (* [R4] P2IM, USENIX Security 2020) Tj
+0 -12 Td (* [R5] DICE, IEEE S&P 2021) Tj
+0 -12 Td (* [R6] Fuzzware, USENIX Security 2022) Tj
+0 -12 Td (* [R7] RTCON, NDSS 2026) Tj
+0 -12 Td (* [R8] HEAPSTER, IEEE S&P 2022) Tj
+0 -12 Td (* [R9] FirmXRay, CCS 2020) Tj
+0 -12 Td (* [R10] LATTE, ACM TOSEM 2025) Tj
+0 -12 Td (* [R11] IRIS, ICLR 2025) Tj
+0 -12 Td (* [R12] AdaTaint, 2025 preprint) Tj
+ET
+endstream
+endobj
+24 0 obj
+<< /Type /Page /Parent 26 0 R /MediaBox [0 0 595 842] /Contents 23 0 R /Resources << /Font << /F1 25 0 R >> >> >>
+endobj
+25 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+26 0 obj
+<< /Type /Pages /Kids [2 0 R 4 0 R 6 0 R 8 0 R 10 0 R 12 0 R 14 0 R 16 0 R 18 0 R 20 0 R 22 0 R 24 0 R] /Count 12 >>
+endobj
+27 0 obj
+<< /Type /Catalog /Pages 26 0 R >>
+endobj
+xref
+0 28
+0000000000 65535 f 
+0000000015 00000 n 
+0000003660 00000 n 
+0000003788 00000 n 
+0000007018 00000 n 
+0000007146 00000 n 
+0000009787 00000 n 
+0000009915 00000 n 
+0000012481 00000 n 
+0000012609 00000 n 
+0000015270 00000 n 
+0000015399 00000 n 
+0000018305 00000 n 
+0000018435 00000 n 
+0000021409 00000 n 
+0000021539 00000 n 
+0000024232 00000 n 
+0000024362 00000 n 
+0000027261 00000 n 
+0000027391 00000 n 
+0000030374 00000 n 
+0000030504 00000 n 
+0000033337 00000 n 
+0000033467 00000 n 
+0000034578 00000 n 
+0000034708 00000 n 
+0000034779 00000 n 
+0000034912 00000 n 
+trailer
+<< /Size 28 /Root 27 0 R >>
+startxref
+34963
+%%EOF

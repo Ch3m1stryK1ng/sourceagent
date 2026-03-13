@@ -42,6 +42,25 @@
     ],
     "current_support_status": "high_value_gt_target"
   },
+  "evaluation_only": {
+    "canonical_cve_anchor_status": "provisional",
+    "canonical_cve_chain_ids": [
+      "chain_zephyr-CVE-2020-10065_SINK_zephyr-CVE-2020-10065_0002_a1d90589",
+      "chain_zephyr-CVE-2020-10065_SINK_zephyr-CVE-2020-10065_0006_4a18cb0f"
+    ],
+    "canonical_cve_sink_ids": [
+      "SINK_zephyr-CVE-2020-10065_0002",
+      "SINK_zephyr-CVE-2020-10065_0006"
+    ],
+    "canonical_cve_root_ids": [
+      "SR_AUTO_004_SINK_zephyr-CVE-2020-10065_0002_primary",
+      "SR_AUTO_007_SINK_zephyr-CVE-2020-10065_0006_primary"
+    ],
+    "canonical_cve_notes": [
+      "Evaluation-only anchor: use the recovered GATT notify/indicate length-controlled copy paths as the closest observable high-risk chains in this prebuilt sample.",
+      "Do not use this anchor as a runtime oracle. Upstream advisory-to-binary alignment for the original ACL-length root cause remains TODO."
+    ]
+  },
   "sources": [],
   "objects": [
     {

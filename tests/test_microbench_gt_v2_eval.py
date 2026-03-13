@@ -261,6 +261,42 @@ def _predicted_base(include_spurious=False) -> dict:
     }
 
 
+def _annotate_chain_risk_gt(
+    sample: dict,
+    *,
+    expected_verdict: str = "CONFIRMED",
+    expected_final_verdict: str = "CONFIRMED",
+    expected_final_risk_band: str = "HIGH",
+    expected_review_priority: str = "P0",
+) -> dict:
+    sample["chains"][0]["expected_verdict"] = expected_verdict
+    sample["chains"][0]["expected_final_verdict"] = expected_final_verdict
+    sample["chains"][0]["expected_final_risk_band"] = expected_final_risk_band
+    sample["chains"][0]["expected_review_priority"] = expected_review_priority
+    sample["chains"][0]["risk_gt_provenance"] = "manual_anchor_chain_v1"
+    return sample
+
+
+def _annotate_pred_chain_risk(
+    predicted: dict,
+    *,
+    pred_verdict: str = "CONFIRMED",
+    final_verdict: str = "CONFIRMED",
+    final_risk_band: str = "HIGH",
+    review_priority: str = "P0",
+) -> dict:
+    predicted["pred_chains"][0]["verdict"] = pred_verdict
+    predicted["pred_chain_risk"] = {
+        "pred_good": {
+            "chain_id": "pred_good",
+            "final_verdict": final_verdict,
+            "final_risk_band": final_risk_band,
+            "review_priority": review_priority,
+        }
+    }
+    return predicted
+
+
 def test_evaluate_sample_artifacts_matches_required_channel_chain():
     gt = _sample_base()
     pred = _predicted_base()
@@ -274,6 +310,41 @@ def test_evaluate_sample_artifacts_matches_required_channel_chain():
     assert report["chains"]["verdict_exact"] == 1
     assert report["chains"]["must_use_channel_ok"] == 1
     assert report["negative_expectations"]["violated"] == 0
+
+
+def test_evaluate_sample_artifacts_compares_chain_level_risk_gt():
+    gt = _annotate_chain_risk_gt(_sample_base())
+    pred = _annotate_pred_chain_risk(_predicted_base())
+    report = evaluate_sample_artifacts(gt, pred)
+
+    assert report["chains"]["matched"] == 1
+    assert report["chain_risk"]["annotated_total"] == 1
+    assert report["chain_risk"]["structurally_matched"] == 1
+    assert report["chain_risk"]["risk_artifact_present"] == 1
+    assert report["chain_risk"]["final_verdict"]["exact"] == 1
+    assert report["chain_risk"]["final_risk_band"]["exact"] == 1
+    assert report["chain_risk"]["review_priority"]["exact"] == 1
+    assert report["chain_risk"]["fully_exact"] == 1
+    detail = report["chain_risk"]["details"][0]
+    assert detail["pred_final_verdict"] == "CONFIRMED"
+    assert detail["pred_final_risk_band"] == "HIGH"
+    assert detail["pred_review_priority"] == "P0"
+    assert detail["risk_gt_exact"] is True
+
+
+def test_evaluate_sample_artifacts_flags_missing_chain_level_risk_outputs():
+    gt = _annotate_chain_risk_gt(_sample_base())
+    pred = _predicted_base()
+    pred["pred_chains"][0]["verdict"] = "CONFIRMED"
+    report = evaluate_sample_artifacts(gt, pred)
+
+    assert report["chains"]["matched"] == 1
+    assert report["chain_risk"]["annotated_total"] == 1
+    assert report["chain_risk"]["risk_artifact_present"] == 0
+    assert report["chain_risk"]["final_verdict"]["missing"] == 1
+    assert report["chain_risk"]["final_risk_band"]["missing"] == 1
+    assert report["chain_risk"]["review_priority"]["missing"] == 1
+    assert report["chain_risk"]["fully_exact"] == 0
 
 
 def test_evaluate_sample_artifacts_flags_spurious_chain_and_negative_violation():
@@ -464,7 +535,7 @@ def test_evaluate_microbench_v2_run_writes_reports(tmp_path: Path):
     gt_root = tmp_path / "gt"
     sample_dir = gt_root / "samples"
     sample_dir.mkdir(parents=True)
-    sample = _sample_base("demo")
+    sample = _annotate_chain_risk_gt(_sample_base("demo"))
     (sample_dir / "demo.json").write_text(json.dumps(sample, indent=2) + "\n")
     (gt_root / "index.json").write_text(
         json.dumps({"schema_version": SCHEMA_VERSION, "sample_count": 1, "samples": [{"binary_stem": "demo"}]}, indent=2) + "\n"
@@ -531,15 +602,33 @@ def test_evaluate_microbench_v2_run_writes_reports(tmp_path: Path):
         + "\n"
     )
     (eval_dir / "raw_views" / "demo.chains.json").write_text(
-        json.dumps({"chains": _predicted_base()["pred_chains"]}, indent=2) + "\n"
+        json.dumps({"chains": _annotate_pred_chain_risk(_predicted_base())["pred_chains"]}, indent=2) + "\n"
     )
     (eval_dir / "raw_views" / "demo.chain_eval.json").write_text(
         json.dumps({"stats": {"chain_count": 1}}, indent=2) + "\n"
+    )
+    (eval_dir / "raw_views" / "demo.verdict_soft_triage.json").write_text(
+        json.dumps(
+            {
+                "items": [
+                    {
+                        "chain_id": "pred_good",
+                        "final_verdict": "CONFIRMED",
+                        "final_risk_band": "HIGH",
+                        "review_priority": "P0",
+                    }
+                ]
+            },
+            indent=2,
+        )
+        + "\n"
     )
 
     report = evaluate_microbench_v2_run(eval_dir, gt_root=gt_root)
     assert report["summary"]["sample_count"] == 1
     assert report["summary"]["chains"]["matched"] == 1
+    assert report["summary"]["chain_risk"]["annotated_total"] == 1
+    assert report["summary"]["chain_risk"]["fully_exact"] == 1
     assert (eval_dir / "summary" / "artifact_eval_summary.json").exists()
     assert (eval_dir / "summary" / "artifact_eval_by_sample.json").exists()
     assert (eval_dir / "summary" / "artifact_eval_report.md").exists()

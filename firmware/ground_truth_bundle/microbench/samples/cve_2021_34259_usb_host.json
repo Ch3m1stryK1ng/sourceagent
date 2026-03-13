@@ -1,6 +1,8 @@
 {
   "schema_version": "2.0-seed",
   "binary_stem": "cve_2021_34259_usb_host",
+  "annotation_level": "full_gt",
+  "chain_gt_scope": "exhaustive",
   "binary_paths": {
     "source_file": "firmware/microbench/cve_2021_34259_usb_host.c",
     "map_file": "firmware/microbench/cve_2021_34259_usb_host.map",
@@ -15,6 +17,28 @@
     "arch": "ARM_CORTEX_M",
     "expected_channel_mode": "none",
     "chain_shape": "same_context_parser_overflow"
+  },
+  "evaluation_only": {
+    "canonical_cve_anchor_status": "complete",
+    "canonical_cve_chain_ids": [
+      "C1_cfg_total_length_overwalk",
+      "C2_endpoint_count_overflow"
+    ],
+    "canonical_cve_sink_ids": [
+      "S1",
+      "S2"
+    ],
+    "canonical_cve_root_ids": [
+      "SR1_wTotalLength",
+      "SR2_bNumEndpoints"
+    ],
+    "related_cve_chain_ids": [
+      "C3_ep_packet_size_risky_state"
+    ],
+    "canonical_cve_notes": [
+      "Evaluation-only anchor: C1 and C2 capture the primary descriptor-walk and endpoint-count overflow paths from this USB host parser sample.",
+      "C3 is retained as a closely related risky parser path, but not the primary anchor for scorekeeping."
+    ]
   },
   "annotation_status": {
     "sources": "complete",
@@ -311,7 +335,12 @@
       "notes": "Attacker-controlled wTotalLength drives descriptor walk past the 512-byte raw buffer.",
       "optional_object_ids": [
         "O1_g_usbh_host"
-      ]
+      ],
+      "expected_final_verdict": "CONFIRMED",
+      "expected_final_risk_band": "HIGH",
+      "expected_review_priority": "P0",
+      "risk_gt_provenance": "manual_anchor_chain_v1",
+      "risk_gt_notes": "Canonical USB configuration-descriptor overwalk: wTotalLength drives parsing beyond the fixed raw descriptor buffer and should score as confirmed P0 high risk."
     },
     {
       "chain_id": "C2_endpoint_count_overflow",
@@ -334,7 +363,12 @@
       "notes": "Attacker-controlled bNumEndpoints expands endpoint loop beyond Ep_Desc[2].",
       "optional_object_ids": [
         "O1_g_usbh_host"
-      ]
+      ],
+      "expected_final_verdict": "CONFIRMED",
+      "expected_final_risk_band": "HIGH",
+      "expected_review_priority": "P0",
+      "risk_gt_provenance": "manual_anchor_chain_v1",
+      "risk_gt_notes": "Canonical endpoint-count overflow: bNumEndpoints expands the endpoint loop past Ep_Desc[2] and should remain confirmed P0 high risk."
     },
     {
       "chain_id": "C3_ep_packet_size_risky_state",

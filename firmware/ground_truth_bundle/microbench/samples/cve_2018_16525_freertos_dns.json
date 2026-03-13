@@ -1,6 +1,8 @@
 {
   "schema_version": "2.0-seed",
   "binary_stem": "cve_2018_16525_freertos_dns",
+  "annotation_level": "full_gt",
+  "chain_gt_scope": "exhaustive",
   "binary_paths": {
     "source_file": "firmware/microbench/cve_2018_16525_freertos_dns.c",
     "map_file": "firmware/microbench/cve_2018_16525_freertos_dns.map",
@@ -15,6 +17,28 @@
     "arch": "ARM_CORTEX_M",
     "expected_channel_mode": "none",
     "chain_shape": "same_context_parser_overflow"
+  },
+  "evaluation_only": {
+    "canonical_cve_anchor_status": "complete",
+    "canonical_cve_chain_ids": [
+      "C2_dns_name_walk_oob",
+      "C3_llmnr_copy_overflow"
+    ],
+    "canonical_cve_sink_ids": [
+      "S2",
+      "S3"
+    ],
+    "canonical_cve_root_ids": [
+      "SR2_dns_name_walk",
+      "SR3_copy_len"
+    ],
+    "supporting_cve_chain_ids": [
+      "C1_trusted_udp_length"
+    ],
+    "canonical_cve_notes": [
+      "Evaluation-only anchor: C2 captures the unbounded DNS-name walk, and C3 captures the downstream memcpy overflow that consumes the corrupted length state.",
+      "C1 is kept as a supporting precursor chain because it explains how attacker-controlled UDP length corrupts xDataLength before the final memory-safety sinks."
+    ]
   },
   "annotation_status": {
     "sources": "complete",
@@ -357,7 +381,12 @@
       "notes": "DNS label walk reads attacker-controlled step sizes with no bounds.",
       "optional_object_ids": [
         "O2_g_rx_buffer"
-      ]
+      ],
+      "expected_final_verdict": "CONFIRMED",
+      "expected_final_risk_band": "HIGH",
+      "expected_review_priority": "P0",
+      "risk_gt_provenance": "manual_anchor_chain_v1",
+      "risk_gt_notes": "Canonical DNS-name walk bug: attacker-controlled label steps remain unbounded and should be scored as confirmed P0 high risk."
     },
     {
       "chain_id": "C3_llmnr_copy_overflow",
@@ -382,7 +411,12 @@
       "optional_object_ids": [
         "O1_g_net_buf",
         "O2_g_rx_buffer"
-      ]
+      ],
+      "expected_final_verdict": "CONFIRMED",
+      "expected_final_risk_band": "HIGH",
+      "expected_review_priority": "P0",
+      "risk_gt_provenance": "manual_anchor_chain_v1",
+      "risk_gt_notes": "Canonical downstream memcpy overflow: corrupted xDataLength reaches memcpy into response[128] and should remain confirmed P0 high risk."
     }
   ],
   "negative_expectations": [

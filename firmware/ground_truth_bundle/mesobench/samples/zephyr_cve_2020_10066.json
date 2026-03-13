@@ -44,6 +44,25 @@
     ],
     "current_support_status": "target_for_artifact_gt"
   },
+  "evaluation_only": {
+    "canonical_cve_anchor_status": "provisional",
+    "canonical_cve_chain_ids": [
+      "chain_zephyr-CVE-2020-10066_SINK_zephyr-CVE-2020-10066_0002_531986f9",
+      "chain_zephyr-CVE-2020-10066_SINK_zephyr-CVE-2020-10066_0006_e72ac38e"
+    ],
+    "canonical_cve_sink_ids": [
+      "SINK_zephyr-CVE-2020-10066_0002",
+      "SINK_zephyr-CVE-2020-10066_0006"
+    ],
+    "canonical_cve_root_ids": [
+      "SR_AUTO_004_SINK_zephyr-CVE-2020-10066_0002_primary",
+      "SR_AUTO_007_SINK_zephyr-CVE-2020-10066_0006_primary"
+    ],
+    "canonical_cve_notes": [
+      "Evaluation-only anchor: use the recovered GATT notify/indicate length-controlled copy paths as the closest observable high-risk chains in this prebuilt sample.",
+      "Do not use this anchor as a runtime oracle. Canonical upstream root-cause alignment still needs source-level confirmation."
+    ]
+  },
   "sources": [],
   "objects": [
     {

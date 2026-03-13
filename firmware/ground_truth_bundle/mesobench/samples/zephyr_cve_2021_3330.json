@@ -695,5 +695,21 @@
     "eval_dir": "/tmp/eval_mesobench_missing18_20260308_153906",
     "scope": "pipeline_scope",
     "warning": "This full GT is exhaustive within the current SourceAgent pipeline scope and source-backed focus region; manual semantic refinement may still improve subtype fidelity."
+  },
+  "evaluation_only": {
+    "canonical_cve_anchor_status": "provisional",
+    "canonical_cve_chain_ids": [
+      "chain_zephyr-CVE-2021-3330_SINK_zephyr-CVE-2021-3330_0013_5e39bff9"
+    ],
+    "canonical_cve_sink_ids": [
+      "SINK_zephyr-CVE-2021-3330_0013"
+    ],
+    "canonical_cve_root_ids": [
+      "SR_AUTO_001_SINK_zephyr-CVE-2021-3330_0013_primary"
+    ],
+    "canonical_cve_notes": [
+      "Evaluation-only anchor: use the ieee802154_reassemble copy path as the closest observable answer chain in this prebuilt Zephyr sample.",
+      "This anchor remains provisional because the currently recovered chain still carries an effective root-bound guard and is not yet annotated with manual risk GT."
+    ]
   }
 }

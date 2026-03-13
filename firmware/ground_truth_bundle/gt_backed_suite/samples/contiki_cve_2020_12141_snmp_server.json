@@ -3192,7 +3192,12 @@
       ],
       "must_use_channel": true,
       "required_source_mode": "any",
-      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: snmp_api_replace_oid"
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_gt_backed_suite_v1_20260308_150048: snmp_api_replace_oid",
+      "expected_final_verdict": "CONFIRMED",
+      "expected_final_risk_band": "HIGH",
+      "expected_review_priority": "P0",
+      "risk_gt_provenance": "manual_anchor_chain_v2",
+      "risk_gt_notes": "Second-batch Contiki SNMP anchor: attacker-controlled OID content reaches snmp_api_replace_oid and should remain a confirmed P0 high-risk loop-write chain."
     },
     {
       "chain_id": "chain_snmp-server_SINK_snmp-server_0026_2bf6fffa",

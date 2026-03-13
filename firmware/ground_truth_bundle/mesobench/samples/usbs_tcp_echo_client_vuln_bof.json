@@ -863,7 +863,12 @@
       ],
       "must_use_channel": false,
       "required_source_mode": "any",
-      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: off_by_one"
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: off_by_one",
+      "expected_final_verdict": "CONFIRMED",
+      "expected_final_risk_band": "HIGH",
+      "expected_review_priority": "P0",
+      "risk_gt_provenance": "manual_anchor_chain_v1",
+      "risk_gt_notes": "First-pass real-firmware anchor: the injected off_by_one loop-write path is the curated P0 high-risk chain for this uSBS BOF sample."
     },
     {
       "chain_id": "chain_STM32469I_EVAL_tcp_echo_base_SINK_STM32469I_EVAL_tcp_echo_base_0014_eac354b4",

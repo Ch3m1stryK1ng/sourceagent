@@ -206,6 +206,358 @@ def test_link_chains_hits_object_by_member_name_and_tunnels_to_source():
     assert chains[0]["link_debug"]["object_hit_mode"] == "expr_member"
 
 
+def test_link_chains_infers_dma_channel_for_stripped_payload_proxy_object():
+    sink_roots = [
+        {
+            "sink_id": "SINK_fw_0003b",
+            "sink_label": "STORE_SINK",
+            "sink_function": "FUN_08001234",
+            "sink_site": "0x08001234",
+            "roots": [{"role": "primary", "expr": "0x20001020", "kind": "dst_ptr"}],
+            "evidence_refs": [],
+            "confidence": 0.7,
+            "status": "ok",
+            "root_source": "call_args",
+        },
+    ]
+    channel_graph = {
+        "object_nodes": [
+            {
+                "object_id": "obj_sram_20001000_200010ff",
+                "addr_range": ["0x20001000", "0x200010ff"],
+                "members": [],
+                "writer_sites": [{"context": "MAIN", "fn": "FUN_08000100"}],
+                "writers": ["FUN_08000100"],
+                "reader_sites": [{"context": "MAIN", "fn": "FUN_08001234"}],
+                "readers": ["FUN_08001234"],
+                "type_facts": {"kind_hint": "payload", "symbol_backed": False},
+            },
+        ],
+        "channel_edges": [],
+    }
+    sources = [
+        {
+            "label": "DMA_BACKED_BUFFER",
+            "address": 0x40001000,
+            "function_name": "FUN_08000080",
+            "evidence_refs": ["E_DMA"],
+            "facts": {
+                "buffer_cluster": "0x20001000",
+                "buffer_binding_confidence": 0.84,
+            },
+        },
+        {
+            "label": "MMIO_READ",
+            "address": 0x40011004,
+            "function_name": "FUN_08000100",
+            "evidence_refs": ["E_MMIO"],
+        },
+    ]
+
+    chains = link_chains(
+        sink_roots,
+        channel_graph,
+        mai=None,
+        sources=sources,
+        sink_facts_by_pack={"p3b": {"has_bounds_guard": False}},
+        sink_pack_id_by_site={"0x08001234|FUN_08001234|STORE_SINK": "p3b"},
+        binary_stem="fw",
+        max_depth=1,
+    )
+
+    assert any(any(step.get("kind") == "SOURCE" and step.get("label") == "DMA_BACKED_BUFFER" for step in ch["steps"]) for ch in chains)
+    assert any(
+        any(step.get("kind") == "CHANNEL" and step.get("edge") == "DMA->MAIN" and step.get("object_id") == "obj_sram_20001000_200010ff" for step in ch["steps"])
+        for ch in chains
+    )
+
+
+def test_link_chains_rejects_unbound_dma_source_for_payload_proxy_object():
+    sink_roots = [
+        {
+            "sink_id": "SINK_fw_0003bb",
+            "sink_label": "STORE_SINK",
+            "sink_function": "FUN_08001234",
+            "sink_site": "0x08001234",
+            "roots": [{"role": "primary", "expr": "0x20001020", "kind": "dst_ptr"}],
+            "evidence_refs": [],
+            "confidence": 0.7,
+            "status": "ok",
+            "root_source": "call_args",
+        },
+    ]
+    channel_graph = {
+        "object_nodes": [
+            {
+                "object_id": "obj_sram_20001000_200010ff",
+                "addr_range": ["0x20001000", "0x200010ff"],
+                "members": [],
+                "writer_sites": [{"context": "MAIN", "fn": "FUN_08000100"}],
+                "writers": ["FUN_08000100"],
+                "reader_sites": [{"context": "MAIN", "fn": "FUN_08001234"}],
+                "readers": ["FUN_08001234"],
+                "type_facts": {"kind_hint": "payload", "symbol_backed": False},
+            },
+        ],
+        "channel_edges": [],
+    }
+    sources = [
+        {
+            "label": "DMA_BACKED_BUFFER",
+            "address": 0x40001000,
+            "function_name": "FUN_08000080",
+            "evidence_refs": ["E_DMA"],
+        },
+    ]
+
+    chains = link_chains(
+        sink_roots,
+        channel_graph,
+        mai=None,
+        sources=sources,
+        sink_facts_by_pack={"p3bb": {"has_bounds_guard": False}},
+        sink_pack_id_by_site={"0x08001234|FUN_08001234|STORE_SINK": "p3bb"},
+        binary_stem="fw",
+        max_depth=1,
+    )
+
+    assert chains
+    assert all(not any(step.get("kind") == "SOURCE" and step.get("label") == "DMA_BACKED_BUFFER" for step in ch["steps"]) for ch in chains)
+
+
+def test_link_chains_infers_main_to_task_shared_handoff_for_bound_dma_object():
+    sink_roots = [
+        {
+            "sink_id": "SINK_fw_0003bc",
+            "sink_label": "COPY_SINK",
+            "sink_function": "FUN_08002222",
+            "sink_site": "0x08002222",
+            "roots": [{"role": "primary", "expr": "0x20002040", "kind": "dst_ptr"}],
+            "evidence_refs": [],
+            "confidence": 0.74,
+            "status": "ok",
+            "root_source": "call_args",
+        },
+    ]
+    channel_graph = {
+        "object_nodes": [
+            {
+                "object_id": "obj_sram_20002000_200020ff",
+                "addr_range": ["0x20002000", "0x200020ff"],
+                "members": [],
+                "writer_sites": [{"context": "DMA", "fn": "FUN_08000080"}],
+                "writers": ["FUN_08000080"],
+                "reader_sites": [
+                    {"context": "MAIN", "fn": "FUN_08001000"},
+                    {"context": "MAIN", "fn": "FUN_08002222"},
+                    {"context": "MAIN", "fn": "FUN_08003333"},
+                ],
+                "readers": ["FUN_08001000", "FUN_08002222", "FUN_08003333"],
+                "type_facts": {
+                    "kind_hint": "payload",
+                    "symbol_backed": False,
+                    "source_label": "DMA_BACKED_BUFFER",
+                    "buffer_cluster": "0x20002000",
+                    "buffer_binding_confidence": 0.88,
+                    "shared_handoff_hint": {"edge": "MAIN->TASK", "score": 0.84},
+                },
+                "quality": {"score": 0.78, "ambiguity_penalty": 0.18},
+            },
+        ],
+        "channel_edges": [],
+    }
+    sources = [
+        {
+            "label": "DMA_BACKED_BUFFER",
+            "address": 0x40001000,
+            "function_name": "FUN_08000080",
+            "evidence_refs": ["E_DMA"],
+            "facts": {
+                "buffer_cluster": "0x20002000",
+                "buffer_binding_confidence": 0.88,
+            },
+        },
+    ]
+
+    chains = link_chains(
+        sink_roots,
+        channel_graph,
+        mai=None,
+        sources=sources,
+        sink_facts_by_pack={"p3bc": {"has_bounds_guard": False}},
+        sink_pack_id_by_site={"0x08002222|FUN_08002222|COPY_SINK": "p3bc"},
+        binary_stem="fw",
+        max_depth=1,
+    )
+
+    assert any(any(step.get("kind") == "CHANNEL" and step.get("edge") == "DMA->MAIN" for step in ch["steps"]) for ch in chains)
+    assert any(any(step.get("kind") == "CHANNEL" and step.get("edge") == "MAIN->TASK" for step in ch["steps"]) for ch in chains)
+
+
+def test_link_chains_does_not_infer_proxy_channel_for_symbol_rich_named_functions():
+    sink_roots = [
+        {
+            "sink_id": "SINK_fw_0003c",
+            "sink_label": "STORE_SINK",
+            "sink_function": "process_packet",
+            "sink_site": "0x08001240",
+            "roots": [{"role": "primary", "expr": "0x20001120", "kind": "dst_ptr"}],
+            "evidence_refs": [],
+            "confidence": 0.7,
+            "status": "ok",
+            "root_source": "call_args",
+        },
+    ]
+    channel_graph = {
+        "object_nodes": [
+            {
+                "object_id": "obj_sram_20001100_200011ff",
+                "addr_range": ["0x20001100", "0x200011ff"],
+                "members": [],
+                "writer_sites": [{"context": "MAIN", "fn": "uart_rx"}],
+                "writers": ["uart_rx"],
+                "reader_sites": [{"context": "MAIN", "fn": "process_packet"}],
+                "readers": ["process_packet"],
+                "type_facts": {"kind_hint": "payload", "source_label": "MMIO_READ", "symbol_backed": False},
+            },
+        ],
+        "channel_edges": [],
+    }
+    sources = [
+        {
+            "label": "MMIO_READ",
+            "address": 0x40011004,
+            "function_name": "uart_rx",
+            "evidence_refs": ["E_SRC"],
+        },
+    ]
+
+    chains = link_chains(
+        sink_roots,
+        channel_graph,
+        mai=None,
+        sources=sources,
+        sink_facts_by_pack={"p3c": {"has_bounds_guard": False}},
+        sink_pack_id_by_site={"0x08001240|process_packet|STORE_SINK": "p3c"},
+        binary_stem="fw",
+        max_depth=1,
+    )
+
+    assert chains
+    assert all(not any(step.get("kind") == "CHANNEL" for step in ch["steps"]) for ch in chains)
+
+
+def test_link_chains_does_not_infer_proxy_channel_for_isr_proxy_support_root():
+    sink_roots = [
+        {
+            "sink_id": "SINK_fw_0003d",
+            "sink_label": "COPY_SINK",
+            "sink_function": "FUN_08001244",
+            "sink_site": "0x08001244",
+            "roots": [
+                {"role": "primary", "expr": "copy_len", "kind": "length"},
+                {"role": "secondary", "expr": "0x20001220", "kind": "src_ptr"},
+            ],
+            "evidence_refs": [],
+            "confidence": 0.72,
+            "status": "ok",
+            "root_source": "miner_facts",
+        },
+    ]
+    channel_graph = {
+        "object_nodes": [
+            {
+                "object_id": "obj_sram_20001200_200012ff",
+                "addr_range": ["0x20001200", "0x200012ff"],
+                "members": [],
+                "writer_sites": [{"context": "MAIN", "fn": "FUN_08000080"}],
+                "writers": ["FUN_08000080"],
+                "reader_sites": [{"context": "MAIN", "fn": "FUN_08001244"}],
+                "readers": ["FUN_08001244"],
+                "type_facts": {"kind_hint": "payload", "symbol_backed": False},
+            },
+        ],
+        "channel_edges": [],
+    }
+    sources = [
+        {
+            "label": "ISR_FILLED_BUFFER",
+            "address": 0x20001200,
+            "function_name": "FUN_08000080",
+            "evidence_refs": ["E_ISR"],
+        },
+    ]
+
+    chains = link_chains(
+        sink_roots,
+        channel_graph,
+        mai=None,
+        sources=sources,
+        sink_facts_by_pack={"p3d": {"has_bounds_guard": False}},
+        sink_pack_id_by_site={"0x08001244|FUN_08001244|COPY_SINK": "p3d"},
+        binary_stem="fw",
+        max_depth=1,
+    )
+
+    assert chains
+    assert all(not any(step.get("kind") == "CHANNEL" for step in ch["steps"]) for ch in chains)
+    assert all(ch["verdict"] == "DROP" for ch in chains)
+
+
+def test_link_chains_does_not_infer_proxy_channel_for_func_ptr_proxy_source():
+    sink_roots = [
+        {
+            "sink_id": "SINK_fw_0003e",
+            "sink_label": "FUNC_PTR_SINK",
+            "sink_function": "FUN_08001248",
+            "sink_site": "0x08001248",
+            "roots": [{"role": "primary", "expr": "dispatch_idx", "kind": "dispatch"}],
+            "evidence_refs": [],
+            "confidence": 0.68,
+            "status": "ok",
+            "root_source": "call_args",
+        },
+    ]
+    channel_graph = {
+        "object_nodes": [
+            {
+                "object_id": "obj_sram_20001300_200013ff",
+                "addr_range": ["0x20001300", "0x200013ff"],
+                "members": [],
+                "writer_sites": [{"context": "MAIN", "fn": "FUN_08000084"}],
+                "writers": ["FUN_08000084"],
+                "reader_sites": [{"context": "MAIN", "fn": "FUN_08001248"}],
+                "readers": ["FUN_08001248"],
+                "type_facts": {"kind_hint": "payload", "symbol_backed": False},
+            },
+        ],
+        "channel_edges": [],
+    }
+    sources = [
+        {
+            "label": "DMA_BACKED_BUFFER",
+            "address": 0x40026000,
+            "function_name": "FUN_08000084",
+            "evidence_refs": ["E_DMA"],
+        },
+    ]
+
+    chains = link_chains(
+        sink_roots,
+        channel_graph,
+        mai=None,
+        sources=sources,
+        sink_facts_by_pack={"p3e": {"has_bounds_guard": False}},
+        sink_pack_id_by_site={"0x08001248|FUN_08001248|FUNC_PTR_SINK": "p3e"},
+        binary_stem="fw",
+        max_depth=1,
+    )
+
+    assert chains
+    assert all(not any(step.get("kind") == "CHANNEL" for step in ch["steps"]) for ch in chains)
+    assert all(ch["verdict"] == "DROP" for ch in chains)
+
+
 def test_link_chains_can_use_secondary_root_when_primary_misses():
     sink_roots = [
         {

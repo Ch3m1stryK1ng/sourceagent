@@ -17,6 +17,8 @@ _GENERIC_FALLBACK_MARKERS = {
 _FUNC_PTR_INDEX_RE = re.compile(r"\[(?P<idx>[A-Za-z_]\w*)\]")
 _FUNC_PTR_DEREF_RE = re.compile(r"\(\*\s*(?P<expr>[^)]+?)\s*\)\(")
 _CALL_RE = re.compile(r"(?P<callee>[A-Za-z_]\w*)\s*\((?P<args>[^;\n]*)\)")
+_POINTER_BASE_RE = re.compile(r"^\*?\(?\s*([A-Za-z_]\w*)")
+_OFFSET_HINT_RE = re.compile(r"(?:\+\s*(0x[0-9a-fA-F]+|\d+)|\[\s*([^\]]+)\s*\])")
 
 
 def extract_sink_roots(
@@ -225,6 +227,14 @@ def _extract_roots(
             else:
                 _push("primary", "format_arg_variable", "format_arg", "generic_fallback")
 
+    roots = _supplement_roots_from_decompile(
+        label,
+        roots,
+        decompiled_code=decompiled_code,
+        callee=callee,
+        sink_function=sink_function,
+    )
+
     if not roots and decompiled_code:
         fallback_roots = _roots_from_decompile(
             label,
@@ -242,6 +252,61 @@ def _extract_roots(
     roots = _dedupe_roots(roots)
     root_source = _root_source_summary(roots)
     return roots, root_source
+
+
+def _supplement_roots_from_decompile(
+    label: str,
+    roots: List[Dict[str, Any]],
+    *,
+    decompiled_code: str,
+    callee: str,
+    sink_function: str,
+) -> List[Dict[str, Any]]:
+    if not roots or not decompiled_code:
+        return roots
+
+    supplements = _roots_from_decompile(
+        label,
+        decompiled_code,
+        callee=callee,
+        sink_function=sink_function,
+    )
+    if not supplements:
+        return roots
+
+    existing_kinds = {str(root.get("kind", "")).lower() for root in roots}
+    existing_primary = {str(root.get("kind", "")).lower() for root in roots if str(root.get("role", "")).lower() == "primary"}
+    prefix: List[Dict[str, Any]] = []
+
+    for root in supplements:
+        kind = str(root.get("kind", "")).lower()
+        role = str(root.get("role", "")).lower()
+        if label == SinkLabel.COPY_SINK.value:
+            if kind == "length" and "length" not in existing_primary:
+                prefix.append(root)
+                existing_primary.add("length")
+                existing_kinds.add("length")
+            continue
+        elif label == SinkLabel.MEMSET_SINK.value:
+            if kind == "length" and "length" not in existing_primary:
+                prefix.append(root)
+                existing_primary.add("length")
+                existing_kinds.add("length")
+                continue
+            continue
+        elif label == SinkLabel.LOOP_WRITE_SINK.value:
+            if kind == "index_or_bound" and "index_or_bound" not in existing_primary:
+                prefix.append(root)
+                existing_primary.add("index_or_bound")
+                existing_kinds.add("index_or_bound")
+                continue
+            continue
+        elif role == "primary" and kind not in existing_primary:
+            prefix.append(root)
+            existing_primary.add(kind)
+            existing_kinds.add(kind)
+            continue
+    return prefix + roots
 
 
 def _roots_from_decompile(
@@ -509,12 +574,28 @@ def _clean_expr(value: Any) -> str:
     text = str(value or "").strip()
     if not text:
         return ""
-    return re.sub(r"\s+", " ", text)
+    text = re.sub(r"\s+", " ", text)
+    if _looks_malformed_root_expr(text):
+        return ""
+    return text
+
+
+def _looks_malformed_root_expr(expr: str) -> bool:
+    text = str(expr or "").strip()
+    if not text:
+        return True
+    # Miner/decompile fallbacks sometimes yield a truncated cast fragment like "(int *".
+    if re.fullmatch(r"\(\s*[A-Za-z_][A-Za-z0-9_\s]*\*\s*", text):
+        return True
+    if text in {"(", ")", "*", "&", "[]"}:
+        return True
+    return False
 
 
 def _make_root(*, role: str, expr: str, kind: str, source: str) -> Dict[str, Any]:
     cleaned = _clean_expr(expr)
     aliases = _root_aliases(cleaned)
+    path_meta = _root_path_metadata(cleaned)
     return {
         "role": role,
         "expr": cleaned,
@@ -523,6 +604,7 @@ def _make_root(*, role: str, expr: str, kind: str, source: str) -> Dict[str, Any
         "canonical_expr": _canonical_root_expr(cleaned),
         "family": _root_family(kind),
         "aliases": aliases,
+        **path_meta,
     }
 
 
@@ -593,6 +675,23 @@ def _root_aliases(expr: str) -> List[str]:
         if token in canon_text:
             _add(token)
 
+    match = _POINTER_BASE_RE.match(text)
+    if match:
+        base = _clean_expr(match.group(1))
+        if base:
+            _add(base)
+            _add(_canonical_root_expr(base))
+    segments = [seg for seg in re.split(r"[.\[\]]+", canon_text) if seg]
+    if segments:
+        _add(segments[0])
+        _add(segments[-1])
+        if len(segments) >= 2:
+            _add(".".join(segments[:2]))
+            _add(".".join(segments[-2:]))
+        for seg in segments:
+            if not seg.isdigit():
+                _add(seg)
+
     return aliases
 
 
@@ -607,6 +706,58 @@ def _root_family(kind: str) -> str:
     if low in {"src_ptr", "src_data", "dst_ptr", "target_addr"}:
         return "pointer"
     return low or "unknown"
+
+
+def _root_path_metadata(expr: str) -> Dict[str, Any]:
+    text = _clean_expr(expr)
+    canonical = _canonical_root_expr(text)
+    tokens = [tok for tok in re.findall(r"[A-Za-z_]\w*", canonical) if tok]
+    seen = set()
+    uniq_tokens: List[str] = []
+    for tok in tokens:
+        low = tok.lower()
+        if low in seen:
+            continue
+        seen.add(low)
+        uniq_tokens.append(low)
+
+    segments = [seg for seg in re.split(r"[.\[\]]+", canonical) if seg]
+    path_kind = "expr"
+    literal_addr = ""
+    path_base = ""
+    path_leaf = ""
+    offset_hint = ""
+    if canonical and re.fullmatch(r"0x[0-9a-f]+", canonical):
+        path_kind = "literal_addr"
+        literal_addr = canonical
+    elif "(" in text and ")" in text:
+        path_kind = "call_or_cast"
+    elif "[" in text and "]" in text:
+        path_kind = "indexed_path"
+    elif "." in canonical:
+        path_kind = "member_path"
+    elif uniq_tokens:
+        path_kind = "symbol"
+
+    if segments:
+        path_base = segments[0]
+        path_leaf = segments[-2] if "[" in text and "]" in text and len(segments) >= 2 else segments[-1]
+    offset_match = _OFFSET_HINT_RE.search(text)
+    if offset_match:
+        offset_hint = _clean_expr(offset_match.group(1) or offset_match.group(2) or "")
+    path_key = ".".join(seg for seg in segments if not seg.isdigit())
+    return {
+        "path_tokens": uniq_tokens,
+        "path_segments": segments,
+        "path_key": path_key,
+        "path_kind": path_kind,
+        "path_base": path_base,
+        "path_leaf": path_leaf,
+        "path_depth": len(segments),
+        "has_index": "[" in text and "]" in text,
+        "literal_addr": literal_addr,
+        "offset_hint": offset_hint,
+    }
 
 
 def _dedupe_roots(roots: List[Dict[str, Any]]) -> List[Dict[str, Any]]:

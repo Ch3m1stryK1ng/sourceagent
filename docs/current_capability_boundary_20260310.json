@@ -1,0 +1,454 @@
+{
+  "run_dir": "/tmp/eval_gt_backed_supervision_all_20260310",
+  "eval_summary": {
+    "strict_overall": {
+      "tp": 41.0,
+      "fp": 8.0,
+      "fn": 5.0,
+      "precision": 0.8367346938775511,
+      "recall": 0.8913043478260869,
+      "f1": 0.8631578947368421
+    },
+    "weighted_overall": {
+      "tp": 43.5,
+      "fp": 5.5,
+      "fn": 2.5,
+      "precision": 0.8877551020408163,
+      "recall": 0.9456521739130435,
+      "f1": 0.9157894736842105,
+      "partial_credit": 0.5
+    },
+    "chain_overall": {
+      "chain_count": 1275,
+      "chain_with_source": 1185,
+      "chain_with_channel": 699,
+      "chain_confirmed": 90,
+      "chain_suspicious": 321,
+      "chain_safe_or_low_risk": 479,
+      "chain_dropped": 385,
+      "verdict_review_queue": 556,
+      "verdict_review_needed": 556,
+      "verdict_soft_suspicious": 525,
+      "verdict_llm_reviewed": 121
+    }
+  },
+  "artifact_summary": {
+    "schema_version": "0.1",
+    "eval_dir": "/tmp/eval_gt_backed_supervision_all_20260310",
+    "gt_root": "firmware/ground_truth_bundle/gt_backed_suite",
+    "sample_count": 44,
+    "missing_samples": 0,
+    "missing_sample_stems": [],
+    "artifacts": {
+      "sources": {
+        "gt_total": 105,
+        "pred_total": 1761,
+        "matched_gt": 97,
+        "used_pred": 97,
+        "fp": 1664,
+        "fn": 8,
+        "precision": 0.0551,
+        "recall": 0.9238,
+        "f1": 0.104
+      },
+      "objects": {
+        "gt_total": 58,
+        "pred_total": 842,
+        "matched_gt": 51,
+        "used_pred": 51,
+        "fp": 791,
+        "fn": 7,
+        "precision": 0.0606,
+        "recall": 0.8793,
+        "f1": 0.1133
+      },
+      "channels": {
+        "gt_total": 48,
+        "pred_total": 116,
+        "matched_gt": 42,
+        "used_pred": 42,
+        "fp": 74,
+        "fn": 6,
+        "precision": 0.3621,
+        "recall": 0.875,
+        "f1": 0.5122
+      },
+      "sinks": {
+        "gt_total": 376,
+        "pred_total": 1270,
+        "matched_gt": 374,
+        "used_pred": 374,
+        "fp": 896,
+        "fn": 2,
+        "precision": 0.2945,
+        "recall": 0.9947,
+        "f1": 0.4544
+      },
+      "sink_roots": {
+        "gt_total": 721,
+        "pred_total": 2697,
+        "matched_gt": 718,
+        "used_pred": 718,
+        "fp": 1979,
+        "fn": 3,
+        "precision": 0.2662,
+        "recall": 0.9958,
+        "f1": 0.4201
+      },
+      "derive_checks": {
+        "gt_total": 390,
+        "pred_total": 1275,
+        "matched_gt": 310,
+        "used_pred": 310,
+        "fp": 965,
+        "fn": 80,
+        "precision": 0.2431,
+        "recall": 0.7949,
+        "f1": 0.3724
+      }
+    },
+    "chains": {
+      "positive_total": 386,
+      "matched": 318,
+      "missed": 68,
+      "verdict_exact": 221,
+      "verdict_over": 13,
+      "verdict_under": 84,
+      "pred_total": 1275,
+      "pred_non_drop": 890,
+      "spurious_non_drop": 680,
+      "must_use_channel_total": 253,
+      "must_use_channel_ok": 185
+    },
+    "negative_expectations": {
+      "total": 27,
+      "satisfied": 27,
+      "violated": 0
+    }
+  },
+  "supervision_summary": {
+    "queue_total": 148,
+    "reviewed_total": 122,
+    "accepted_total": 70,
+    "audit_only_total": 30,
+    "rejected_total": 22,
+    "objects_enriched_total": 12,
+    "channels_enriched_total": 2,
+    "accepted_by_kind": {
+      "sink": 13,
+      "source": 43,
+      "channel": 2,
+      "object": 12
+    },
+    "accepted_by_label_top12": [
+      [
+        "MMIO_READ",
+        40
+      ],
+      [
+        "COPY_SINK",
+        9
+      ],
+      [
+        "SRAM_CLUSTER",
+        9
+      ],
+      [
+        "STORE_SINK",
+        4
+      ],
+      [
+        "DMA_BUFFER",
+        2
+      ],
+      [
+        "DMA_CHANNEL",
+        2
+      ],
+      [
+        "ISR_MMIO_READ",
+        2
+      ],
+      [
+        "DMA_BACKED_BUFFER",
+        1
+      ],
+      [
+        "RING_BUFFER",
+        1
+      ]
+    ]
+  },
+  "review_summary": {
+    "queue_total": 556,
+    "llm_reviewed_total": 238,
+    "final_verdict_distribution": {
+      "SAFE_OR_LOW_RISK": 483,
+      "CONFIRMED": 9,
+      "SUSPICIOUS": 525,
+      "DROP": 258
+    },
+    "risk_band_distribution": {
+      "LOW": 742,
+      "MEDIUM": 533
+    },
+    "review_priority_distribution": {
+      "P2": 741,
+      "P0": 9,
+      "P1": 525
+    },
+    "top_reason_codes": [
+      [
+        "CHECK_NOT_BINDING_ROOT",
+        105
+      ],
+      [
+        "ROOT_NOT_CAPACITY_RELEVANT",
+        54
+      ],
+      [
+        "ROOT_FROM_MMIO_OR_DMA",
+        38
+      ],
+      [
+        "CHECK_ONLY_STATE_GATE",
+        29
+      ],
+      [
+        "LIKELY_SAFE_BOUND_PRESENT",
+        26
+      ],
+      [
+        "TRIGGER_UNCERTAIN_MISSING_CAPACITY",
+        17
+      ],
+      [
+        "WEAK_GUARDING",
+        13
+      ],
+      [
+        "TRIGGERABLE_LEN_GT_CAPACITY",
+        13
+      ],
+      [
+        "ROOT_SECONDARY_ONLY",
+        13
+      ],
+      [
+        "NO_SOURCE_SEGMENT",
+        12
+      ],
+      [
+        "TRIGGERABLE_WITH_SIMPLE_CONSTRAINTS",
+        10
+      ],
+      [
+        "ROOT_DERIVED_ARITHMETIC",
+        10
+      ],
+      [
+        "TAINT_CLEANSED_CONST_ASSIGN",
+        5
+      ],
+      [
+        "TAINT_PRESERVED_COPY_FROM_IO",
+        3
+      ],
+      [
+        "TRIGGERABLE_FORMAT_CONTROLLED",
+        3
+      ]
+    ],
+    "top_blockers": [
+      [
+        "review_required",
+        80
+      ],
+      [
+        "object_bound",
+        1
+      ]
+    ]
+  },
+  "dataset_rollup": {
+    "microbench": {
+      "supervision_queue": 32,
+      "supervision_reviewed": 32,
+      "supervision_accepted": 22,
+      "supervision_audit_only": 8,
+      "supervision_rejected": 2,
+      "objects_enriched": 3,
+      "channels_enriched": 2,
+      "review_queue": 5,
+      "llm_reviewed": 10,
+      "final_SAFE_OR_LOW_RISK": 8,
+      "risk_LOW": 7,
+      "prio_P2": 8,
+      "final_CONFIRMED": 8,
+      "risk_MEDIUM": 10,
+      "prio_P0": 8,
+      "final_SUSPICIOUS": 1,
+      "prio_P1": 1
+    },
+    "monolithic-firmware-collection": {
+      "supervision_queue": 76,
+      "supervision_reviewed": 58,
+      "supervision_accepted": 32,
+      "supervision_audit_only": 12,
+      "supervision_rejected": 14,
+      "objects_enriched": 9,
+      "channels_enriched": 0,
+      "review_queue": 407,
+      "llm_reviewed": 149,
+      "final_SUSPICIOUS": 390,
+      "risk_MEDIUM": 390,
+      "prio_P1": 390,
+      "final_SAFE_OR_LOW_RISK": 430,
+      "risk_LOW": 612,
+      "prio_P2": 612,
+      "final_DROP": 182
+    },
+    "uSBS": {
+      "supervision_queue": 40,
+      "supervision_reviewed": 32,
+      "supervision_accepted": 16,
+      "supervision_audit_only": 10,
+      "supervision_rejected": 6,
+      "objects_enriched": 0,
+      "channels_enriched": 0,
+      "review_queue": 144,
+      "llm_reviewed": 79,
+      "final_DROP": 76,
+      "risk_LOW": 123,
+      "prio_P2": 121,
+      "final_SAFE_OR_LOW_RISK": 45,
+      "final_SUSPICIOUS": 134,
+      "risk_MEDIUM": 133,
+      "prio_P1": 134,
+      "final_CONFIRMED": 1,
+      "prio_P0": 1
+    }
+  },
+  "worst_samples": [
+    {
+      "sample_id": "contiki_cve_2020_12141_snmp_server",
+      "dataset": "monolithic-firmware-collection",
+      "positive_total": 46,
+      "matched": 21,
+      "hit_rate": 0.4565,
+      "spurious_non_drop": 30,
+      "must_use_channel_total": 39,
+      "must_use_channel_ok": 14
+    },
+    {
+      "sample_id": "contiki_cve_2020_12140_hello_world",
+      "dataset": "monolithic-firmware-collection",
+      "positive_total": 64,
+      "matched": 30,
+      "hit_rate": 0.4688,
+      "spurious_non_drop": 36,
+      "must_use_channel_total": 56,
+      "must_use_channel_ok": 22
+    },
+    {
+      "sample_id": "contiki_halucinator_cve_2019_9183_hello_world",
+      "dataset": "monolithic-firmware-collection",
+      "positive_total": 54,
+      "matched": 47,
+      "hit_rate": 0.8704,
+      "spurious_non_drop": 19,
+      "must_use_channel_total": 50,
+      "must_use_channel_ok": 43
+    },
+    {
+      "sample_id": "zephyr_cve_2020_10066",
+      "dataset": "monolithic-firmware-collection",
+      "positive_total": 21,
+      "matched": 20,
+      "hit_rate": 0.9524,
+      "spurious_non_drop": 38,
+      "must_use_channel_total": 21,
+      "must_use_channel_ok": 20
+    },
+    {
+      "sample_id": "zephyr_cve_2020_10065",
+      "dataset": "monolithic-firmware-collection",
+      "positive_total": 22,
+      "matched": 21,
+      "hit_rate": 0.9545,
+      "spurious_non_drop": 38,
+      "must_use_channel_total": 22,
+      "must_use_channel_ok": 21
+    },
+    {
+      "sample_id": "zephyr_cve_2021_3330",
+      "dataset": "monolithic-firmware-collection",
+      "positive_total": 1,
+      "matched": 1,
+      "hit_rate": 1.0,
+      "spurious_non_drop": 41,
+      "must_use_channel_total": 1,
+      "must_use_channel_ok": 1
+    },
+    {
+      "sample_id": "zephyr_cve_2021_3320",
+      "dataset": "monolithic-firmware-collection",
+      "positive_total": 2,
+      "matched": 2,
+      "hit_rate": 1.0,
+      "spurious_non_drop": 39,
+      "must_use_channel_total": 2,
+      "must_use_channel_ok": 2
+    },
+    {
+      "sample_id": "zephyr_cve_2021_3321",
+      "dataset": "monolithic-firmware-collection",
+      "positive_total": 2,
+      "matched": 2,
+      "hit_rate": 1.0,
+      "spurious_non_drop": 39,
+      "must_use_channel_total": 2,
+      "must_use_channel_ok": 2
+    },
+    {
+      "sample_id": "zephyr_cve_2021_3322",
+      "dataset": "monolithic-firmware-collection",
+      "positive_total": 2,
+      "matched": 2,
+      "hit_rate": 1.0,
+      "spurious_non_drop": 39,
+      "must_use_channel_total": 2,
+      "must_use_channel_ok": 2
+    },
+    {
+      "sample_id": "zephyr_cve_2021_3323",
+      "dataset": "monolithic-firmware-collection",
+      "positive_total": 2,
+      "matched": 2,
+      "hit_rate": 1.0,
+      "spurious_non_drop": 39,
+      "must_use_channel_total": 2,
+      "must_use_channel_ok": 2
+    },
+    {
+      "sample_id": "zephyr_false_positive_rf_size_check",
+      "dataset": "monolithic-firmware-collection",
+      "positive_total": 2,
+      "matched": 2,
+      "hit_rate": 1.0,
+      "spurious_non_drop": 39,
+      "must_use_channel_total": 2,
+      "must_use_channel_ok": 2
+    },
+    {
+      "sample_id": "zephyr_false_positive_watchdog_callback",
+      "dataset": "monolithic-firmware-collection",
+      "positive_total": 2,
+      "matched": 2,
+      "hit_rate": 1.0,
+      "spurious_non_drop": 39,
+      "must_use_channel_total": 2,
+      "must_use_channel_ok": 2
+    }
+  ]
+}

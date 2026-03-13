@@ -1,0 +1,1989 @@
+{
+  "schema_version": "1.0",
+  "generated_at_utc": "2026-03-12T08:18:42+00:00",
+  "sample_count": 108,
+  "family_count": 6,
+  "variants_per_family": 18,
+  "samples": [
+    {
+      "binary_stem": "copy_variant_00",
+      "family": "copy",
+      "sink_label": "COPY_SINK",
+      "sink_function": "copy_handler",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated copy sink variant",
+      "params": {
+        "dst_size": 8,
+        "raw_len": 24,
+        "guard_mode": "none",
+        "api": "memcpy",
+        "mmio": "0x40011004"
+      },
+      "source_path": "firmware/microbench_autogen/copy_variant_00.c",
+      "elf_path": "firmware/microbench_autogen/copy_variant_00.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/copy_variant_00_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/copy_variant_00.bin",
+      "map_path": "firmware/microbench_autogen/copy_variant_00.map"
+    },
+    {
+      "binary_stem": "copy_variant_01",
+      "family": "copy",
+      "sink_label": "COPY_SINK",
+      "sink_function": "copy_handler",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated copy sink variant",
+      "params": {
+        "dst_size": 12,
+        "raw_len": 28,
+        "guard_mode": "none",
+        "api": "memmove",
+        "mmio": "0x40011008"
+      },
+      "source_path": "firmware/microbench_autogen/copy_variant_01.c",
+      "elf_path": "firmware/microbench_autogen/copy_variant_01.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/copy_variant_01_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/copy_variant_01.bin",
+      "map_path": "firmware/microbench_autogen/copy_variant_01.map"
+    },
+    {
+      "binary_stem": "copy_variant_02",
+      "family": "copy",
+      "sink_label": "COPY_SINK",
+      "sink_function": "copy_handler",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated copy sink variant",
+      "params": {
+        "dst_size": 16,
+        "raw_len": 32,
+        "guard_mode": "none",
+        "api": "memcpy",
+        "mmio": "0x4001100c"
+      },
+      "source_path": "firmware/microbench_autogen/copy_variant_02.c",
+      "elf_path": "firmware/microbench_autogen/copy_variant_02.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/copy_variant_02_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/copy_variant_02.bin",
+      "map_path": "firmware/microbench_autogen/copy_variant_02.map"
+    },
+    {
+      "binary_stem": "copy_variant_03",
+      "family": "copy",
+      "sink_label": "COPY_SINK",
+      "sink_function": "copy_handler",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated copy sink variant",
+      "params": {
+        "dst_size": 20,
+        "raw_len": 36,
+        "guard_mode": "none",
+        "api": "memmove",
+        "mmio": "0x40011010"
+      },
+      "source_path": "firmware/microbench_autogen/copy_variant_03.c",
+      "elf_path": "firmware/microbench_autogen/copy_variant_03.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/copy_variant_03_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/copy_variant_03.bin",
+      "map_path": "firmware/microbench_autogen/copy_variant_03.map"
+    },
+    {
+      "binary_stem": "copy_variant_04",
+      "family": "copy",
+      "sink_label": "COPY_SINK",
+      "sink_function": "copy_handler",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated copy sink variant",
+      "params": {
+        "dst_size": 24,
+        "raw_len": 40,
+        "guard_mode": "none",
+        "api": "memcpy",
+        "mmio": "0x40011004"
+      },
+      "source_path": "firmware/microbench_autogen/copy_variant_04.c",
+      "elf_path": "firmware/microbench_autogen/copy_variant_04.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/copy_variant_04_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/copy_variant_04.bin",
+      "map_path": "firmware/microbench_autogen/copy_variant_04.map"
+    },
+    {
+      "binary_stem": "copy_variant_05",
+      "family": "copy",
+      "sink_label": "COPY_SINK",
+      "sink_function": "copy_handler",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated copy sink variant",
+      "params": {
+        "dst_size": 28,
+        "raw_len": 44,
+        "guard_mode": "none",
+        "api": "memmove",
+        "mmio": "0x40011008"
+      },
+      "source_path": "firmware/microbench_autogen/copy_variant_05.c",
+      "elf_path": "firmware/microbench_autogen/copy_variant_05.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/copy_variant_05_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/copy_variant_05.bin",
+      "map_path": "firmware/microbench_autogen/copy_variant_05.map"
+    },
+    {
+      "binary_stem": "copy_variant_06",
+      "family": "copy",
+      "sink_label": "COPY_SINK",
+      "sink_function": "copy_handler",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated copy sink variant",
+      "params": {
+        "dst_size": 8,
+        "raw_len": 24,
+        "guard_mode": "weak_floor",
+        "api": "memcpy",
+        "mmio": "0x4001100c"
+      },
+      "source_path": "firmware/microbench_autogen/copy_variant_06.c",
+      "elf_path": "firmware/microbench_autogen/copy_variant_06.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/copy_variant_06_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/copy_variant_06.bin",
+      "map_path": "firmware/microbench_autogen/copy_variant_06.map"
+    },
+    {
+      "binary_stem": "copy_variant_07",
+      "family": "copy",
+      "sink_label": "COPY_SINK",
+      "sink_function": "copy_handler",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated copy sink variant",
+      "params": {
+        "dst_size": 12,
+        "raw_len": 28,
+        "guard_mode": "weak_floor",
+        "api": "memmove",
+        "mmio": "0x40011010"
+      },
+      "source_path": "firmware/microbench_autogen/copy_variant_07.c",
+      "elf_path": "firmware/microbench_autogen/copy_variant_07.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/copy_variant_07_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/copy_variant_07.bin",
+      "map_path": "firmware/microbench_autogen/copy_variant_07.map"
+    },
+    {
+      "binary_stem": "copy_variant_08",
+      "family": "copy",
+      "sink_label": "COPY_SINK",
+      "sink_function": "copy_handler",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated copy sink variant",
+      "params": {
+        "dst_size": 16,
+        "raw_len": 32,
+        "guard_mode": "weak_floor",
+        "api": "memcpy",
+        "mmio": "0x40011004"
+      },
+      "source_path": "firmware/microbench_autogen/copy_variant_08.c",
+      "elf_path": "firmware/microbench_autogen/copy_variant_08.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/copy_variant_08_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/copy_variant_08.bin",
+      "map_path": "firmware/microbench_autogen/copy_variant_08.map"
+    },
+    {
+      "binary_stem": "copy_variant_09",
+      "family": "copy",
+      "sink_label": "COPY_SINK",
+      "sink_function": "copy_handler",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated copy sink variant",
+      "params": {
+        "dst_size": 20,
+        "raw_len": 36,
+        "guard_mode": "weak_floor",
+        "api": "memmove",
+        "mmio": "0x40011008"
+      },
+      "source_path": "firmware/microbench_autogen/copy_variant_09.c",
+      "elf_path": "firmware/microbench_autogen/copy_variant_09.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/copy_variant_09_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/copy_variant_09.bin",
+      "map_path": "firmware/microbench_autogen/copy_variant_09.map"
+    },
+    {
+      "binary_stem": "copy_variant_10",
+      "family": "copy",
+      "sink_label": "COPY_SINK",
+      "sink_function": "copy_handler",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated copy sink variant",
+      "params": {
+        "dst_size": 24,
+        "raw_len": 40,
+        "guard_mode": "weak_floor",
+        "api": "memcpy",
+        "mmio": "0x4001100c"
+      },
+      "source_path": "firmware/microbench_autogen/copy_variant_10.c",
+      "elf_path": "firmware/microbench_autogen/copy_variant_10.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/copy_variant_10_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/copy_variant_10.bin",
+      "map_path": "firmware/microbench_autogen/copy_variant_10.map"
+    },
+    {
+      "binary_stem": "copy_variant_11",
+      "family": "copy",
+      "sink_label": "COPY_SINK",
+      "sink_function": "copy_handler",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated copy sink variant",
+      "params": {
+        "dst_size": 28,
+        "raw_len": 44,
+        "guard_mode": "weak_floor",
+        "api": "memmove",
+        "mmio": "0x40011010"
+      },
+      "source_path": "firmware/microbench_autogen/copy_variant_11.c",
+      "elf_path": "firmware/microbench_autogen/copy_variant_11.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/copy_variant_11_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/copy_variant_11.bin",
+      "map_path": "firmware/microbench_autogen/copy_variant_11.map"
+    },
+    {
+      "binary_stem": "copy_variant_12",
+      "family": "copy",
+      "sink_label": "COPY_SINK",
+      "sink_function": "copy_handler",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated copy sink variant",
+      "params": {
+        "dst_size": 8,
+        "raw_len": 24,
+        "guard_mode": "weak_cap",
+        "api": "memcpy",
+        "mmio": "0x40011004"
+      },
+      "source_path": "firmware/microbench_autogen/copy_variant_12.c",
+      "elf_path": "firmware/microbench_autogen/copy_variant_12.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/copy_variant_12_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/copy_variant_12.bin",
+      "map_path": "firmware/microbench_autogen/copy_variant_12.map"
+    },
+    {
+      "binary_stem": "copy_variant_13",
+      "family": "copy",
+      "sink_label": "COPY_SINK",
+      "sink_function": "copy_handler",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated copy sink variant",
+      "params": {
+        "dst_size": 12,
+        "raw_len": 28,
+        "guard_mode": "weak_cap",
+        "api": "memmove",
+        "mmio": "0x40011008"
+      },
+      "source_path": "firmware/microbench_autogen/copy_variant_13.c",
+      "elf_path": "firmware/microbench_autogen/copy_variant_13.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/copy_variant_13_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/copy_variant_13.bin",
+      "map_path": "firmware/microbench_autogen/copy_variant_13.map"
+    },
+    {
+      "binary_stem": "copy_variant_14",
+      "family": "copy",
+      "sink_label": "COPY_SINK",
+      "sink_function": "copy_handler",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated copy sink variant",
+      "params": {
+        "dst_size": 16,
+        "raw_len": 32,
+        "guard_mode": "weak_cap",
+        "api": "memcpy",
+        "mmio": "0x4001100c"
+      },
+      "source_path": "firmware/microbench_autogen/copy_variant_14.c",
+      "elf_path": "firmware/microbench_autogen/copy_variant_14.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/copy_variant_14_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/copy_variant_14.bin",
+      "map_path": "firmware/microbench_autogen/copy_variant_14.map"
+    },
+    {
+      "binary_stem": "copy_variant_15",
+      "family": "copy",
+      "sink_label": "COPY_SINK",
+      "sink_function": "copy_handler",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated copy sink variant",
+      "params": {
+        "dst_size": 20,
+        "raw_len": 36,
+        "guard_mode": "weak_cap",
+        "api": "memmove",
+        "mmio": "0x40011010"
+      },
+      "source_path": "firmware/microbench_autogen/copy_variant_15.c",
+      "elf_path": "firmware/microbench_autogen/copy_variant_15.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/copy_variant_15_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/copy_variant_15.bin",
+      "map_path": "firmware/microbench_autogen/copy_variant_15.map"
+    },
+    {
+      "binary_stem": "copy_variant_16",
+      "family": "copy",
+      "sink_label": "COPY_SINK",
+      "sink_function": "copy_handler",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated copy sink variant",
+      "params": {
+        "dst_size": 24,
+        "raw_len": 40,
+        "guard_mode": "weak_cap",
+        "api": "memcpy",
+        "mmio": "0x40011004"
+      },
+      "source_path": "firmware/microbench_autogen/copy_variant_16.c",
+      "elf_path": "firmware/microbench_autogen/copy_variant_16.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/copy_variant_16_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/copy_variant_16.bin",
+      "map_path": "firmware/microbench_autogen/copy_variant_16.map"
+    },
+    {
+      "binary_stem": "copy_variant_17",
+      "family": "copy",
+      "sink_label": "COPY_SINK",
+      "sink_function": "copy_handler",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated copy sink variant",
+      "params": {
+        "dst_size": 28,
+        "raw_len": 44,
+        "guard_mode": "weak_cap",
+        "api": "memmove",
+        "mmio": "0x40011008"
+      },
+      "source_path": "firmware/microbench_autogen/copy_variant_17.c",
+      "elf_path": "firmware/microbench_autogen/copy_variant_17.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/copy_variant_17_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/copy_variant_17.bin",
+      "map_path": "firmware/microbench_autogen/copy_variant_17.map"
+    },
+    {
+      "binary_stem": "format_variant_00",
+      "family": "format",
+      "sink_label": "FORMAT_STRING_SINK",
+      "sink_function": "log_message",
+      "sink_address_hex": "0x08000044",
+      "description": "Auto-generated format-string variant",
+      "params": {
+        "log_size": 32,
+        "wrapper_depth": 0,
+        "api": "sprintf"
+      },
+      "source_path": "firmware/microbench_autogen/format_variant_00.c",
+      "elf_path": "firmware/microbench_autogen/format_variant_00.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/format_variant_00_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/format_variant_00.bin",
+      "map_path": "firmware/microbench_autogen/format_variant_00.map"
+    },
+    {
+      "binary_stem": "format_variant_01",
+      "family": "format",
+      "sink_label": "FORMAT_STRING_SINK",
+      "sink_function": "log_message",
+      "sink_address_hex": "0x08000044",
+      "description": "Auto-generated format-string variant",
+      "params": {
+        "log_size": 48,
+        "wrapper_depth": 0,
+        "api": "snprintf"
+      },
+      "source_path": "firmware/microbench_autogen/format_variant_01.c",
+      "elf_path": "firmware/microbench_autogen/format_variant_01.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/format_variant_01_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/format_variant_01.bin",
+      "map_path": "firmware/microbench_autogen/format_variant_01.map"
+    },
+    {
+      "binary_stem": "format_variant_02",
+      "family": "format",
+      "sink_label": "FORMAT_STRING_SINK",
+      "sink_function": "log_message",
+      "sink_address_hex": "0x08000044",
+      "description": "Auto-generated format-string variant",
+      "params": {
+        "log_size": 64,
+        "wrapper_depth": 0,
+        "api": "sprintf"
+      },
+      "source_path": "firmware/microbench_autogen/format_variant_02.c",
+      "elf_path": "firmware/microbench_autogen/format_variant_02.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/format_variant_02_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/format_variant_02.bin",
+      "map_path": "firmware/microbench_autogen/format_variant_02.map"
+    },
+    {
+      "binary_stem": "format_variant_03",
+      "family": "format",
+      "sink_label": "FORMAT_STRING_SINK",
+      "sink_function": "log_message",
+      "sink_address_hex": "0x08000044",
+      "description": "Auto-generated format-string variant",
+      "params": {
+        "log_size": 80,
+        "wrapper_depth": 0,
+        "api": "snprintf"
+      },
+      "source_path": "firmware/microbench_autogen/format_variant_03.c",
+      "elf_path": "firmware/microbench_autogen/format_variant_03.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/format_variant_03_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/format_variant_03.bin",
+      "map_path": "firmware/microbench_autogen/format_variant_03.map"
+    },
+    {
+      "binary_stem": "format_variant_04",
+      "family": "format",
+      "sink_label": "FORMAT_STRING_SINK",
+      "sink_function": "log_message",
+      "sink_address_hex": "0x08000044",
+      "description": "Auto-generated format-string variant",
+      "params": {
+        "log_size": 96,
+        "wrapper_depth": 0,
+        "api": "sprintf"
+      },
+      "source_path": "firmware/microbench_autogen/format_variant_04.c",
+      "elf_path": "firmware/microbench_autogen/format_variant_04.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/format_variant_04_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/format_variant_04.bin",
+      "map_path": "firmware/microbench_autogen/format_variant_04.map"
+    },
+    {
+      "binary_stem": "format_variant_05",
+      "family": "format",
+      "sink_label": "FORMAT_STRING_SINK",
+      "sink_function": "log_message",
+      "sink_address_hex": "0x08000044",
+      "description": "Auto-generated format-string variant",
+      "params": {
+        "log_size": 112,
+        "wrapper_depth": 0,
+        "api": "snprintf"
+      },
+      "source_path": "firmware/microbench_autogen/format_variant_05.c",
+      "elf_path": "firmware/microbench_autogen/format_variant_05.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/format_variant_05_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/format_variant_05.bin",
+      "map_path": "firmware/microbench_autogen/format_variant_05.map"
+    },
+    {
+      "binary_stem": "format_variant_06",
+      "family": "format",
+      "sink_label": "FORMAT_STRING_SINK",
+      "sink_function": "log_message",
+      "sink_address_hex": "0x08000044",
+      "description": "Auto-generated format-string variant",
+      "params": {
+        "log_size": 32,
+        "wrapper_depth": 1,
+        "api": "sprintf"
+      },
+      "source_path": "firmware/microbench_autogen/format_variant_06.c",
+      "elf_path": "firmware/microbench_autogen/format_variant_06.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/format_variant_06_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/format_variant_06.bin",
+      "map_path": "firmware/microbench_autogen/format_variant_06.map"
+    },
+    {
+      "binary_stem": "format_variant_07",
+      "family": "format",
+      "sink_label": "FORMAT_STRING_SINK",
+      "sink_function": "log_message",
+      "sink_address_hex": "0x08000044",
+      "description": "Auto-generated format-string variant",
+      "params": {
+        "log_size": 48,
+        "wrapper_depth": 1,
+        "api": "snprintf"
+      },
+      "source_path": "firmware/microbench_autogen/format_variant_07.c",
+      "elf_path": "firmware/microbench_autogen/format_variant_07.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/format_variant_07_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/format_variant_07.bin",
+      "map_path": "firmware/microbench_autogen/format_variant_07.map"
+    },
+    {
+      "binary_stem": "format_variant_08",
+      "family": "format",
+      "sink_label": "FORMAT_STRING_SINK",
+      "sink_function": "log_message",
+      "sink_address_hex": "0x08000044",
+      "description": "Auto-generated format-string variant",
+      "params": {
+        "log_size": 64,
+        "wrapper_depth": 1,
+        "api": "sprintf"
+      },
+      "source_path": "firmware/microbench_autogen/format_variant_08.c",
+      "elf_path": "firmware/microbench_autogen/format_variant_08.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/format_variant_08_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/format_variant_08.bin",
+      "map_path": "firmware/microbench_autogen/format_variant_08.map"
+    },
+    {
+      "binary_stem": "format_variant_09",
+      "family": "format",
+      "sink_label": "FORMAT_STRING_SINK",
+      "sink_function": "log_message",
+      "sink_address_hex": "0x08000044",
+      "description": "Auto-generated format-string variant",
+      "params": {
+        "log_size": 80,
+        "wrapper_depth": 1,
+        "api": "snprintf"
+      },
+      "source_path": "firmware/microbench_autogen/format_variant_09.c",
+      "elf_path": "firmware/microbench_autogen/format_variant_09.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/format_variant_09_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/format_variant_09.bin",
+      "map_path": "firmware/microbench_autogen/format_variant_09.map"
+    },
+    {
+      "binary_stem": "format_variant_10",
+      "family": "format",
+      "sink_label": "FORMAT_STRING_SINK",
+      "sink_function": "log_message",
+      "sink_address_hex": "0x08000044",
+      "description": "Auto-generated format-string variant",
+      "params": {
+        "log_size": 96,
+        "wrapper_depth": 1,
+        "api": "sprintf"
+      },
+      "source_path": "firmware/microbench_autogen/format_variant_10.c",
+      "elf_path": "firmware/microbench_autogen/format_variant_10.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/format_variant_10_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/format_variant_10.bin",
+      "map_path": "firmware/microbench_autogen/format_variant_10.map"
+    },
+    {
+      "binary_stem": "format_variant_11",
+      "family": "format",
+      "sink_label": "FORMAT_STRING_SINK",
+      "sink_function": "log_message",
+      "sink_address_hex": "0x08000044",
+      "description": "Auto-generated format-string variant",
+      "params": {
+        "log_size": 112,
+        "wrapper_depth": 1,
+        "api": "snprintf"
+      },
+      "source_path": "firmware/microbench_autogen/format_variant_11.c",
+      "elf_path": "firmware/microbench_autogen/format_variant_11.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/format_variant_11_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/format_variant_11.bin",
+      "map_path": "firmware/microbench_autogen/format_variant_11.map"
+    },
+    {
+      "binary_stem": "format_variant_12",
+      "family": "format",
+      "sink_label": "FORMAT_STRING_SINK",
+      "sink_function": "log_message",
+      "sink_address_hex": "0x08000044",
+      "description": "Auto-generated format-string variant",
+      "params": {
+        "log_size": 32,
+        "wrapper_depth": 2,
+        "api": "sprintf"
+      },
+      "source_path": "firmware/microbench_autogen/format_variant_12.c",
+      "elf_path": "firmware/microbench_autogen/format_variant_12.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/format_variant_12_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/format_variant_12.bin",
+      "map_path": "firmware/microbench_autogen/format_variant_12.map"
+    },
+    {
+      "binary_stem": "format_variant_13",
+      "family": "format",
+      "sink_label": "FORMAT_STRING_SINK",
+      "sink_function": "log_message",
+      "sink_address_hex": "0x08000044",
+      "description": "Auto-generated format-string variant",
+      "params": {
+        "log_size": 48,
+        "wrapper_depth": 2,
+        "api": "snprintf"
+      },
+      "source_path": "firmware/microbench_autogen/format_variant_13.c",
+      "elf_path": "firmware/microbench_autogen/format_variant_13.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/format_variant_13_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/format_variant_13.bin",
+      "map_path": "firmware/microbench_autogen/format_variant_13.map"
+    },
+    {
+      "binary_stem": "format_variant_14",
+      "family": "format",
+      "sink_label": "FORMAT_STRING_SINK",
+      "sink_function": "log_message",
+      "sink_address_hex": "0x08000044",
+      "description": "Auto-generated format-string variant",
+      "params": {
+        "log_size": 64,
+        "wrapper_depth": 2,
+        "api": "sprintf"
+      },
+      "source_path": "firmware/microbench_autogen/format_variant_14.c",
+      "elf_path": "firmware/microbench_autogen/format_variant_14.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/format_variant_14_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/format_variant_14.bin",
+      "map_path": "firmware/microbench_autogen/format_variant_14.map"
+    },
+    {
+      "binary_stem": "format_variant_15",
+      "family": "format",
+      "sink_label": "FORMAT_STRING_SINK",
+      "sink_function": "log_message",
+      "sink_address_hex": "0x08000044",
+      "description": "Auto-generated format-string variant",
+      "params": {
+        "log_size": 80,
+        "wrapper_depth": 2,
+        "api": "snprintf"
+      },
+      "source_path": "firmware/microbench_autogen/format_variant_15.c",
+      "elf_path": "firmware/microbench_autogen/format_variant_15.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/format_variant_15_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/format_variant_15.bin",
+      "map_path": "firmware/microbench_autogen/format_variant_15.map"
+    },
+    {
+      "binary_stem": "format_variant_16",
+      "family": "format",
+      "sink_label": "FORMAT_STRING_SINK",
+      "sink_function": "log_message",
+      "sink_address_hex": "0x08000044",
+      "description": "Auto-generated format-string variant",
+      "params": {
+        "log_size": 96,
+        "wrapper_depth": 2,
+        "api": "sprintf"
+      },
+      "source_path": "firmware/microbench_autogen/format_variant_16.c",
+      "elf_path": "firmware/microbench_autogen/format_variant_16.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/format_variant_16_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/format_variant_16.bin",
+      "map_path": "firmware/microbench_autogen/format_variant_16.map"
+    },
+    {
+      "binary_stem": "format_variant_17",
+      "family": "format",
+      "sink_label": "FORMAT_STRING_SINK",
+      "sink_function": "log_message",
+      "sink_address_hex": "0x08000044",
+      "description": "Auto-generated format-string variant",
+      "params": {
+        "log_size": 112,
+        "wrapper_depth": 2,
+        "api": "snprintf"
+      },
+      "source_path": "firmware/microbench_autogen/format_variant_17.c",
+      "elf_path": "firmware/microbench_autogen/format_variant_17.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/format_variant_17_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/format_variant_17.bin",
+      "map_path": "firmware/microbench_autogen/format_variant_17.map"
+    },
+    {
+      "binary_stem": "funcptr_variant_00",
+      "family": "func_ptr",
+      "sink_label": "FUNC_PTR_SINK",
+      "sink_function": "dispatch_command",
+      "sink_address_hex": "0x08000064",
+      "description": "Auto-generated function-pointer variant",
+      "params": {
+        "table_size": 2,
+        "wrapper_depth": 0,
+        "mask_bias": 0
+      },
+      "source_path": "firmware/microbench_autogen/funcptr_variant_00.c",
+      "elf_path": "firmware/microbench_autogen/funcptr_variant_00.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/funcptr_variant_00_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/funcptr_variant_00.bin",
+      "map_path": "firmware/microbench_autogen/funcptr_variant_00.map"
+    },
+    {
+      "binary_stem": "funcptr_variant_01",
+      "family": "func_ptr",
+      "sink_label": "FUNC_PTR_SINK",
+      "sink_function": "dispatch_command",
+      "sink_address_hex": "0x08000074",
+      "description": "Auto-generated function-pointer variant",
+      "params": {
+        "table_size": 3,
+        "wrapper_depth": 0,
+        "mask_bias": 0
+      },
+      "source_path": "firmware/microbench_autogen/funcptr_variant_01.c",
+      "elf_path": "firmware/microbench_autogen/funcptr_variant_01.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/funcptr_variant_01_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/funcptr_variant_01.bin",
+      "map_path": "firmware/microbench_autogen/funcptr_variant_01.map"
+    },
+    {
+      "binary_stem": "funcptr_variant_02",
+      "family": "func_ptr",
+      "sink_label": "FUNC_PTR_SINK",
+      "sink_function": "dispatch_command",
+      "sink_address_hex": "0x08000084",
+      "description": "Auto-generated function-pointer variant",
+      "params": {
+        "table_size": 4,
+        "wrapper_depth": 0,
+        "mask_bias": 0
+      },
+      "source_path": "firmware/microbench_autogen/funcptr_variant_02.c",
+      "elf_path": "firmware/microbench_autogen/funcptr_variant_02.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/funcptr_variant_02_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/funcptr_variant_02.bin",
+      "map_path": "firmware/microbench_autogen/funcptr_variant_02.map"
+    },
+    {
+      "binary_stem": "funcptr_variant_03",
+      "family": "func_ptr",
+      "sink_label": "FUNC_PTR_SINK",
+      "sink_function": "dispatch_command",
+      "sink_address_hex": "0x08000094",
+      "description": "Auto-generated function-pointer variant",
+      "params": {
+        "table_size": 5,
+        "wrapper_depth": 0,
+        "mask_bias": 0
+      },
+      "source_path": "firmware/microbench_autogen/funcptr_variant_03.c",
+      "elf_path": "firmware/microbench_autogen/funcptr_variant_03.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/funcptr_variant_03_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/funcptr_variant_03.bin",
+      "map_path": "firmware/microbench_autogen/funcptr_variant_03.map"
+    },
+    {
+      "binary_stem": "funcptr_variant_04",
+      "family": "func_ptr",
+      "sink_label": "FUNC_PTR_SINK",
+      "sink_function": "dispatch_command",
+      "sink_address_hex": "0x080000a4",
+      "description": "Auto-generated function-pointer variant",
+      "params": {
+        "table_size": 6,
+        "wrapper_depth": 0,
+        "mask_bias": 0
+      },
+      "source_path": "firmware/microbench_autogen/funcptr_variant_04.c",
+      "elf_path": "firmware/microbench_autogen/funcptr_variant_04.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/funcptr_variant_04_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/funcptr_variant_04.bin",
+      "map_path": "firmware/microbench_autogen/funcptr_variant_04.map"
+    },
+    {
+      "binary_stem": "funcptr_variant_05",
+      "family": "func_ptr",
+      "sink_label": "FUNC_PTR_SINK",
+      "sink_function": "dispatch_command",
+      "sink_address_hex": "0x080000b4",
+      "description": "Auto-generated function-pointer variant",
+      "params": {
+        "table_size": 7,
+        "wrapper_depth": 0,
+        "mask_bias": 0
+      },
+      "source_path": "firmware/microbench_autogen/funcptr_variant_05.c",
+      "elf_path": "firmware/microbench_autogen/funcptr_variant_05.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/funcptr_variant_05_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/funcptr_variant_05.bin",
+      "map_path": "firmware/microbench_autogen/funcptr_variant_05.map"
+    },
+    {
+      "binary_stem": "funcptr_variant_06",
+      "family": "func_ptr",
+      "sink_label": "FUNC_PTR_SINK",
+      "sink_function": "dispatch_command",
+      "sink_address_hex": "0x08000064",
+      "description": "Auto-generated function-pointer variant",
+      "params": {
+        "table_size": 2,
+        "wrapper_depth": 1,
+        "mask_bias": 3
+      },
+      "source_path": "firmware/microbench_autogen/funcptr_variant_06.c",
+      "elf_path": "firmware/microbench_autogen/funcptr_variant_06.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/funcptr_variant_06_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/funcptr_variant_06.bin",
+      "map_path": "firmware/microbench_autogen/funcptr_variant_06.map"
+    },
+    {
+      "binary_stem": "funcptr_variant_07",
+      "family": "func_ptr",
+      "sink_label": "FUNC_PTR_SINK",
+      "sink_function": "dispatch_command",
+      "sink_address_hex": "0x08000074",
+      "description": "Auto-generated function-pointer variant",
+      "params": {
+        "table_size": 3,
+        "wrapper_depth": 1,
+        "mask_bias": 3
+      },
+      "source_path": "firmware/microbench_autogen/funcptr_variant_07.c",
+      "elf_path": "firmware/microbench_autogen/funcptr_variant_07.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/funcptr_variant_07_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/funcptr_variant_07.bin",
+      "map_path": "firmware/microbench_autogen/funcptr_variant_07.map"
+    },
+    {
+      "binary_stem": "funcptr_variant_08",
+      "family": "func_ptr",
+      "sink_label": "FUNC_PTR_SINK",
+      "sink_function": "dispatch_command",
+      "sink_address_hex": "0x08000054",
+      "description": "Auto-generated function-pointer variant",
+      "params": {
+        "table_size": 4,
+        "wrapper_depth": 1,
+        "mask_bias": 3
+      },
+      "source_path": "firmware/microbench_autogen/funcptr_variant_08.c",
+      "elf_path": "firmware/microbench_autogen/funcptr_variant_08.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/funcptr_variant_08_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/funcptr_variant_08.bin",
+      "map_path": "firmware/microbench_autogen/funcptr_variant_08.map"
+    },
+    {
+      "binary_stem": "funcptr_variant_09",
+      "family": "func_ptr",
+      "sink_label": "FUNC_PTR_SINK",
+      "sink_function": "dispatch_command",
+      "sink_address_hex": "0x08000094",
+      "description": "Auto-generated function-pointer variant",
+      "params": {
+        "table_size": 5,
+        "wrapper_depth": 1,
+        "mask_bias": 3
+      },
+      "source_path": "firmware/microbench_autogen/funcptr_variant_09.c",
+      "elf_path": "firmware/microbench_autogen/funcptr_variant_09.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/funcptr_variant_09_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/funcptr_variant_09.bin",
+      "map_path": "firmware/microbench_autogen/funcptr_variant_09.map"
+    },
+    {
+      "binary_stem": "funcptr_variant_10",
+      "family": "func_ptr",
+      "sink_label": "FUNC_PTR_SINK",
+      "sink_function": "dispatch_command",
+      "sink_address_hex": "0x080000a4",
+      "description": "Auto-generated function-pointer variant",
+      "params": {
+        "table_size": 6,
+        "wrapper_depth": 1,
+        "mask_bias": 3
+      },
+      "source_path": "firmware/microbench_autogen/funcptr_variant_10.c",
+      "elf_path": "firmware/microbench_autogen/funcptr_variant_10.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/funcptr_variant_10_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/funcptr_variant_10.bin",
+      "map_path": "firmware/microbench_autogen/funcptr_variant_10.map"
+    },
+    {
+      "binary_stem": "funcptr_variant_11",
+      "family": "func_ptr",
+      "sink_label": "FUNC_PTR_SINK",
+      "sink_function": "dispatch_command",
+      "sink_address_hex": "0x080000b4",
+      "description": "Auto-generated function-pointer variant",
+      "params": {
+        "table_size": 7,
+        "wrapper_depth": 1,
+        "mask_bias": 3
+      },
+      "source_path": "firmware/microbench_autogen/funcptr_variant_11.c",
+      "elf_path": "firmware/microbench_autogen/funcptr_variant_11.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/funcptr_variant_11_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/funcptr_variant_11.bin",
+      "map_path": "firmware/microbench_autogen/funcptr_variant_11.map"
+    },
+    {
+      "binary_stem": "funcptr_variant_12",
+      "family": "func_ptr",
+      "sink_label": "FUNC_PTR_SINK",
+      "sink_function": "dispatch_command",
+      "sink_address_hex": "0x08000064",
+      "description": "Auto-generated function-pointer variant",
+      "params": {
+        "table_size": 2,
+        "wrapper_depth": 2,
+        "mask_bias": 6
+      },
+      "source_path": "firmware/microbench_autogen/funcptr_variant_12.c",
+      "elf_path": "firmware/microbench_autogen/funcptr_variant_12.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/funcptr_variant_12_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/funcptr_variant_12.bin",
+      "map_path": "firmware/microbench_autogen/funcptr_variant_12.map"
+    },
+    {
+      "binary_stem": "funcptr_variant_13",
+      "family": "func_ptr",
+      "sink_label": "FUNC_PTR_SINK",
+      "sink_function": "dispatch_command",
+      "sink_address_hex": "0x08000074",
+      "description": "Auto-generated function-pointer variant",
+      "params": {
+        "table_size": 3,
+        "wrapper_depth": 2,
+        "mask_bias": 6
+      },
+      "source_path": "firmware/microbench_autogen/funcptr_variant_13.c",
+      "elf_path": "firmware/microbench_autogen/funcptr_variant_13.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/funcptr_variant_13_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/funcptr_variant_13.bin",
+      "map_path": "firmware/microbench_autogen/funcptr_variant_13.map"
+    },
+    {
+      "binary_stem": "funcptr_variant_14",
+      "family": "func_ptr",
+      "sink_label": "FUNC_PTR_SINK",
+      "sink_function": "dispatch_command",
+      "sink_address_hex": "0x08000084",
+      "description": "Auto-generated function-pointer variant",
+      "params": {
+        "table_size": 4,
+        "wrapper_depth": 2,
+        "mask_bias": 6
+      },
+      "source_path": "firmware/microbench_autogen/funcptr_variant_14.c",
+      "elf_path": "firmware/microbench_autogen/funcptr_variant_14.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/funcptr_variant_14_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/funcptr_variant_14.bin",
+      "map_path": "firmware/microbench_autogen/funcptr_variant_14.map"
+    },
+    {
+      "binary_stem": "funcptr_variant_15",
+      "family": "func_ptr",
+      "sink_label": "FUNC_PTR_SINK",
+      "sink_function": "dispatch_command",
+      "sink_address_hex": "0x08000094",
+      "description": "Auto-generated function-pointer variant",
+      "params": {
+        "table_size": 5,
+        "wrapper_depth": 2,
+        "mask_bias": 6
+      },
+      "source_path": "firmware/microbench_autogen/funcptr_variant_15.c",
+      "elf_path": "firmware/microbench_autogen/funcptr_variant_15.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/funcptr_variant_15_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/funcptr_variant_15.bin",
+      "map_path": "firmware/microbench_autogen/funcptr_variant_15.map"
+    },
+    {
+      "binary_stem": "funcptr_variant_16",
+      "family": "func_ptr",
+      "sink_label": "FUNC_PTR_SINK",
+      "sink_function": "dispatch_command",
+      "sink_address_hex": "0x080000a4",
+      "description": "Auto-generated function-pointer variant",
+      "params": {
+        "table_size": 6,
+        "wrapper_depth": 2,
+        "mask_bias": 6
+      },
+      "source_path": "firmware/microbench_autogen/funcptr_variant_16.c",
+      "elf_path": "firmware/microbench_autogen/funcptr_variant_16.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/funcptr_variant_16_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/funcptr_variant_16.bin",
+      "map_path": "firmware/microbench_autogen/funcptr_variant_16.map"
+    },
+    {
+      "binary_stem": "funcptr_variant_17",
+      "family": "func_ptr",
+      "sink_label": "FUNC_PTR_SINK",
+      "sink_function": "dispatch_command",
+      "sink_address_hex": "0x08000054",
+      "description": "Auto-generated function-pointer variant",
+      "params": {
+        "table_size": 7,
+        "wrapper_depth": 2,
+        "mask_bias": 6
+      },
+      "source_path": "firmware/microbench_autogen/funcptr_variant_17.c",
+      "elf_path": "firmware/microbench_autogen/funcptr_variant_17.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/funcptr_variant_17_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/funcptr_variant_17.bin",
+      "map_path": "firmware/microbench_autogen/funcptr_variant_17.map"
+    },
+    {
+      "binary_stem": "loop_variant_00",
+      "family": "loop_write",
+      "sink_label": "LOOP_WRITE_SINK",
+      "sink_function": "fill_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated loop-write sink variant",
+      "params": {
+        "dst_size": 16,
+        "overshoot": 2,
+        "stride": 1
+      },
+      "source_path": "firmware/microbench_autogen/loop_variant_00.c",
+      "elf_path": "firmware/microbench_autogen/loop_variant_00.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/loop_variant_00_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/loop_variant_00.bin",
+      "map_path": "firmware/microbench_autogen/loop_variant_00.map"
+    },
+    {
+      "binary_stem": "loop_variant_01",
+      "family": "loop_write",
+      "sink_label": "LOOP_WRITE_SINK",
+      "sink_function": "fill_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated loop-write sink variant",
+      "params": {
+        "dst_size": 24,
+        "overshoot": 2,
+        "stride": 2
+      },
+      "source_path": "firmware/microbench_autogen/loop_variant_01.c",
+      "elf_path": "firmware/microbench_autogen/loop_variant_01.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/loop_variant_01_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/loop_variant_01.bin",
+      "map_path": "firmware/microbench_autogen/loop_variant_01.map"
+    },
+    {
+      "binary_stem": "loop_variant_02",
+      "family": "loop_write",
+      "sink_label": "LOOP_WRITE_SINK",
+      "sink_function": "fill_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated loop-write sink variant",
+      "params": {
+        "dst_size": 32,
+        "overshoot": 2,
+        "stride": 3
+      },
+      "source_path": "firmware/microbench_autogen/loop_variant_02.c",
+      "elf_path": "firmware/microbench_autogen/loop_variant_02.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/loop_variant_02_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/loop_variant_02.bin",
+      "map_path": "firmware/microbench_autogen/loop_variant_02.map"
+    },
+    {
+      "binary_stem": "loop_variant_03",
+      "family": "loop_write",
+      "sink_label": "LOOP_WRITE_SINK",
+      "sink_function": "fill_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated loop-write sink variant",
+      "params": {
+        "dst_size": 40,
+        "overshoot": 2,
+        "stride": 1
+      },
+      "source_path": "firmware/microbench_autogen/loop_variant_03.c",
+      "elf_path": "firmware/microbench_autogen/loop_variant_03.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/loop_variant_03_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/loop_variant_03.bin",
+      "map_path": "firmware/microbench_autogen/loop_variant_03.map"
+    },
+    {
+      "binary_stem": "loop_variant_04",
+      "family": "loop_write",
+      "sink_label": "LOOP_WRITE_SINK",
+      "sink_function": "fill_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated loop-write sink variant",
+      "params": {
+        "dst_size": 48,
+        "overshoot": 2,
+        "stride": 2
+      },
+      "source_path": "firmware/microbench_autogen/loop_variant_04.c",
+      "elf_path": "firmware/microbench_autogen/loop_variant_04.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/loop_variant_04_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/loop_variant_04.bin",
+      "map_path": "firmware/microbench_autogen/loop_variant_04.map"
+    },
+    {
+      "binary_stem": "loop_variant_05",
+      "family": "loop_write",
+      "sink_label": "LOOP_WRITE_SINK",
+      "sink_function": "fill_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated loop-write sink variant",
+      "params": {
+        "dst_size": 56,
+        "overshoot": 2,
+        "stride": 3
+      },
+      "source_path": "firmware/microbench_autogen/loop_variant_05.c",
+      "elf_path": "firmware/microbench_autogen/loop_variant_05.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/loop_variant_05_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/loop_variant_05.bin",
+      "map_path": "firmware/microbench_autogen/loop_variant_05.map"
+    },
+    {
+      "binary_stem": "loop_variant_06",
+      "family": "loop_write",
+      "sink_label": "LOOP_WRITE_SINK",
+      "sink_function": "fill_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated loop-write sink variant",
+      "params": {
+        "dst_size": 16,
+        "overshoot": 4,
+        "stride": 1
+      },
+      "source_path": "firmware/microbench_autogen/loop_variant_06.c",
+      "elf_path": "firmware/microbench_autogen/loop_variant_06.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/loop_variant_06_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/loop_variant_06.bin",
+      "map_path": "firmware/microbench_autogen/loop_variant_06.map"
+    },
+    {
+      "binary_stem": "loop_variant_07",
+      "family": "loop_write",
+      "sink_label": "LOOP_WRITE_SINK",
+      "sink_function": "fill_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated loop-write sink variant",
+      "params": {
+        "dst_size": 24,
+        "overshoot": 4,
+        "stride": 2
+      },
+      "source_path": "firmware/microbench_autogen/loop_variant_07.c",
+      "elf_path": "firmware/microbench_autogen/loop_variant_07.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/loop_variant_07_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/loop_variant_07.bin",
+      "map_path": "firmware/microbench_autogen/loop_variant_07.map"
+    },
+    {
+      "binary_stem": "loop_variant_08",
+      "family": "loop_write",
+      "sink_label": "LOOP_WRITE_SINK",
+      "sink_function": "fill_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated loop-write sink variant",
+      "params": {
+        "dst_size": 32,
+        "overshoot": 4,
+        "stride": 3
+      },
+      "source_path": "firmware/microbench_autogen/loop_variant_08.c",
+      "elf_path": "firmware/microbench_autogen/loop_variant_08.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/loop_variant_08_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/loop_variant_08.bin",
+      "map_path": "firmware/microbench_autogen/loop_variant_08.map"
+    },
+    {
+      "binary_stem": "loop_variant_09",
+      "family": "loop_write",
+      "sink_label": "LOOP_WRITE_SINK",
+      "sink_function": "fill_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated loop-write sink variant",
+      "params": {
+        "dst_size": 40,
+        "overshoot": 4,
+        "stride": 1
+      },
+      "source_path": "firmware/microbench_autogen/loop_variant_09.c",
+      "elf_path": "firmware/microbench_autogen/loop_variant_09.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/loop_variant_09_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/loop_variant_09.bin",
+      "map_path": "firmware/microbench_autogen/loop_variant_09.map"
+    },
+    {
+      "binary_stem": "loop_variant_10",
+      "family": "loop_write",
+      "sink_label": "LOOP_WRITE_SINK",
+      "sink_function": "fill_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated loop-write sink variant",
+      "params": {
+        "dst_size": 48,
+        "overshoot": 4,
+        "stride": 2
+      },
+      "source_path": "firmware/microbench_autogen/loop_variant_10.c",
+      "elf_path": "firmware/microbench_autogen/loop_variant_10.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/loop_variant_10_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/loop_variant_10.bin",
+      "map_path": "firmware/microbench_autogen/loop_variant_10.map"
+    },
+    {
+      "binary_stem": "loop_variant_11",
+      "family": "loop_write",
+      "sink_label": "LOOP_WRITE_SINK",
+      "sink_function": "fill_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated loop-write sink variant",
+      "params": {
+        "dst_size": 56,
+        "overshoot": 4,
+        "stride": 3
+      },
+      "source_path": "firmware/microbench_autogen/loop_variant_11.c",
+      "elf_path": "firmware/microbench_autogen/loop_variant_11.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/loop_variant_11_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/loop_variant_11.bin",
+      "map_path": "firmware/microbench_autogen/loop_variant_11.map"
+    },
+    {
+      "binary_stem": "loop_variant_12",
+      "family": "loop_write",
+      "sink_label": "LOOP_WRITE_SINK",
+      "sink_function": "fill_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated loop-write sink variant",
+      "params": {
+        "dst_size": 16,
+        "overshoot": 6,
+        "stride": 1
+      },
+      "source_path": "firmware/microbench_autogen/loop_variant_12.c",
+      "elf_path": "firmware/microbench_autogen/loop_variant_12.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/loop_variant_12_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/loop_variant_12.bin",
+      "map_path": "firmware/microbench_autogen/loop_variant_12.map"
+    },
+    {
+      "binary_stem": "loop_variant_13",
+      "family": "loop_write",
+      "sink_label": "LOOP_WRITE_SINK",
+      "sink_function": "fill_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated loop-write sink variant",
+      "params": {
+        "dst_size": 24,
+        "overshoot": 6,
+        "stride": 2
+      },
+      "source_path": "firmware/microbench_autogen/loop_variant_13.c",
+      "elf_path": "firmware/microbench_autogen/loop_variant_13.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/loop_variant_13_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/loop_variant_13.bin",
+      "map_path": "firmware/microbench_autogen/loop_variant_13.map"
+    },
+    {
+      "binary_stem": "loop_variant_14",
+      "family": "loop_write",
+      "sink_label": "LOOP_WRITE_SINK",
+      "sink_function": "fill_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated loop-write sink variant",
+      "params": {
+        "dst_size": 32,
+        "overshoot": 6,
+        "stride": 3
+      },
+      "source_path": "firmware/microbench_autogen/loop_variant_14.c",
+      "elf_path": "firmware/microbench_autogen/loop_variant_14.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/loop_variant_14_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/loop_variant_14.bin",
+      "map_path": "firmware/microbench_autogen/loop_variant_14.map"
+    },
+    {
+      "binary_stem": "loop_variant_15",
+      "family": "loop_write",
+      "sink_label": "LOOP_WRITE_SINK",
+      "sink_function": "fill_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated loop-write sink variant",
+      "params": {
+        "dst_size": 40,
+        "overshoot": 6,
+        "stride": 1
+      },
+      "source_path": "firmware/microbench_autogen/loop_variant_15.c",
+      "elf_path": "firmware/microbench_autogen/loop_variant_15.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/loop_variant_15_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/loop_variant_15.bin",
+      "map_path": "firmware/microbench_autogen/loop_variant_15.map"
+    },
+    {
+      "binary_stem": "loop_variant_16",
+      "family": "loop_write",
+      "sink_label": "LOOP_WRITE_SINK",
+      "sink_function": "fill_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated loop-write sink variant",
+      "params": {
+        "dst_size": 48,
+        "overshoot": 6,
+        "stride": 2
+      },
+      "source_path": "firmware/microbench_autogen/loop_variant_16.c",
+      "elf_path": "firmware/microbench_autogen/loop_variant_16.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/loop_variant_16_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/loop_variant_16.bin",
+      "map_path": "firmware/microbench_autogen/loop_variant_16.map"
+    },
+    {
+      "binary_stem": "loop_variant_17",
+      "family": "loop_write",
+      "sink_label": "LOOP_WRITE_SINK",
+      "sink_function": "fill_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated loop-write sink variant",
+      "params": {
+        "dst_size": 56,
+        "overshoot": 6,
+        "stride": 3
+      },
+      "source_path": "firmware/microbench_autogen/loop_variant_17.c",
+      "elf_path": "firmware/microbench_autogen/loop_variant_17.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/loop_variant_17_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/loop_variant_17.bin",
+      "map_path": "firmware/microbench_autogen/loop_variant_17.map"
+    },
+    {
+      "binary_stem": "memset_variant_00",
+      "family": "memset",
+      "sink_label": "MEMSET_SINK",
+      "sink_function": "clear_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated memset sink variant",
+      "params": {
+        "dst_size": 16,
+        "len_bump": 4,
+        "pattern": "0x0"
+      },
+      "source_path": "firmware/microbench_autogen/memset_variant_00.c",
+      "elf_path": "firmware/microbench_autogen/memset_variant_00.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/memset_variant_00_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/memset_variant_00.bin",
+      "map_path": "firmware/microbench_autogen/memset_variant_00.map"
+    },
+    {
+      "binary_stem": "memset_variant_01",
+      "family": "memset",
+      "sink_label": "MEMSET_SINK",
+      "sink_function": "clear_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated memset sink variant",
+      "params": {
+        "dst_size": 24,
+        "len_bump": 4,
+        "pattern": "0x11"
+      },
+      "source_path": "firmware/microbench_autogen/memset_variant_01.c",
+      "elf_path": "firmware/microbench_autogen/memset_variant_01.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/memset_variant_01_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/memset_variant_01.bin",
+      "map_path": "firmware/microbench_autogen/memset_variant_01.map"
+    },
+    {
+      "binary_stem": "memset_variant_02",
+      "family": "memset",
+      "sink_label": "MEMSET_SINK",
+      "sink_function": "clear_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated memset sink variant",
+      "params": {
+        "dst_size": 32,
+        "len_bump": 4,
+        "pattern": "0x22"
+      },
+      "source_path": "firmware/microbench_autogen/memset_variant_02.c",
+      "elf_path": "firmware/microbench_autogen/memset_variant_02.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/memset_variant_02_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/memset_variant_02.bin",
+      "map_path": "firmware/microbench_autogen/memset_variant_02.map"
+    },
+    {
+      "binary_stem": "memset_variant_03",
+      "family": "memset",
+      "sink_label": "MEMSET_SINK",
+      "sink_function": "clear_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated memset sink variant",
+      "params": {
+        "dst_size": 40,
+        "len_bump": 4,
+        "pattern": "0x33"
+      },
+      "source_path": "firmware/microbench_autogen/memset_variant_03.c",
+      "elf_path": "firmware/microbench_autogen/memset_variant_03.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/memset_variant_03_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/memset_variant_03.bin",
+      "map_path": "firmware/microbench_autogen/memset_variant_03.map"
+    },
+    {
+      "binary_stem": "memset_variant_04",
+      "family": "memset",
+      "sink_label": "MEMSET_SINK",
+      "sink_function": "clear_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated memset sink variant",
+      "params": {
+        "dst_size": 48,
+        "len_bump": 4,
+        "pattern": "0x44"
+      },
+      "source_path": "firmware/microbench_autogen/memset_variant_04.c",
+      "elf_path": "firmware/microbench_autogen/memset_variant_04.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/memset_variant_04_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/memset_variant_04.bin",
+      "map_path": "firmware/microbench_autogen/memset_variant_04.map"
+    },
+    {
+      "binary_stem": "memset_variant_05",
+      "family": "memset",
+      "sink_label": "MEMSET_SINK",
+      "sink_function": "clear_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated memset sink variant",
+      "params": {
+        "dst_size": 56,
+        "len_bump": 4,
+        "pattern": "0x55"
+      },
+      "source_path": "firmware/microbench_autogen/memset_variant_05.c",
+      "elf_path": "firmware/microbench_autogen/memset_variant_05.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/memset_variant_05_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/memset_variant_05.bin",
+      "map_path": "firmware/microbench_autogen/memset_variant_05.map"
+    },
+    {
+      "binary_stem": "memset_variant_06",
+      "family": "memset",
+      "sink_label": "MEMSET_SINK",
+      "sink_function": "clear_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated memset sink variant",
+      "params": {
+        "dst_size": 16,
+        "len_bump": 8,
+        "pattern": "0x66"
+      },
+      "source_path": "firmware/microbench_autogen/memset_variant_06.c",
+      "elf_path": "firmware/microbench_autogen/memset_variant_06.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/memset_variant_06_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/memset_variant_06.bin",
+      "map_path": "firmware/microbench_autogen/memset_variant_06.map"
+    },
+    {
+      "binary_stem": "memset_variant_07",
+      "family": "memset",
+      "sink_label": "MEMSET_SINK",
+      "sink_function": "clear_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated memset sink variant",
+      "params": {
+        "dst_size": 24,
+        "len_bump": 8,
+        "pattern": "0x77"
+      },
+      "source_path": "firmware/microbench_autogen/memset_variant_07.c",
+      "elf_path": "firmware/microbench_autogen/memset_variant_07.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/memset_variant_07_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/memset_variant_07.bin",
+      "map_path": "firmware/microbench_autogen/memset_variant_07.map"
+    },
+    {
+      "binary_stem": "memset_variant_08",
+      "family": "memset",
+      "sink_label": "MEMSET_SINK",
+      "sink_function": "clear_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated memset sink variant",
+      "params": {
+        "dst_size": 32,
+        "len_bump": 8,
+        "pattern": "0x88"
+      },
+      "source_path": "firmware/microbench_autogen/memset_variant_08.c",
+      "elf_path": "firmware/microbench_autogen/memset_variant_08.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/memset_variant_08_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/memset_variant_08.bin",
+      "map_path": "firmware/microbench_autogen/memset_variant_08.map"
+    },
+    {
+      "binary_stem": "memset_variant_09",
+      "family": "memset",
+      "sink_label": "MEMSET_SINK",
+      "sink_function": "clear_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated memset sink variant",
+      "params": {
+        "dst_size": 40,
+        "len_bump": 8,
+        "pattern": "0x99"
+      },
+      "source_path": "firmware/microbench_autogen/memset_variant_09.c",
+      "elf_path": "firmware/microbench_autogen/memset_variant_09.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/memset_variant_09_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/memset_variant_09.bin",
+      "map_path": "firmware/microbench_autogen/memset_variant_09.map"
+    },
+    {
+      "binary_stem": "memset_variant_10",
+      "family": "memset",
+      "sink_label": "MEMSET_SINK",
+      "sink_function": "clear_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated memset sink variant",
+      "params": {
+        "dst_size": 48,
+        "len_bump": 8,
+        "pattern": "0xaa"
+      },
+      "source_path": "firmware/microbench_autogen/memset_variant_10.c",
+      "elf_path": "firmware/microbench_autogen/memset_variant_10.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/memset_variant_10_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/memset_variant_10.bin",
+      "map_path": "firmware/microbench_autogen/memset_variant_10.map"
+    },
+    {
+      "binary_stem": "memset_variant_11",
+      "family": "memset",
+      "sink_label": "MEMSET_SINK",
+      "sink_function": "clear_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated memset sink variant",
+      "params": {
+        "dst_size": 56,
+        "len_bump": 8,
+        "pattern": "0xbb"
+      },
+      "source_path": "firmware/microbench_autogen/memset_variant_11.c",
+      "elf_path": "firmware/microbench_autogen/memset_variant_11.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/memset_variant_11_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/memset_variant_11.bin",
+      "map_path": "firmware/microbench_autogen/memset_variant_11.map"
+    },
+    {
+      "binary_stem": "memset_variant_12",
+      "family": "memset",
+      "sink_label": "MEMSET_SINK",
+      "sink_function": "clear_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated memset sink variant",
+      "params": {
+        "dst_size": 16,
+        "len_bump": 12,
+        "pattern": "0xcc"
+      },
+      "source_path": "firmware/microbench_autogen/memset_variant_12.c",
+      "elf_path": "firmware/microbench_autogen/memset_variant_12.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/memset_variant_12_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/memset_variant_12.bin",
+      "map_path": "firmware/microbench_autogen/memset_variant_12.map"
+    },
+    {
+      "binary_stem": "memset_variant_13",
+      "family": "memset",
+      "sink_label": "MEMSET_SINK",
+      "sink_function": "clear_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated memset sink variant",
+      "params": {
+        "dst_size": 24,
+        "len_bump": 12,
+        "pattern": "0xdd"
+      },
+      "source_path": "firmware/microbench_autogen/memset_variant_13.c",
+      "elf_path": "firmware/microbench_autogen/memset_variant_13.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/memset_variant_13_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/memset_variant_13.bin",
+      "map_path": "firmware/microbench_autogen/memset_variant_13.map"
+    },
+    {
+      "binary_stem": "memset_variant_14",
+      "family": "memset",
+      "sink_label": "MEMSET_SINK",
+      "sink_function": "clear_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated memset sink variant",
+      "params": {
+        "dst_size": 32,
+        "len_bump": 12,
+        "pattern": "0xee"
+      },
+      "source_path": "firmware/microbench_autogen/memset_variant_14.c",
+      "elf_path": "firmware/microbench_autogen/memset_variant_14.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/memset_variant_14_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/memset_variant_14.bin",
+      "map_path": "firmware/microbench_autogen/memset_variant_14.map"
+    },
+    {
+      "binary_stem": "memset_variant_15",
+      "family": "memset",
+      "sink_label": "MEMSET_SINK",
+      "sink_function": "clear_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated memset sink variant",
+      "params": {
+        "dst_size": 40,
+        "len_bump": 12,
+        "pattern": "0xff"
+      },
+      "source_path": "firmware/microbench_autogen/memset_variant_15.c",
+      "elf_path": "firmware/microbench_autogen/memset_variant_15.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/memset_variant_15_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/memset_variant_15.bin",
+      "map_path": "firmware/microbench_autogen/memset_variant_15.map"
+    },
+    {
+      "binary_stem": "memset_variant_16",
+      "family": "memset",
+      "sink_label": "MEMSET_SINK",
+      "sink_function": "clear_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated memset sink variant",
+      "params": {
+        "dst_size": 48,
+        "len_bump": 12,
+        "pattern": "0x10"
+      },
+      "source_path": "firmware/microbench_autogen/memset_variant_16.c",
+      "elf_path": "firmware/microbench_autogen/memset_variant_16.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/memset_variant_16_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/memset_variant_16.bin",
+      "map_path": "firmware/microbench_autogen/memset_variant_16.map"
+    },
+    {
+      "binary_stem": "memset_variant_17",
+      "family": "memset",
+      "sink_label": "MEMSET_SINK",
+      "sink_function": "clear_buffer",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated memset sink variant",
+      "params": {
+        "dst_size": 56,
+        "len_bump": 12,
+        "pattern": "0x21"
+      },
+      "source_path": "firmware/microbench_autogen/memset_variant_17.c",
+      "elf_path": "firmware/microbench_autogen/memset_variant_17.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/memset_variant_17_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/memset_variant_17.bin",
+      "map_path": "firmware/microbench_autogen/memset_variant_17.map"
+    },
+    {
+      "binary_stem": "store_variant_00",
+      "family": "store",
+      "sink_label": "STORE_SINK",
+      "sink_function": "write_register",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated store sink variant",
+      "params": {
+        "reg_offset": 0,
+        "transform": "raw",
+        "base_addr": "0x40020000"
+      },
+      "source_path": "firmware/microbench_autogen/store_variant_00.c",
+      "elf_path": "firmware/microbench_autogen/store_variant_00.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/store_variant_00_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/store_variant_00.bin",
+      "map_path": "firmware/microbench_autogen/store_variant_00.map"
+    },
+    {
+      "binary_stem": "store_variant_01",
+      "family": "store",
+      "sink_label": "STORE_SINK",
+      "sink_function": "write_register",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated store sink variant",
+      "params": {
+        "reg_offset": 4,
+        "transform": "raw",
+        "base_addr": "0x40020004"
+      },
+      "source_path": "firmware/microbench_autogen/store_variant_01.c",
+      "elf_path": "firmware/microbench_autogen/store_variant_01.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/store_variant_01_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/store_variant_01.bin",
+      "map_path": "firmware/microbench_autogen/store_variant_01.map"
+    },
+    {
+      "binary_stem": "store_variant_02",
+      "family": "store",
+      "sink_label": "STORE_SINK",
+      "sink_function": "write_register",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated store sink variant",
+      "params": {
+        "reg_offset": 8,
+        "transform": "raw",
+        "base_addr": "0x40020008"
+      },
+      "source_path": "firmware/microbench_autogen/store_variant_02.c",
+      "elf_path": "firmware/microbench_autogen/store_variant_02.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/store_variant_02_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/store_variant_02.bin",
+      "map_path": "firmware/microbench_autogen/store_variant_02.map"
+    },
+    {
+      "binary_stem": "store_variant_03",
+      "family": "store",
+      "sink_label": "STORE_SINK",
+      "sink_function": "write_register",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated store sink variant",
+      "params": {
+        "reg_offset": 12,
+        "transform": "raw",
+        "base_addr": "0x4002000c"
+      },
+      "source_path": "firmware/microbench_autogen/store_variant_03.c",
+      "elf_path": "firmware/microbench_autogen/store_variant_03.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/store_variant_03_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/store_variant_03.bin",
+      "map_path": "firmware/microbench_autogen/store_variant_03.map"
+    },
+    {
+      "binary_stem": "store_variant_04",
+      "family": "store",
+      "sink_label": "STORE_SINK",
+      "sink_function": "write_register",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated store sink variant",
+      "params": {
+        "reg_offset": 16,
+        "transform": "raw",
+        "base_addr": "0x40020010"
+      },
+      "source_path": "firmware/microbench_autogen/store_variant_04.c",
+      "elf_path": "firmware/microbench_autogen/store_variant_04.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/store_variant_04_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/store_variant_04.bin",
+      "map_path": "firmware/microbench_autogen/store_variant_04.map"
+    },
+    {
+      "binary_stem": "store_variant_05",
+      "family": "store",
+      "sink_label": "STORE_SINK",
+      "sink_function": "write_register",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated store sink variant",
+      "params": {
+        "reg_offset": 20,
+        "transform": "raw",
+        "base_addr": "0x40020014"
+      },
+      "source_path": "firmware/microbench_autogen/store_variant_05.c",
+      "elf_path": "firmware/microbench_autogen/store_variant_05.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/store_variant_05_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/store_variant_05.bin",
+      "map_path": "firmware/microbench_autogen/store_variant_05.map"
+    },
+    {
+      "binary_stem": "store_variant_06",
+      "family": "store",
+      "sink_label": "STORE_SINK",
+      "sink_function": "write_register",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated store sink variant",
+      "params": {
+        "reg_offset": 0,
+        "transform": "shifted",
+        "base_addr": "0x40020000"
+      },
+      "source_path": "firmware/microbench_autogen/store_variant_06.c",
+      "elf_path": "firmware/microbench_autogen/store_variant_06.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/store_variant_06_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/store_variant_06.bin",
+      "map_path": "firmware/microbench_autogen/store_variant_06.map"
+    },
+    {
+      "binary_stem": "store_variant_07",
+      "family": "store",
+      "sink_label": "STORE_SINK",
+      "sink_function": "write_register",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated store sink variant",
+      "params": {
+        "reg_offset": 4,
+        "transform": "shifted",
+        "base_addr": "0x40020004"
+      },
+      "source_path": "firmware/microbench_autogen/store_variant_07.c",
+      "elf_path": "firmware/microbench_autogen/store_variant_07.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/store_variant_07_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/store_variant_07.bin",
+      "map_path": "firmware/microbench_autogen/store_variant_07.map"
+    },
+    {
+      "binary_stem": "store_variant_08",
+      "family": "store",
+      "sink_label": "STORE_SINK",
+      "sink_function": "write_register",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated store sink variant",
+      "params": {
+        "reg_offset": 8,
+        "transform": "shifted",
+        "base_addr": "0x40020008"
+      },
+      "source_path": "firmware/microbench_autogen/store_variant_08.c",
+      "elf_path": "firmware/microbench_autogen/store_variant_08.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/store_variant_08_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/store_variant_08.bin",
+      "map_path": "firmware/microbench_autogen/store_variant_08.map"
+    },
+    {
+      "binary_stem": "store_variant_09",
+      "family": "store",
+      "sink_label": "STORE_SINK",
+      "sink_function": "write_register",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated store sink variant",
+      "params": {
+        "reg_offset": 12,
+        "transform": "shifted",
+        "base_addr": "0x4002000c"
+      },
+      "source_path": "firmware/microbench_autogen/store_variant_09.c",
+      "elf_path": "firmware/microbench_autogen/store_variant_09.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/store_variant_09_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/store_variant_09.bin",
+      "map_path": "firmware/microbench_autogen/store_variant_09.map"
+    },
+    {
+      "binary_stem": "store_variant_10",
+      "family": "store",
+      "sink_label": "STORE_SINK",
+      "sink_function": "write_register",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated store sink variant",
+      "params": {
+        "reg_offset": 16,
+        "transform": "shifted",
+        "base_addr": "0x40020010"
+      },
+      "source_path": "firmware/microbench_autogen/store_variant_10.c",
+      "elf_path": "firmware/microbench_autogen/store_variant_10.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/store_variant_10_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/store_variant_10.bin",
+      "map_path": "firmware/microbench_autogen/store_variant_10.map"
+    },
+    {
+      "binary_stem": "store_variant_11",
+      "family": "store",
+      "sink_label": "STORE_SINK",
+      "sink_function": "write_register",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated store sink variant",
+      "params": {
+        "reg_offset": 20,
+        "transform": "shifted",
+        "base_addr": "0x40020014"
+      },
+      "source_path": "firmware/microbench_autogen/store_variant_11.c",
+      "elf_path": "firmware/microbench_autogen/store_variant_11.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/store_variant_11_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/store_variant_11.bin",
+      "map_path": "firmware/microbench_autogen/store_variant_11.map"
+    },
+    {
+      "binary_stem": "store_variant_12",
+      "family": "store",
+      "sink_label": "STORE_SINK",
+      "sink_function": "write_register",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated store sink variant",
+      "params": {
+        "reg_offset": 0,
+        "transform": "xor_tag",
+        "base_addr": "0x40020000"
+      },
+      "source_path": "firmware/microbench_autogen/store_variant_12.c",
+      "elf_path": "firmware/microbench_autogen/store_variant_12.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/store_variant_12_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/store_variant_12.bin",
+      "map_path": "firmware/microbench_autogen/store_variant_12.map"
+    },
+    {
+      "binary_stem": "store_variant_13",
+      "family": "store",
+      "sink_label": "STORE_SINK",
+      "sink_function": "write_register",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated store sink variant",
+      "params": {
+        "reg_offset": 4,
+        "transform": "xor_tag",
+        "base_addr": "0x40020004"
+      },
+      "source_path": "firmware/microbench_autogen/store_variant_13.c",
+      "elf_path": "firmware/microbench_autogen/store_variant_13.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/store_variant_13_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/store_variant_13.bin",
+      "map_path": "firmware/microbench_autogen/store_variant_13.map"
+    },
+    {
+      "binary_stem": "store_variant_14",
+      "family": "store",
+      "sink_label": "STORE_SINK",
+      "sink_function": "write_register",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated store sink variant",
+      "params": {
+        "reg_offset": 8,
+        "transform": "xor_tag",
+        "base_addr": "0x40020008"
+      },
+      "source_path": "firmware/microbench_autogen/store_variant_14.c",
+      "elf_path": "firmware/microbench_autogen/store_variant_14.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/store_variant_14_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/store_variant_14.bin",
+      "map_path": "firmware/microbench_autogen/store_variant_14.map"
+    },
+    {
+      "binary_stem": "store_variant_15",
+      "family": "store",
+      "sink_label": "STORE_SINK",
+      "sink_function": "write_register",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated store sink variant",
+      "params": {
+        "reg_offset": 12,
+        "transform": "xor_tag",
+        "base_addr": "0x4002000c"
+      },
+      "source_path": "firmware/microbench_autogen/store_variant_15.c",
+      "elf_path": "firmware/microbench_autogen/store_variant_15.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/store_variant_15_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/store_variant_15.bin",
+      "map_path": "firmware/microbench_autogen/store_variant_15.map"
+    },
+    {
+      "binary_stem": "store_variant_16",
+      "family": "store",
+      "sink_label": "STORE_SINK",
+      "sink_function": "write_register",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated store sink variant",
+      "params": {
+        "reg_offset": 16,
+        "transform": "xor_tag",
+        "base_addr": "0x40020010"
+      },
+      "source_path": "firmware/microbench_autogen/store_variant_16.c",
+      "elf_path": "firmware/microbench_autogen/store_variant_16.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/store_variant_16_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/store_variant_16.bin",
+      "map_path": "firmware/microbench_autogen/store_variant_16.map"
+    },
+    {
+      "binary_stem": "store_variant_17",
+      "family": "store",
+      "sink_label": "STORE_SINK",
+      "sink_function": "write_register",
+      "sink_address_hex": "0x08000042",
+      "description": "Auto-generated store sink variant",
+      "params": {
+        "reg_offset": 20,
+        "transform": "xor_tag",
+        "base_addr": "0x40020014"
+      },
+      "source_path": "firmware/microbench_autogen/store_variant_17.c",
+      "elf_path": "firmware/microbench_autogen/store_variant_17.elf",
+      "stripped_elf_path": "firmware/microbench_autogen/store_variant_17_stripped.elf",
+      "bin_path": "firmware/microbench_autogen/store_variant_17.bin",
+      "map_path": "firmware/microbench_autogen/store_variant_17.map"
+    }
+  ]
+}

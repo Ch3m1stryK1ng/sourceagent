@@ -31,6 +31,8 @@ def test_extract_sink_roots_copy_len_and_dst():
     assert rows[0]["roots"][0]["canonical_expr"] == "payload_len"
     assert rows[0]["roots"][0]["family"] == "length"
     assert "payload_len" in rows[0]["roots"][0]["aliases"]
+    assert rows[0]["roots"][0]["path_tokens"] == ["payload_len"]
+    assert rows[0]["roots"][0]["path_key"] == "payload_len"
 
 
 def test_extract_sink_roots_missing_facts_marks_partial():
@@ -195,6 +197,82 @@ void uart_receive(byte *buf, byte len) {
     assert rows[0]["root_source"] == "decompile_fallback"
 
 
+def test_extract_sink_roots_uses_loop_copy_miner_facts_for_stripped_copy():
+    verified_sinks = [
+        {
+            "pack_id": "p6b",
+            "label": "COPY_SINK",
+            "address": 0x08000068,
+            "function_name": "FUN_08000068",
+            "confidence": 0.58,
+            "evidence_refs": ["E1"],
+        },
+    ]
+    facts = {
+        "p6b": {
+            "promoted_from": "LOOP_WRITE_SINK",
+            "callee": "loop_copy_idiom",
+            "len_expr": "param_3",
+            "dst_expr": "param_1[i]",
+            "src_expr": "param_2[i]",
+            "in_loop": True,
+        },
+    }
+
+    rows = extract_sink_roots(
+        verified_sinks,
+        sink_facts_by_pack=facts,
+        binary_stem="fw",
+    )
+
+    assert rows[0]["status"] == "ok"
+    exprs = [root["expr"] for root in rows[0]["roots"]]
+    assert exprs[0] == "param_3"
+    assert "param_1[i]" in exprs
+    assert "param_2[i]" in exprs
+    assert rows[0]["root_source"] == "miner_facts"
+
+
+def test_extract_sink_roots_filters_malformed_copy_root_and_supplements_from_decompile():
+    verified_sinks = [
+        {
+            "pack_id": "p6c",
+            "label": "COPY_SINK",
+            "address": 0x08000084,
+            "function_name": "FUN_08000084",
+            "confidence": 0.55,
+            "evidence_refs": ["E1"],
+        },
+    ]
+    facts = {
+        "p6c": {
+            "len_expr": "(int *",
+            "dst_expr": "param_1",
+        },
+    }
+    decompiled_cache = {
+        "FUN_08000084": """
+void FUN_08000084(char *param_1, char *param_2, unsigned int param_3) {
+  memcpy(param_1, param_2, param_3);
+}
+""",
+    }
+
+    rows = extract_sink_roots(
+        verified_sinks,
+        sink_facts_by_pack=facts,
+        binary_stem="fw",
+        decompiled_cache=decompiled_cache,
+    )
+
+    exprs = [root["expr"] for root in rows[0]["roots"]]
+    assert rows[0]["status"] == "ok"
+    assert rows[0]["roots"][0]["expr"] == "param_3"
+    assert "param_1" in exprs
+    assert "param_2" not in exprs
+    assert "(int *" not in exprs
+
+
 def test_extract_sink_roots_recovers_loop_write_bound_from_decompile():
     verified_sinks = [
         {
@@ -231,3 +309,31 @@ void fill_buffer(byte *buf, uint n) {
     assert rows[0]["status"] == "ok"
     assert rows[0]["roots"][0]["expr"] == "n"
     assert rows[0]["roots"][0]["kind"] == "index_or_bound"
+
+
+def test_extract_sink_roots_adds_pointer_base_alias_and_offset_hint():
+    verified_sinks = [
+        {
+            "pack_id": "p8",
+            "label": "STORE_SINK",
+            "address": 0x08000090,
+            "function_name": "FUN_08000090",
+            "confidence": 0.55,
+            "evidence_refs": ["E1"],
+        },
+    ]
+    facts = {
+        "p8": {
+            "dst_expr": "pkt->payload[hdr_len]",
+        },
+    }
+
+    rows = extract_sink_roots(verified_sinks, sink_facts_by_pack=facts, binary_stem="fw")
+
+    root = rows[0]["roots"][0]
+    assert root["path_base"] == "pkt"
+    assert root["path_leaf"] == "payload"
+    assert root["has_index"] is True
+    assert root["offset_hint"] == "hdr_len"
+    assert "pkt" in root["aliases"]
+    assert "payload" in root["aliases"]

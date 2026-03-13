@@ -759,7 +759,12 @@
       ],
       "must_use_channel": true,
       "required_source_mode": "any",
-      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: spi_sam_fast_rx"
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: spi_sam_fast_rx",
+      "expected_final_verdict": "CONFIRMED",
+      "expected_final_risk_band": "HIGH",
+      "expected_review_priority": "P0",
+      "risk_gt_provenance": "manual_anchor_chain_v2",
+      "risk_gt_notes": "Second-batch Zephyr anchor: attacker-controlled radio frame state reaches spi_sam_fast_rx loop-write path and should remain a confirmed P0 high-risk chain."
     }
   ],
   "negative_expectations": [],

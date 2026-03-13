@@ -231,7 +231,8 @@
   "todo_items": [],
   "notes": [
     "This sample is a full-GT negative control for control-only trigger paths into an injected sprintf-based overflow.",
-    "addr2line maps bof() to udp_echoserver.c:76 and udp_echoserver_receive_callback() to udp_echoserver.c:246 in the STM32Cube/uSBS build."
+    "addr2line maps bof() to udp_echoserver.c:76 and udp_echoserver_receive_callback() to udp_echoserver.c:246 in the STM32Cube/uSBS build.",
+    "Chain-level risk GT is intentionally absent here because this sample remains negative-only under the current attacker-derived root policy."
   ],
   "chain_gt_scope": "negative_only",
   "gt_provenance": {

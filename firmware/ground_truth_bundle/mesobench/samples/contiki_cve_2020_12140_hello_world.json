@@ -4068,6 +4068,11 @@
       "chain_id": "chain_hello-world_SINK_hello-world_0000_b9bbad48",
       "sink_id": "SINK_hello-world_0000",
       "expected_verdict": "CONFIRMED",
+      "expected_final_verdict": "CONFIRMED",
+      "expected_final_risk_band": "HIGH",
+      "expected_review_priority": "P0",
+      "risk_gt_provenance": "manual_anchor_chain_v3",
+      "risk_gt_notes": "Third-batch Contiki anchor: attacker-controlled packet bytes reach buffer_str and should remain a confirmed P0 high-risk copy chain.",
       "required_source_ids": [
         "R_AUTO_001"
       ],
@@ -4093,6 +4098,11 @@
       "chain_id": "chain_hello-world_SINK_hello-world_0001_daa00ed7",
       "sink_id": "SINK_hello-world_0001",
       "expected_verdict": "CONFIRMED",
+      "expected_final_verdict": "CONFIRMED",
+      "expected_final_risk_band": "HIGH",
+      "expected_review_priority": "P0",
+      "risk_gt_provenance": "manual_anchor_chain_v3",
+      "risk_gt_notes": "Third-batch Contiki anchor: fragmented payload bytes flow through fragment_copy_payload_and_send into the vulnerable copy path and should remain a confirmed P0 high-risk chain.",
       "required_source_ids": [
         "R_AUTO_001"
       ],
@@ -4235,6 +4245,11 @@
       "chain_id": "chain_hello-world_SINK_hello-world_0007_06a0a259",
       "sink_id": "SINK_hello-world_0007",
       "expected_verdict": "CONFIRMED",
+      "expected_final_verdict": "CONFIRMED",
+      "expected_final_risk_band": "HIGH",
+      "expected_review_priority": "P0",
+      "risk_gt_provenance": "manual_anchor_chain_v3",
+      "risk_gt_notes": "Third-batch Contiki anchor: attacker-controlled routing data reaches rpl_set_prefix_from_addr and should remain a confirmed P0 high-risk copy chain.",
       "required_source_ids": [
         "R_AUTO_001"
       ],
@@ -4260,6 +4275,11 @@
       "chain_id": "chain_hello-world_SINK_hello-world_0009_affe0a8d",
       "sink_id": "SINK_hello-world_0009",
       "expected_verdict": "CONFIRMED",
+      "expected_final_verdict": "CONFIRMED",
+      "expected_final_risk_band": "HIGH",
+      "expected_review_priority": "P0",
+      "risk_gt_provenance": "manual_anchor_chain_v3",
+      "risk_gt_notes": "Third-batch Contiki anchor: attacker-controlled extension-header data reaches rpl_ext_header_remove and should remain a confirmed P0 high-risk copy chain.",
       "required_source_ids": [
         "R_AUTO_001"
       ],
@@ -5093,6 +5113,11 @@
       "chain_id": "chain_hello-world_SINK_hello-world_0041_7e71eff9",
       "sink_id": "SINK_hello-world_0041",
       "expected_verdict": "CONFIRMED",
+      "expected_final_verdict": "CONFIRMED",
+      "expected_final_risk_band": "HIGH",
+      "expected_review_priority": "P0",
+      "risk_gt_provenance": "manual_anchor_chain_v3",
+      "risk_gt_notes": "Third-batch Contiki anchor: attacker-controlled state reaches memb_init memset-style initialization path and should remain a confirmed P0 high-risk memory-write chain.",
       "required_source_ids": [
         "R_AUTO_001"
       ],
@@ -5537,5 +5562,33 @@
     "eval_dir": "/tmp/eval_mesobench_missing18_20260308_153906",
     "scope": "pipeline_scope",
     "warning": "This full GT is exhaustive within the current SourceAgent pipeline scope and source-backed focus region; manual semantic refinement may still improve subtype fidelity."
+  },
+  "evaluation_only": {
+    "canonical_cve_anchor_status": "provisional",
+    "canonical_cve_chain_ids": [
+      "chain_hello-world_SINK_hello-world_0000_b9bbad48",
+      "chain_hello-world_SINK_hello-world_0001_daa00ed7",
+      "chain_hello-world_SINK_hello-world_0007_06a0a259",
+      "chain_hello-world_SINK_hello-world_0009_affe0a8d",
+      "chain_hello-world_SINK_hello-world_0041_7e71eff9"
+    ],
+    "canonical_cve_sink_ids": [
+      "SINK_hello-world_0000",
+      "SINK_hello-world_0001",
+      "SINK_hello-world_0007",
+      "SINK_hello-world_0009",
+      "SINK_hello-world_0041"
+    ],
+    "canonical_cve_root_ids": [
+      "SR_AUTO_001_SINK_hello-world_0000_primary",
+      "SR_AUTO_004_SINK_hello-world_0001_primary",
+      "SR_AUTO_022_SINK_hello-world_0007_primary",
+      "SR_AUTO_025_SINK_hello-world_0009_primary",
+      "SR_AUTO_116_SINK_hello-world_0041_primary"
+    ],
+    "canonical_cve_notes": [
+      "Evaluation-only anchor: these confirmed third-batch Contiki chains represent the primary attacker-controlled copy and memory-write paths in the prebuilt hello-world sample.",
+      "Treat as provisional until upstream advisory-to-binary alignment is rechecked against the corresponding Contiki patch set."
+    ]
   }
 }

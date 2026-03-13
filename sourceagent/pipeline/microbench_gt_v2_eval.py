@@ -42,6 +42,16 @@ _VERDICT_RANK = {
     "SUSPICIOUS": 2,
     "CONFIRMED": 3,
 }
+_RISK_BAND_RANK = {
+    "LOW": 0,
+    "MEDIUM": 1,
+    "HIGH": 2,
+}
+_REVIEW_PRIORITY_RANK = {
+    "P2": 0,
+    "P1": 1,
+    "P0": 2,
+}
 _ROOT_ROLE_FAMILY = {
     "len": "length",
     "length_bound": "length",
@@ -64,6 +74,12 @@ _ROOT_KIND_FAMILY = {
     "src_data": "pointer",
 }
 _CHAIN_GT_SCOPES = {"exhaustive", "targeted_only", "negative_only"}
+_CHAIN_RISK_GT_FIELDS = (
+    "expected_final_verdict",
+    "expected_final_risk_band",
+    "expected_review_priority",
+)
+_ORDERED_STATUS_VALUES = ("exact", "over", "under", "mismatch", "missing")
 
 
 def _repo_root() -> Path:
@@ -80,6 +96,43 @@ def _dump_json(path: Path, obj: Any) -> None:
     with path.open("w", encoding="utf-8") as f:
         json.dump(obj, f, indent=2, sort_keys=False)
         f.write("\n")
+
+
+def _evaluation_overlay_roots(gt_root: Path) -> List[Path]:
+    roots: List[Path] = []
+    repo_gt_root = _repo_root() / "firmware" / "ground_truth_bundle"
+    gt_root_resolved = gt_root.resolve()
+    if gt_root_resolved == (repo_gt_root / "gt_backed_suite").resolve():
+        roots.extend(
+            [
+                repo_gt_root / "microbench" / "samples",
+                repo_gt_root / "mesobench" / "samples",
+            ]
+        )
+    return [path for path in roots if path.exists()]
+
+
+def _merge_evaluation_overlay(sample: Dict[str, Any], overlay: Dict[str, Any], overlay_path: Path) -> None:
+    evaluation_only = overlay.get("evaluation_only")
+    if evaluation_only and not sample.get("evaluation_only"):
+        sample["evaluation_only"] = dict(evaluation_only)
+        sample["_evaluation_overlay_path"] = str(overlay_path)
+    if overlay.get("sample_id") and not sample.get("sample_id"):
+        sample["sample_id"] = str(overlay.get("sample_id"))
+
+
+def _build_evaluation_overlay_index(gt_root: Path) -> Dict[Tuple[str, str], Tuple[Dict[str, Any], Path]]:
+    index: Dict[Tuple[str, str], Tuple[Dict[str, Any], Path]] = {}
+    for sample_dir in _evaluation_overlay_roots(gt_root):
+        for path in sorted(sample_dir.glob("*.json")):
+            sample = _load_json(path)
+            sample_id = str(sample.get("sample_id", "") or "").strip()
+            binary_stem = str(sample.get("binary_stem", "") or "").strip()
+            if sample_id:
+                index[("sample_id", sample_id)] = (sample, path)
+            if binary_stem:
+                index[("binary_stem", binary_stem)] = (sample, path)
+    return index
 
 
 def _to_int_address(value: Any) -> Optional[int]:
@@ -305,6 +358,7 @@ def _load_predicted_sample(eval_dir: Path, stem: str) -> Dict[str, Any]:
     sink_roots_path = raw_views_dir / f"{stem}.sink_roots.json"
     chains_path = raw_views_dir / f"{stem}.chains.json"
     chain_eval_path = raw_views_dir / f"{stem}.chain_eval.json"
+    verdict_soft_triage_path = raw_views_dir / f"{stem}.verdict_soft_triage.json"
 
     out = {
         "present": pipeline_path.exists(),
@@ -313,6 +367,7 @@ def _load_predicted_sample(eval_dir: Path, stem: str) -> Dict[str, Any]:
         "sink_roots": _load_json(sink_roots_path) if sink_roots_path.exists() else {"sink_roots": []},
         "chains": _load_json(chains_path) if chains_path.exists() else {"chains": []},
         "chain_eval": _load_json(chain_eval_path) if chain_eval_path.exists() else {},
+        "verdict_soft_triage": _load_json(verdict_soft_triage_path) if verdict_soft_triage_path.exists() else {"items": []},
     }
     out["pred_sources"] = _iter_pred_sources(out["pipeline"])
     out["pred_sinks"] = _iter_pred_sinks(out["pipeline"])
@@ -320,15 +375,29 @@ def _load_predicted_sample(eval_dir: Path, stem: str) -> Dict[str, Any]:
     out["pred_channels"] = list(out["channel_graph"].get("channel_edges", []))
     out["pred_roots"] = _flatten_pred_roots(out["sink_roots"])
     out["pred_chains"] = list(out["chains"].get("chains", []))
+    out["pred_chain_risk"] = {
+        str(row.get("chain_id", "")): dict(row)
+        for row in (out["verdict_soft_triage"].get("items", []) or [])
+        if str(row.get("chain_id", ""))
+    }
     return out
 
 
 def _load_gt_samples(gt_root: Path) -> List[Dict[str, Any]]:
     sample_dir = gt_root / "samples"
+    overlay_index = _build_evaluation_overlay_index(gt_root)
     samples: List[Dict[str, Any]] = []
     for path in sorted(sample_dir.glob("*.json")):
         sample = _load_json(path)
         sample["_gt_path"] = str(path)
+        sample_id = str(sample.get("sample_id", "") or "").strip()
+        binary_stem = str(sample.get("binary_stem", "") or "").strip()
+        if sample_id and ("sample_id", sample_id) in overlay_index:
+            overlay, overlay_path = overlay_index[("sample_id", sample_id)]
+            _merge_evaluation_overlay(sample, overlay, overlay_path)
+        elif binary_stem and ("binary_stem", binary_stem) in overlay_index:
+            overlay, overlay_path = overlay_index[("binary_stem", binary_stem)]
+            _merge_evaluation_overlay(sample, overlay, overlay_path)
         samples.append(sample)
     return samples
 
@@ -682,6 +751,54 @@ def _verdict_status(pred: str, expected: str) -> str:
     return "mismatch"
 
 
+def _ordered_status(pred: Optional[str], expected: Optional[str], rank_map: Dict[str, int]) -> str:
+    if expected in (None, ""):
+        return "missing"
+    if pred in (None, ""):
+        return "missing"
+    if pred == expected:
+        return "exact"
+    pred_rank = rank_map.get(str(pred), -1)
+    exp_rank = rank_map.get(str(expected), -1)
+    if pred_rank > exp_rank:
+        return "over"
+    if pred_rank < exp_rank:
+        return "under"
+    return "mismatch"
+
+
+def _chain_has_risk_gt(chain_gt: Dict[str, Any]) -> bool:
+    return any(key in chain_gt for key in _CHAIN_RISK_GT_FIELDS)
+
+
+def _lookup_pred_chain_risk(
+    pred_chain: Dict[str, Any],
+    pred_chain_risk: Dict[str, Dict[str, Any]],
+) -> Dict[str, Any]:
+    chain_id = str(pred_chain.get("chain_id", "") or "")
+    if chain_id and chain_id in pred_chain_risk:
+        return dict(pred_chain_risk[chain_id])
+    if any(key in pred_chain for key in ("final_verdict", "final_risk_band", "review_priority")):
+        return dict(pred_chain)
+    return {}
+
+
+def _status_counts(rows: Sequence[Dict[str, Any]], key: str) -> Dict[str, int]:
+    return {
+        status: sum(1 for row in rows if row.get(key) == status)
+        for status in _ORDERED_STATUS_VALUES
+    }
+
+
+def _normalize_id_list(values: Any) -> List[str]:
+    out: List[str] = []
+    for value in values or []:
+        text = str(value or "").strip()
+        if text:
+            out.append(text)
+    return out
+
+
 def _greedy_assign(
     gt_rows: Sequence[Dict[str, Any]],
     pred_rows: Sequence[Dict[str, Any]],
@@ -726,6 +843,11 @@ def evaluate_sample_artifacts(gt_sample: Dict[str, Any], predicted: Dict[str, An
     pred_channels = list(predicted.get("pred_channels", []))
     pred_roots = list(predicted.get("pred_roots", []))
     pred_chains = list(predicted.get("pred_chains", []))
+    pred_chain_risk = {
+        str(key): dict(value)
+        for key, value in (predicted.get("pred_chain_risk", {}) or {}).items()
+        if str(key)
+    }
 
     source_assign, source_details = _greedy_assign(gt_sources, pred_sources, _source_match_score)
     sink_assign, sink_details = _greedy_assign(gt_sinks, pred_sinks, _sink_match_score)
@@ -896,13 +1018,51 @@ def evaluate_sample_artifacts(gt_sample: Dict[str, Any], predicted: Dict[str, An
             pred_verdict = None
             verdict_status = "missing"
             used = False
+        risk_gt_expected = _chain_has_risk_gt(chain)
+        pred_chain_id = match_info["pred_chain"].get("chain_id") if match_info and match_info.get("pred_chain") else None
+        pred_risk_row = (
+            _lookup_pred_chain_risk(match_info["pred_chain"], pred_chain_risk)
+            if risk_gt_expected and match_info and match_info["structural_ok"]
+            else {}
+        )
+        pred_final_verdict = str(pred_risk_row.get("final_verdict", "") or "") or None
+        pred_final_risk_band = str(pred_risk_row.get("final_risk_band", "") or "") or None
+        pred_review_priority = str(pred_risk_row.get("review_priority", "") or "") or None
+        final_verdict_status = None
+        final_risk_band_status = None
+        review_priority_status = None
+        risk_gt_exact = False
+        if risk_gt_expected:
+            expected_final_verdict = str(chain.get("expected_final_verdict", "") or "") or None
+            expected_final_risk_band = str(chain.get("expected_final_risk_band", "") or "") or None
+            expected_review_priority = str(chain.get("expected_review_priority", "") or "") or None
+            final_verdict_status = (
+                _verdict_status(pred_final_verdict, expected_final_verdict)
+                if pred_final_verdict is not None and expected_final_verdict is not None
+                else "missing"
+            )
+            final_risk_band_status = _ordered_status(
+                pred_final_risk_band,
+                expected_final_risk_band,
+                _RISK_BAND_RANK,
+            )
+            review_priority_status = _ordered_status(
+                pred_review_priority,
+                expected_review_priority,
+                _REVIEW_PRIORITY_RANK,
+            )
+            risk_gt_exact = (
+                final_verdict_status == "exact"
+                and final_risk_band_status == "exact"
+                and review_priority_status == "exact"
+            )
         chain_details.append(
             {
                 "chain_id": chain["chain_id"],
                 "sink_id": chain["sink_id"],
                 "expected_verdict": chain.get("expected_verdict"),
                 "matched": bool(match_info and match_info["structural_ok"]),
-                "pred_chain_id": match_info["pred_chain"].get("chain_id") if match_info and match_info.get("pred_chain") else None,
+                "pred_chain_id": pred_chain_id,
                 "pred_verdict": pred_verdict,
                 "verdict_status": verdict_status,
                 "used_pred_chain": used,
@@ -912,6 +1072,20 @@ def evaluate_sample_artifacts(gt_sample: Dict[str, Any], predicted: Dict[str, An
                 "channel_ok": match_info["channel_ok"] if match_info else False,
                 "root_ok": match_info["root_ok"] if match_info else False,
                 "derive_ok": match_info["derive_ok"] if match_info else False,
+                "risk_gt_expected": risk_gt_expected,
+                "risk_gt_provenance": chain.get("risk_gt_provenance"),
+                "risk_gt_notes": chain.get("risk_gt_notes"),
+                "expected_final_verdict": chain.get("expected_final_verdict"),
+                "expected_final_risk_band": chain.get("expected_final_risk_band"),
+                "expected_review_priority": chain.get("expected_review_priority"),
+                "pred_final_verdict": pred_final_verdict,
+                "pred_final_risk_band": pred_final_risk_band,
+                "pred_review_priority": pred_review_priority,
+                "final_verdict_status": final_verdict_status,
+                "final_risk_band_status": final_risk_band_status,
+                "review_priority_status": review_priority_status,
+                "risk_prediction_present": bool(pred_risk_row),
+                "risk_gt_exact": risk_gt_exact,
             }
         )
 
@@ -977,6 +1151,85 @@ def evaluate_sample_artifacts(gt_sample: Dict[str, Any], predicted: Dict[str, An
             }
         )
 
+    chain_detail_by_id = {str(row.get("chain_id", "")): row for row in chain_details if str(row.get("chain_id", ""))}
+    evaluation_only = dict(gt_sample.get("evaluation_only") or {})
+    canonical_main_ids = _normalize_id_list(evaluation_only.get("canonical_cve_chain_ids"))
+    related_ids = _normalize_id_list(evaluation_only.get("related_cve_chain_ids"))
+    supporting_ids = _normalize_id_list(evaluation_only.get("supporting_cve_chain_ids"))
+    associated_pred_chain_ids: set[str] = set()
+
+    def _canonical_rows(gt_ids: Sequence[str], role: str) -> Dict[str, Any]:
+        rows: List[Dict[str, Any]] = []
+        for gt_id in gt_ids:
+            detail = chain_detail_by_id.get(gt_id, {})
+            pred_chain_id = str(detail.get("pred_chain_id", "") or "") or None
+            if pred_chain_id:
+                associated_pred_chain_ids.add(pred_chain_id)
+            pred_risk = dict(pred_chain_risk.get(pred_chain_id or "", {})) if pred_chain_id else {}
+            rows.append(
+                {
+                    "role": role,
+                    "gt_chain_id": gt_id,
+                    "matched": bool(detail.get("matched")),
+                    "pred_chain_id": pred_chain_id,
+                    "expected_verdict": detail.get("expected_verdict"),
+                    "pred_verdict": detail.get("pred_verdict"),
+                    "pred_final_verdict": pred_risk.get("final_verdict"),
+                    "pred_final_risk_band": pred_risk.get("final_risk_band"),
+                    "pred_review_priority": pred_risk.get("review_priority"),
+                    "final_verdict_status": detail.get("final_verdict_status"),
+                    "final_risk_band_status": detail.get("final_risk_band_status"),
+                    "review_priority_status": detail.get("review_priority_status"),
+                }
+            )
+        return {
+            "total": len(rows),
+            "matched": sum(1 for row in rows if row["matched"]),
+            "details": rows,
+        }
+
+    canonical_main = _canonical_rows(canonical_main_ids, "canonical_main_chain")
+    related_risky = _canonical_rows(related_ids, "related_risky_chain")
+    supporting_risky = _canonical_rows(supporting_ids, "supporting_risky_chain")
+
+    peripheral_suspicious_rows: List[Dict[str, Any]] = []
+    for pred_chain in pred_chains:
+        pred_chain_id = str(pred_chain.get("chain_id", "") or "")
+        if not pred_chain_id or pred_chain_id in associated_pred_chain_ids:
+            continue
+        pred_risk = _lookup_pred_chain_risk(pred_chain, pred_chain_risk)
+        final_verdict = str(pred_risk.get("final_verdict", "") or pred_chain.get("verdict", "") or "")
+        if final_verdict != "SUSPICIOUS":
+            continue
+        peripheral_suspicious_rows.append(
+            {
+                "role": "peripheral_suspicious_chain",
+                "pred_chain_id": pred_chain_id,
+                "sink_label": pred_chain.get("sink", {}).get("label"),
+                "sink_function": pred_chain.get("sink", {}).get("function"),
+                "root_expr": pred_chain.get("sink", {}).get("root_expr"),
+                "final_verdict": final_verdict,
+                "final_risk_band": pred_risk.get("final_risk_band"),
+                "review_priority": pred_risk.get("review_priority"),
+            }
+        )
+
+    canonical_cve = {
+        "anchor_status": str(evaluation_only.get("canonical_cve_anchor_status", "") or "absent"),
+        "notes": list(evaluation_only.get("canonical_cve_notes", []) or []),
+        "canonical_main": canonical_main,
+        "related_risky": {
+            "total": related_risky["total"] + supporting_risky["total"],
+            "matched": related_risky["matched"] + supporting_risky["matched"],
+            "details": related_risky["details"] + supporting_risky["details"],
+        },
+        "supporting_risky": supporting_risky,
+        "peripheral_suspicious": {
+            "total": len(peripheral_suspicious_rows),
+            "details": peripheral_suspicious_rows,
+        },
+    }
+
     source_report = _metric_dict(len(gt_sources), len(pred_sources), len(source_assign), len(source_assign))
     sink_report = _metric_dict(len(gt_sinks), len(pred_sinks), len(sink_assign), len(sink_assign))
     object_report = _metric_dict(len(gt_objects), len(pred_objects), len(object_assign_idx), len(object_assign_idx))
@@ -994,6 +1247,17 @@ def evaluate_sample_artifacts(gt_sample: Dict[str, Any], predicted: Dict[str, An
     must_use_channel_ok = sum(
         1 for row in chain_details if row["must_use_channel"] and row["channel_ok"] and row["matched"]
     )
+    chain_risk_rows = [row for row in chain_details if row["risk_gt_expected"]]
+    chain_risk_report = {
+        "annotated_total": len(chain_risk_rows),
+        "structurally_matched": sum(1 for row in chain_risk_rows if row["matched"]),
+        "risk_artifact_present": sum(1 for row in chain_risk_rows if row["risk_prediction_present"]),
+        "final_verdict": _status_counts(chain_risk_rows, "final_verdict_status"),
+        "final_risk_band": _status_counts(chain_risk_rows, "final_risk_band_status"),
+        "review_priority": _status_counts(chain_risk_rows, "review_priority_status"),
+        "fully_exact": sum(1 for row in chain_risk_rows if row["risk_gt_exact"]),
+        "details": chain_risk_rows,
+    }
 
     negative_total = len(negative_rows)
     negative_satisfied = sum(1 for row in negative_rows if row["satisfied"])
@@ -1029,12 +1293,14 @@ def evaluate_sample_artifacts(gt_sample: Dict[str, Any], predicted: Dict[str, An
             "must_use_channel_ok": must_use_channel_ok,
             "details": chain_details,
         },
+        "chain_risk": chain_risk_report,
         "negative_expectations": {
             "total": negative_total,
             "satisfied": negative_satisfied,
             "violated": negative_total - negative_satisfied,
             "details": negative_rows,
         },
+        "canonical_cve": canonical_cve,
     }
 
 
@@ -1044,6 +1310,13 @@ def _aggregate_metric_rows(rows: Sequence[Dict[str, Any]], key: str) -> Dict[str
     matched_gt = sum(int(row["artifacts"][key]["matched_gt"]) for row in rows)
     used_pred = sum(int(row["artifacts"][key]["used_pred"]) for row in rows)
     return _metric_dict(gt_total, pred_total, matched_gt, used_pred)
+
+
+def _aggregate_status_summary(rows: Sequence[Dict[str, Any]], section: str, key: str) -> Dict[str, int]:
+    return {
+        status: sum(int(row[section][key][status]) for row in rows)
+        for status in _ORDERED_STATUS_VALUES
+    }
 
 
 def _render_markdown(summary: Dict[str, Any], per_sample: Sequence[Dict[str, Any]]) -> str:
@@ -1066,6 +1339,7 @@ def _render_markdown(summary: Dict[str, Any], per_sample: Sequence[Dict[str, Any
             f"{row['fp']} | {row['fn']} | {row['precision']:.3f} | {row['recall']:.3f} | {row['f1']:.3f} |"
         )
     chain = summary["chains"]
+    chain_risk = summary["chain_risk"]
     neg = summary["negative_expectations"]
     lines.extend(
         [
@@ -1082,6 +1356,28 @@ def _render_markdown(summary: Dict[str, Any], per_sample: Sequence[Dict[str, Any
             f"- Spurious non-drop chains: {chain['spurious_non_drop']}",
             f"- Required-channel chains satisfied: {chain['must_use_channel_ok']}/{chain['must_use_channel_total']}",
             "",
+            "## Chain Risk GT",
+            "",
+            f"- Annotated risk-GT chains: {chain_risk['annotated_total']}",
+            f"- Structurally matched risk-GT chains: {chain_risk['structurally_matched']}",
+            f"- Risk artifacts present: {chain_risk['risk_artifact_present']}",
+            f"- Final verdict exact: {chain_risk['final_verdict']['exact']}",
+            f"- Final risk-band exact: {chain_risk['final_risk_band']['exact']}",
+            f"- Review-priority exact: {chain_risk['review_priority']['exact']}",
+            f"- Fully exact risk matches: {chain_risk['fully_exact']}",
+            "",
+            "## Canonical CVE Anchors",
+            "",
+            f"- Samples with canonical anchors: {summary['canonical_cve']['samples_with_anchor']}",
+            f"- Complete anchors: {summary['canonical_cve']['complete_anchor_samples']}",
+            f"- Provisional anchors: {summary['canonical_cve']['provisional_anchor_samples']}",
+            f"- Canonical main chains matched: {summary['canonical_cve']['canonical_main_matched']}/{summary['canonical_cve']['canonical_main_total']}",
+            f"- Related risky chains matched: {summary['canonical_cve']['related_risky_matched']}/{summary['canonical_cve']['related_risky_total']}",
+            f"- Peripheral suspicious chains: {summary['canonical_cve']['peripheral_suspicious_total']}",
+            f"- Canonical main final verdicts: {summary['canonical_cve']['canonical_main_final_verdict']}",
+            f"- Canonical main final risk bands: {summary['canonical_cve']['canonical_main_final_risk_band']}",
+            f"- Canonical main review priorities: {summary['canonical_cve']['canonical_main_review_priority']}",
+            "",
             "## Negative Expectations",
             "",
             f"- Total: {neg['total']}",
@@ -1090,15 +1386,23 @@ def _render_markdown(summary: Dict[str, Any], per_sample: Sequence[Dict[str, Any
             "",
             "## Per Sample",
             "",
-            "| Sample | Sources R | Objects R | Channels R | Roots R | Chains Matched | Spurious+ | Neg Violations |",
-            "|---|---:|---:|---:|---:|---:|---:|---:|",
+            "| Sample | Sources R | Objects R | Channels R | Roots R | Chains Matched | Risk Exact | Canonical Main | Related Risky | Peripheral Susp. | Spurious+ | Neg Violations |",
+            "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
         ]
     )
     for row in per_sample:
+        canonical = row.get("canonical_cve") or {}
+        canonical_main = canonical.get("canonical_main") or {}
+        related_risky = canonical.get("related_risky") or {}
+        peripheral = canonical.get("peripheral_suspicious") or {}
         lines.append(
             f"| {row.get('display_name') or row['binary_stem']} | {row['artifacts']['sources']['recall']:.3f} | "
             f"{row['artifacts']['objects']['recall']:.3f} | {row['artifacts']['channels']['recall']:.3f} | "
             f"{row['artifacts']['sink_roots']['recall']:.3f} | {row['chains']['matched']}/{row['chains']['positive_total']} | "
+            f"{row['chain_risk']['fully_exact']}/{row['chain_risk']['annotated_total']} | "
+            f"{canonical_main.get('matched', 0)}/{canonical_main.get('total', 0)} | "
+            f"{related_risky.get('matched', 0)}/{related_risky.get('total', 0)} | "
+            f"{peripheral.get('total', 0)} | "
             f"{row['chains']['spurious_non_drop']} | {row['negative_expectations']['violated']} |"
         )
     lines.append("")
@@ -1158,11 +1462,21 @@ def evaluate_microbench_run(
             "must_use_channel_total": sum(row["chains"]["must_use_channel_total"] for row in per_sample),
             "must_use_channel_ok": sum(row["chains"]["must_use_channel_ok"] for row in per_sample),
         },
+        "chain_risk": {
+            "annotated_total": sum(row["chain_risk"]["annotated_total"] for row in per_sample),
+            "structurally_matched": sum(row["chain_risk"]["structurally_matched"] for row in per_sample),
+            "risk_artifact_present": sum(row["chain_risk"]["risk_artifact_present"] for row in per_sample),
+            "final_verdict": _aggregate_status_summary(per_sample, "chain_risk", "final_verdict"),
+            "final_risk_band": _aggregate_status_summary(per_sample, "chain_risk", "final_risk_band"),
+            "review_priority": _aggregate_status_summary(per_sample, "chain_risk", "review_priority"),
+            "fully_exact": sum(row["chain_risk"]["fully_exact"] for row in per_sample),
+        },
         "negative_expectations": {
             "total": sum(row["negative_expectations"]["total"] for row in per_sample),
             "satisfied": sum(row["negative_expectations"]["satisfied"] for row in per_sample),
             "violated": sum(row["negative_expectations"]["violated"] for row in per_sample),
         },
+        "canonical_cve": _aggregate_canonical_cve(per_sample),
     }
 
     _dump_json(output_dir / "artifact_eval_summary.json", summary)
@@ -1175,6 +1489,71 @@ def evaluate_microbench_run(
         "summary": summary,
         "per_sample": per_sample,
         "output_dir": str(output_dir),
+    }
+
+
+def _aggregate_canonical_cve(per_sample: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
+    samples_with_anchor = 0
+    complete_anchor_samples = 0
+    provisional_anchor_samples = 0
+    canonical_main_total = 0
+    canonical_main_matched = 0
+    related_risky_total = 0
+    related_risky_matched = 0
+    peripheral_suspicious_total = 0
+    verdict_counter: Counter[str] = Counter()
+    risk_counter: Counter[str] = Counter()
+    priority_counter: Counter[str] = Counter()
+    samples_with_canonical_miss: List[str] = []
+
+    for row in per_sample:
+        canonical = row.get("canonical_cve") or {}
+        anchor_status = str(canonical.get("anchor_status") or "absent")
+        if anchor_status != "absent":
+            samples_with_anchor += 1
+        if anchor_status == "complete":
+            complete_anchor_samples += 1
+        elif anchor_status == "provisional":
+            provisional_anchor_samples += 1
+
+        canonical_main = canonical.get("canonical_main") or {}
+        canonical_main_total += int(canonical_main.get("total") or 0)
+        canonical_main_matched += int(canonical_main.get("matched") or 0)
+        if (canonical_main.get("total") or 0) > (canonical_main.get("matched") or 0):
+            samples_with_canonical_miss.append(row.get("display_name") or row.get("binary_stem") or "")
+        for detail in canonical_main.get("details") or []:
+            if not detail.get("matched"):
+                continue
+            verdict = str(detail.get("pred_final_verdict") or "").strip()
+            risk = str(detail.get("pred_final_risk_band") or "").strip()
+            priority = str(detail.get("pred_review_priority") or "").strip()
+            if verdict:
+                verdict_counter[verdict] += 1
+            if risk:
+                risk_counter[risk] += 1
+            if priority:
+                priority_counter[priority] += 1
+
+        related_risky = canonical.get("related_risky") or {}
+        related_risky_total += int(related_risky.get("total") or 0)
+        related_risky_matched += int(related_risky.get("matched") or 0)
+
+        peripheral = canonical.get("peripheral_suspicious") or {}
+        peripheral_suspicious_total += int(peripheral.get("total") or 0)
+
+    return {
+        "samples_with_anchor": samples_with_anchor,
+        "complete_anchor_samples": complete_anchor_samples,
+        "provisional_anchor_samples": provisional_anchor_samples,
+        "canonical_main_total": canonical_main_total,
+        "canonical_main_matched": canonical_main_matched,
+        "related_risky_total": related_risky_total,
+        "related_risky_matched": related_risky_matched,
+        "peripheral_suspicious_total": peripheral_suspicious_total,
+        "canonical_main_final_verdict": dict(sorted(verdict_counter.items())),
+        "canonical_main_final_risk_band": dict(sorted(risk_counter.items())),
+        "canonical_main_review_priority": dict(sorted(priority_counter.items())),
+        "samples_with_canonical_miss": [name for name in samples_with_canonical_miss if name],
     }
 
 

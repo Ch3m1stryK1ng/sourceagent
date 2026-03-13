@@ -1,0 +1,145 @@
+
+Discarded input sections
+
+ .text          0x00000000        0x0 /tmp/cczP0Jet.o
+ .data          0x00000000        0x0 /tmp/cczP0Jet.o
+ .bss           0x00000000        0x0 /tmp/cczP0Jet.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+FLASH            0x08000000         0x00010000         xr
+RAM              0x20000000         0x00005000         xrw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD /tmp/cczP0Jet.o
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m/nofp/libgcc.a
+START GROUP
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m/nofp/libgcc.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libg_nano.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a
+END GROUP
+START GROUP
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m/nofp/libgcc.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libnosys.a
+END GROUP
+START GROUP
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/thumb/v7e-m/nofp/libgcc.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a
+LOAD /home/a347908610/local/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libnosys.a
+END GROUP
+                0x20005000                        _estack = (ORIGIN (RAM) + LENGTH (RAM))
+
+.isr_vector     0x08000000       0x40
+ *(.isr_vector)
+ .isr_vector    0x08000000       0x40 /tmp/cczP0Jet.o
+                0x08000000                vector_table
+
+.text           0x08000040       0x8c
+ *(.text*)
+ .text.Default_Handler
+                0x08000040        0x2 /tmp/cczP0Jet.o
+                0x08000040                Default_Handler
+ *fill*         0x08000042        0x2 
+ .text.cmd_0    0x08000044       0x10 /tmp/cczP0Jet.o
+ .text.cmd_1    0x08000054       0x10 /tmp/cczP0Jet.o
+ .text.cmd_2    0x08000064       0x10 /tmp/cczP0Jet.o
+ .text.dispatch_command
+                0x08000074       0x14 /tmp/cczP0Jet.o
+                0x08000074                dispatch_command
+ .text.dispatch_wrapper_1
+                0x08000088        0x8 /tmp/cczP0Jet.o
+ .text.dispatch_wrapper_2
+                0x08000090        0x8 /tmp/cczP0Jet.o
+ .text.main     0x08000098       0x20 /tmp/cczP0Jet.o
+                0x08000098                main
+ .text.Reset_Handler
+                0x080000b8        0x8 /tmp/cczP0Jet.o
+                0x080000b8                Reset_Handler
+ *(.rodata*)
+ .rodata.cmd_table
+                0x080000c0        0xc /tmp/cczP0Jet.o
+
+.glue_7         0x080000cc        0x0
+ .glue_7        0x080000cc        0x0 linker stubs
+
+.glue_7t        0x080000cc        0x0
+ .glue_7t       0x080000cc        0x0 linker stubs
+
+.vfp11_veneer   0x080000cc        0x0
+ .vfp11_veneer  0x080000cc        0x0 linker stubs
+
+.v4_bx          0x080000cc        0x0
+ .v4_bx         0x080000cc        0x0 linker stubs
+
+.iplt           0x080000cc        0x0
+ .iplt          0x080000cc        0x0 /tmp/cczP0Jet.o
+
+.rel.dyn        0x080000cc        0x0
+ .rel.iplt      0x080000cc        0x0 /tmp/cczP0Jet.o
+
+.ARM.extab
+ *(.ARM.extab*)
+
+.ARM.exidx
+ *(.ARM.exidx*)
+                0x080000cc                        _sidata = .
+
+.data           0x20000000        0x0 load address 0x080000cc
+                0x20000000                        _sdata = .
+ *(.data*)
+                0x20000000                        _edata = .
+
+.igot.plt       0x20000000        0x0
+ .igot.plt      0x20000000        0x0 /tmp/cczP0Jet.o
+
+.bss            0x20000000        0x4
+                0x20000000                        _sbss = .
+ *(.bss*)
+ .bss.g_state   0x20000000        0x4 /tmp/cczP0Jet.o
+ *(COMMON)
+                0x20000004                        _ebss = .
+                0x20005000                        PROVIDE (__stack_top__ = _estack)
+                [!provide]                        PROVIDE (end = _ebss)
+                [!provide]                        PROVIDE (_end = _ebss)
+OUTPUT(/home/a347908610/sourceagent/firmware/microbench_autogen/funcptr_variant_13.elf elf32-littlearm)
+LOAD linker stubs
+
+.debug_info     0x00000000      0x2bb
+ .debug_info    0x00000000      0x2bb /tmp/cczP0Jet.o
+
+.debug_abbrev   0x00000000      0x1bf
+ .debug_abbrev  0x00000000      0x1bf /tmp/cczP0Jet.o
+
+.debug_loc      0x00000000       0xbd
+ .debug_loc     0x00000000       0xbd /tmp/cczP0Jet.o
+
+.debug_aranges  0x00000000       0x60
+ .debug_aranges
+                0x00000000       0x60 /tmp/cczP0Jet.o
+
+.debug_ranges   0x00000000       0x50
+ .debug_ranges  0x00000000       0x50 /tmp/cczP0Jet.o
+
+.debug_line     0x00000000      0x29d
+ .debug_line    0x00000000      0x29d /tmp/cczP0Jet.o
+
+.debug_str      0x00000000      0x231
+ .debug_str     0x00000000      0x231 /tmp/cczP0Jet.o
+                                0x276 (size before relaxing)
+
+.comment        0x00000000       0x45
+ .comment       0x00000000       0x45 /tmp/cczP0Jet.o
+                                 0x46 (size before relaxing)
+
+.ARM.attributes
+                0x00000000       0x2e
+ .ARM.attributes
+                0x00000000       0x2e /tmp/cczP0Jet.o
+
+.debug_frame    0x00000000       0xc8
+ .debug_frame   0x00000000       0xc8 /tmp/cczP0Jet.o

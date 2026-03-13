@@ -70,6 +70,14 @@ _WEAK_SOURCE_NAME_PARTS = _WEAK_BRIDGE_NAME_PARTS + (
     "sched",
 )
 _WEAK_OBJECT_HIT_MODES = {"local_sram_access", "fn_expr_heuristic", "context_rw"}
+_STRONG_PROXY_CHANNEL_HIT_MODES = {"expr_member", "expr_address", "expr_object_id", "support_root"}
+_PROXY_SOURCE_MODES = {
+    "object_source_proxy",
+    "bound_object_source_proxy",
+    "payload_object_source_proxy",
+    "synthetic_object_source_proxy",
+    "heuristic_object_source_proxy",
+}
 
 
 def link_chains(
@@ -184,7 +192,23 @@ def link_chains(
                 obj_hits,
                 edges_by_object,
             )
+            if prefer_tunnel and str(slice_res.get("source_resolve_mode", "none") or "").lower() in _PROXY_SOURCE_MODES:
+                fallback_source = None
+                fallback_source_mode = "none"
+                fallback_bridge_steps = []
             if source is not None and not prefer_tunnel:
+                channel_steps = _augment_channel_steps_with_inferred_proxy_channel(
+                    current_fn=str(st.get("current_fn", "")),
+                    source=fallback_source,
+                    source_resolve_mode=fallback_source_mode,
+                    object_hits=obj_hits,
+                    object_hit_mode=str(slice_res.get("object_hit_mode", "none") or "none"),
+                    objects_by_id=objects_by_id,
+                    bridge_steps=list(fallback_bridge_steps),
+                    channel_steps=st.get("channel_steps", []),
+                    sink_label=sink_label,
+                    active_root=st.get("active_root"),
+                )
                 chain = _materialize_chain(
                     sink_root=sink_root,
                     sink_site_hex=sink_site_hex,
@@ -194,7 +218,7 @@ def link_chains(
                     source=fallback_source,
                     source_resolve_mode=fallback_source_mode,
                     bridge_steps=list(fallback_bridge_steps),
-                    channel_steps=st.get("channel_steps", []),
+                    channel_steps=channel_steps,
                     sink_facts=sink_facts_by_pack.get(
                         sink_pack_id_by_site.get(_sink_site_key(sink_site_hex, sink_fn, sink_label), ""),
                         {},
@@ -234,11 +258,14 @@ def link_chains(
                         )
                         if producer_fn:
                             producer_candidates.append(producer_fn)
+                        edge_conf = _edge_channel_confidence(edge, obj)
                         ch_step = {
                             "kind": "CHANNEL",
                             "edge": f"{edge.get('src_context', 'UNKNOWN')}->{edge.get('dst_context', 'UNKNOWN')}",
                             "object_id": obj_id,
                             "evidence_refs": list(edge.get("evidence_refs", [])),
+                            "channel_confidence": round(edge_conf, 4),
+                            "ambiguity_penalty": round(_object_ambiguity_penalty(obj), 4),
                         }
                         next_state = {
                             "current_fn": producer_fn,
@@ -406,6 +433,8 @@ def _materialize_chain(
     source_reached = source is not None
     has_channel = any(s.get("kind") == "CHANNEL" for s in steps)
     has_app_anchor = bool(source_reached or has_channel)
+    channel_confidence = _channel_confidence(channel_steps)
+    channel_ambiguity = _channel_ambiguity(channel_steps)
     active_root_kind = str((active_root or {}).get("kind", ""))
     object_hit_mode = str((link_debug or {}).get("object_hit_mode", "none"))
     producer_candidates = [str(fn) for fn in ((link_debug or {}).get("producer_candidates", []) or []) if str(fn)]
@@ -450,12 +479,25 @@ def _materialize_chain(
     )
     chain_complete = bool(primary_root and primary_root != "UNKNOWN")
     has_contradiction = False
+    check_binding_target = "unknown"
+    check_capacity_scope = "unknown"
+    if checks:
+        binding_targets = [str(row.get("binding_target", "") or "").strip() for row in checks if str(row.get("binding_target", "") or "").strip()]
+        capacity_scopes = [str(row.get("capacity_scope", "") or "").strip() for row in checks if str(row.get("capacity_scope", "") or "").strip()]
+        if binding_targets:
+            check_binding_target = binding_targets[0]
+        if capacity_scopes:
+            check_capacity_scope = capacity_scopes[0]
 
     score = _chain_score(
         sink_conf=float(sink_root.get("confidence", 0.0)),
         source_reached=source_reached,
         has_channel=has_channel,
+        channel_confidence=channel_confidence,
+        channel_ambiguity=channel_ambiguity,
         check_strength=check_strength,
+        check_binding_target=check_binding_target,
+        check_capacity_scope=check_capacity_scope,
         root_controllable=root_controllable,
     )
 
@@ -493,6 +535,8 @@ def _materialize_chain(
         source_reached=source_reached,
         root_controllable=root_controllable,
         check_strength=check_strength,
+        check_binding_target=check_binding_target,
+        check_capacity_scope=check_capacity_scope,
         chain_complete=chain_complete,
         has_contradiction=has_contradiction,
         has_app_anchor=has_app_anchor,
@@ -502,6 +546,8 @@ def _materialize_chain(
         secondary_root_only=secondary_root_only,
         channel_required_hint=channel_required_hint,
         has_channel=has_channel,
+        channel_confidence=channel_confidence,
+        channel_ambiguity=channel_ambiguity,
     )
 
     chain = {
@@ -550,6 +596,8 @@ def _materialize_chain(
         chain["link_debug"]["weak_producer_only"] = True
     if secondary_root_only:
         chain["link_debug"]["secondary_root_only"] = True
+    chain["link_debug"]["channel_confidence"] = round(channel_confidence, 4)
+    chain["link_debug"]["channel_ambiguity"] = round(channel_ambiguity, 4)
 
     if failure_code:
         chain["failure_code"] = failure_code
@@ -612,6 +660,14 @@ def _cached_slice(
         if support_hits:
             object_hits = support_hits
             object_hit_mode = support_mode
+    object_hits, object_hit_quality, object_hit_ambiguity = _rank_object_hits(
+        object_hits,
+        objects_by_id,
+        expr=expr,
+        current_fn=current_fn,
+        active_root=active_root,
+        hit_mode=object_hit_mode,
+    )
     if source is None and object_hits:
         proxy_source, proxy_mode, proxy_steps = _resolve_object_proxy_source(
             current_fn=current_fn,
@@ -649,6 +705,8 @@ def _cached_slice(
         "bridge_steps": bridge_steps,
         "object_hits": object_hits,
         "object_hit_mode": object_hit_mode,
+        "object_hit_quality": object_hit_quality,
+        "object_hit_ambiguity": object_hit_ambiguity,
         "channel_required_hint": channel_required_hint,
         "failure_code": failure_code,
         "failure_detail": failure_detail,
@@ -940,6 +998,7 @@ def _source_candidate_rank(
         "transitive_caller_bridge": 24,
         "caller_bridge": 25,
         "object_source_proxy": 18,
+        "payload_object_source_proxy": 16,
         "synthetic_object_source_proxy": 12,
         "heuristic_object_source_proxy": 9,
         "singleton_fallback": 5,
@@ -974,9 +1033,9 @@ def _resolve_object_hits(
             addr = int(m.group(0), 16)
         except Exception:
             continue
-        obj_id = _object_for_addr(addr, objects_by_id)
-        if obj_id and obj_id not in hits:
-            hits.append(obj_id)
+        for obj_id in _objects_for_addr(addr, objects_by_id):
+            if obj_id not in hits:
+                hits.append(obj_id)
     if hits:
         return hits, "expr_address"
 
@@ -985,11 +1044,13 @@ def _resolve_object_hits(
         addr = int(getattr(a, "target_addr", 0) or 0)
         if addr <= 0:
             continue
-        obj_id = _object_for_addr(addr, objects_by_id)
-        if obj_id and obj_id not in hits:
-            hits.append(obj_id)
-            if len(hits) >= 3:
+        for obj_id in _objects_for_addr(addr, objects_by_id):
+            if obj_id not in hits:
+                hits.append(obj_id)
+            if len(hits) >= 4:
                 break
+        if len(hits) >= 4:
+            break
 
     if hits:
         return hits, "local_sram_access"
@@ -1152,6 +1213,12 @@ def _resolve_object_proxy_source(
                 break
         if hinted_label:
             matches = [dict(src) for src in sources if str(src.get("label", "") or "") == hinted_label]
+            if hinted_label in {"DMA_BACKED_BUFFER", "ISR_FILLED_BUFFER"}:
+                bound_matches = [src for src in matches if _source_matches_object(src, obj)]
+                if bound_matches:
+                    chosen = _choose_best_source(bound_matches, expr=expr, active_root=active_root)
+                    candidates.append((chosen, "bound_object_source_proxy"))
+                    continue
             if matches:
                 chosen = _choose_best_source(matches, expr=expr, active_root=active_root)
                 candidates.append((chosen, "object_source_proxy"))
@@ -1177,6 +1244,17 @@ def _resolve_object_proxy_source(
         )
         if heuristic_source is not None:
             candidates.append(heuristic_source)
+            continue
+
+        payload_proxy = _infer_payload_object_source_proxy(
+            obj=obj,
+            current_fn=current_fn,
+            sources=sources,
+            expr=expr,
+            active_root=active_root,
+        )
+        if payload_proxy is not None:
+            candidates.append(payload_proxy)
 
     if not candidates:
         return None, "none", []
@@ -1257,6 +1335,410 @@ def _infer_object_site_source_proxy(
         return None
     _, src, mode = max(candidates, key=lambda item: item[0])
     return src, mode
+
+
+def _infer_payload_object_source_proxy(
+    *,
+    obj: Dict[str, Any],
+    current_fn: str,
+    sources: Sequence[Dict[str, Any]],
+    expr: str,
+    active_root: Optional[Dict[str, Any]],
+) -> Optional[Tuple[Dict[str, Any], str]]:
+    if not _is_symbol_poor_object(obj):
+        return None
+    if not _looks_stripped_function_name(current_fn):
+        return None
+
+    tf = dict(obj.get("type_facts", {}) or {})
+    kind_hint = str(tf.get("kind_hint", "") or "").lower()
+    region_kind = str(obj.get("region_kind", "") or "").upper()
+    if kind_hint not in {"payload", "payload_or_ctrl"} and region_kind not in {"DMA_BUFFER", "SRAM_CLUSTER"}:
+        return None
+
+    payload_sources = [
+        dict(src)
+        for src in sources
+        if str(src.get("label", "") or "") in {"DMA_BACKED_BUFFER", "ISR_FILLED_BUFFER"}
+        and _source_matches_object(src, obj)
+    ]
+    if not payload_sources:
+        return None
+
+    chosen = _choose_best_source(payload_sources, expr=expr, active_root=active_root)
+    if _source_payload_priority(chosen, expr=expr, active_root=active_root) < 70:
+        return None
+    return chosen, "payload_object_source_proxy"
+
+
+def _augment_channel_steps_with_inferred_proxy_channel(
+    *,
+    current_fn: str,
+    source: Optional[Dict[str, Any]],
+    source_resolve_mode: str,
+    object_hits: Sequence[str],
+    object_hit_mode: str,
+    objects_by_id: Dict[str, Dict[str, Any]],
+    bridge_steps: Sequence[Dict[str, Any]],
+    channel_steps: Sequence[Dict[str, Any]],
+    sink_label: str,
+    active_root: Optional[Dict[str, Any]],
+) -> List[Dict[str, Any]]:
+    steps = [dict(step) for step in (channel_steps or [])]
+    if any(str(step.get("kind", "")) == "CHANNEL" for step in steps):
+        return steps
+    if source is None or not object_hits:
+        return steps
+
+    mode = str(source_resolve_mode or "").lower()
+    if mode not in _PROXY_SOURCE_MODES:
+        return steps
+    if not _should_infer_proxy_channel(
+        current_fn=current_fn,
+        source=source,
+        object_hits=object_hits,
+        object_hit_mode=object_hit_mode,
+        objects_by_id=objects_by_id,
+        sink_label=sink_label,
+        active_root=active_root,
+    ):
+        return steps
+
+    src_context = _inferred_source_context(source)
+    dst_context = _inferred_proxy_consumer_context(
+        current_fn=current_fn,
+        source=source,
+        bridge_steps=bridge_steps,
+    )
+    if not src_context or not dst_context or src_context == "UNKNOWN" or dst_context == "UNKNOWN":
+        return steps
+
+    for support, obj_id, obj in _proxy_channel_candidates(
+        current_fn=current_fn,
+        source=source,
+        object_hits=object_hits,
+        object_hit_mode=object_hit_mode,
+        objects_by_id=objects_by_id,
+        active_root=active_root,
+    )[:2]:
+        steps.append({
+            "kind": "CHANNEL",
+            "edge": f"{src_context}->{dst_context}",
+            "object_id": obj_id,
+            "evidence_refs": list(obj.get("evidence_refs", [])) or list(source.get("evidence_refs", [])),
+            "inferred": True,
+            "channel_confidence": round(support, 4),
+            "ambiguity_penalty": round(_object_ambiguity_penalty(obj), 4),
+        })
+    steps = _dedupe_channel_steps(steps)
+    return _augment_channel_steps_with_shared_handoff(
+        current_fn=current_fn,
+        source=source,
+        object_hits=object_hits,
+        objects_by_id=objects_by_id,
+        active_root=active_root,
+        sink_label=sink_label,
+        steps=steps,
+    )
+
+
+def _augment_channel_steps_with_shared_handoff(
+    *,
+    current_fn: str,
+    source: Optional[Dict[str, Any]],
+    object_hits: Sequence[str],
+    objects_by_id: Dict[str, Dict[str, Any]],
+    active_root: Optional[Dict[str, Any]],
+    sink_label: str,
+    steps: Sequence[Dict[str, Any]],
+) -> List[Dict[str, Any]]:
+    out = [dict(step) for step in (steps or [])]
+    if not _is_memory_write_sink_label(sink_label):
+        return out
+    root_kind = str((active_root or {}).get("kind", "") or "").lower()
+    if root_kind not in {"length", "index_or_bound", "dst_ptr", "src_ptr", "src_data", "target_addr"}:
+        return out
+
+    existing = {
+        (str(step.get("object_id", "") or ""), str(step.get("edge", "") or ""))
+        for step in out
+        if str(step.get("kind", "")) == "CHANNEL"
+    }
+    for support, obj_id, obj in _shared_handoff_candidates(
+        current_fn=current_fn,
+        object_hits=object_hits,
+        objects_by_id=objects_by_id,
+        active_root=active_root,
+    ):
+        if (obj_id, "MAIN->TASK") not in existing:
+            out.append({
+                "kind": "CHANNEL",
+                "edge": "MAIN->TASK",
+                "object_id": obj_id,
+                "evidence_refs": list(obj.get("evidence_refs", [])),
+                "inferred": True,
+                "channel_confidence": round(support, 4),
+                "ambiguity_penalty": round(_object_ambiguity_penalty(obj), 4),
+            })
+            existing.add((obj_id, "MAIN->TASK"))
+        if source is not None and str(source.get("label", "") or "") == "DMA_BACKED_BUFFER" and (obj_id, "DMA->MAIN") not in existing:
+            if _source_matches_object(source, obj):
+                out.append({
+                    "kind": "CHANNEL",
+                    "edge": "DMA->MAIN",
+                    "object_id": obj_id,
+                    "evidence_refs": list(obj.get("evidence_refs", [])) or list(source.get("evidence_refs", [])),
+                    "inferred": True,
+                    "channel_confidence": round(min(1.0, support + 0.06), 4),
+                    "ambiguity_penalty": round(_object_ambiguity_penalty(obj), 4),
+                })
+                existing.add((obj_id, "DMA->MAIN"))
+    return _dedupe_channel_steps(out)
+
+
+def _should_infer_proxy_channel(
+    *,
+    current_fn: str,
+    source: Dict[str, Any],
+    object_hits: Sequence[str],
+    object_hit_mode: str,
+    objects_by_id: Dict[str, Dict[str, Any]],
+    sink_label: str,
+    active_root: Optional[Dict[str, Any]],
+) -> bool:
+    source_fn = str(source.get("function_name", "") or "")
+    if not (_looks_stripped_function_name(current_fn) or _looks_stripped_function_name(source_fn)):
+        return False
+    if bool(source.get("synthetic")):
+        return False
+
+    if not _is_memory_write_sink_label(sink_label):
+        return False
+
+    source_label = str(source.get("label", "") or "")
+    if source_label != "DMA_BACKED_BUFFER":
+        return False
+
+    root_kind = str((active_root or {}).get("kind", "") or "").lower()
+    hit_mode = str(object_hit_mode or "").lower()
+    if hit_mode == "local_sram_access":
+        if root_kind not in {"length", "index_or_bound"}:
+            return False
+    elif hit_mode in _STRONG_PROXY_CHANNEL_HIT_MODES:
+        if root_kind not in {"length", "index_or_bound", "dst_ptr", "target_addr", "src_ptr", "src_data"}:
+            return False
+    else:
+        return False
+
+    return bool(
+        _proxy_channel_candidates(
+            current_fn=current_fn,
+            source=source,
+            object_hits=object_hits,
+            object_hit_mode=object_hit_mode,
+            objects_by_id=objects_by_id,
+            active_root=active_root,
+        )
+    )
+
+
+def _is_memory_write_sink_label(sink_label: str) -> bool:
+    return str(sink_label or "") in {"COPY_SINK", "MEMSET_SINK", "STORE_SINK", "LOOP_WRITE_SINK"}
+
+
+def _shared_handoff_candidates(
+    *,
+    current_fn: str,
+    object_hits: Sequence[str],
+    objects_by_id: Dict[str, Dict[str, Any]],
+    active_root: Optional[Dict[str, Any]],
+) -> List[Tuple[float, str, Dict[str, Any]]]:
+    candidates: List[Tuple[float, str, Dict[str, Any]]] = []
+    for obj_id in _uniq_keep_order(object_hits):
+        obj = objects_by_id.get(obj_id, {})
+        tf = dict(obj.get("type_facts", {}) or {})
+        hint = dict(tf.get("shared_handoff_hint", {}) or {})
+        if str(hint.get("edge", "") or "") != "MAIN->TASK":
+            continue
+        quality = _object_confidence_score(obj)
+        ambiguity = _object_ambiguity_penalty(obj)
+        support = float(hint.get("score", 0.0) or 0.0)
+        support += 0.25 * quality
+        support -= 0.20 * ambiguity
+        support += 0.10 * _root_object_affinity(obj, active_root=active_root, hit_mode="support_root")
+        if current_fn and current_fn.lower() in _object_site_functions(obj):
+            support += 0.05
+        support = max(0.0, min(1.0, support))
+        if support >= 0.72:
+            candidates.append((support, obj_id, obj))
+    candidates.sort(key=lambda item: (-item[0], item[1]))
+    return candidates[:2]
+
+
+def _eligible_proxy_channel_object(obj: Dict[str, Any]) -> bool:
+    if not obj:
+        return False
+    region_kind = str(obj.get("region_kind", "") or "").upper()
+    if not region_kind:
+        obj_id = str(obj.get("object_id", "") or "").lower()
+        if obj_id.startswith("obj_sram_"):
+            region_kind = "SRAM_CLUSTER"
+        elif obj_id.startswith("obj_dma_"):
+            region_kind = "DMA_BUFFER"
+    if region_kind not in {"SRAM_CLUSTER", "DMA_BUFFER", "GLOBAL_SYMBOL", "PARAM_OBJECT"}:
+        return False
+    if region_kind == "PARAM_OBJECT":
+        return False
+    return True
+
+
+def _proxy_channel_candidates(
+    *,
+    current_fn: str,
+    source: Dict[str, Any],
+    object_hits: Sequence[str],
+    object_hit_mode: str,
+    objects_by_id: Dict[str, Dict[str, Any]],
+    active_root: Optional[Dict[str, Any]],
+) -> List[Tuple[float, str, Dict[str, Any]]]:
+    source_label = str(source.get("label", "") or "")
+    if source_label != "DMA_BACKED_BUFFER":
+        return []
+
+    hit_mode = str(object_hit_mode or "").lower()
+    threshold = 0.58
+    if hit_mode == "local_sram_access":
+        threshold = 0.68
+    elif hit_mode not in _STRONG_PROXY_CHANNEL_HIT_MODES:
+        threshold = 0.62
+
+    root_kind = str((active_root or {}).get("kind", "") or "").lower()
+    root_family = str((active_root or {}).get("family", "") or "").lower()
+    candidates: List[Tuple[float, str, Dict[str, Any]]] = []
+    for obj_id in _uniq_keep_order(object_hits):
+        obj = objects_by_id.get(obj_id, {})
+        if not _eligible_proxy_channel_object(obj):
+            continue
+        if not _is_symbol_poor_object(obj):
+            continue
+        if not _source_matches_object(source, obj):
+            continue
+        quality = _object_confidence_score(obj)
+        ambiguity = _object_ambiguity_penalty(obj)
+        affinity = _root_object_affinity(obj, active_root=active_root, hit_mode=hit_mode)
+        support = quality + affinity - 0.45 * ambiguity
+        kind_hint = str((obj.get("type_facts", {}) or {}).get("kind_hint", "") or "").lower()
+        if kind_hint == "payload":
+            support += 0.08
+        if _object_binding_confidence(obj) > 0.0:
+            support += min(0.10, 0.12 * _object_binding_confidence(obj))
+        if root_kind in {"length", "index_or_bound"} or root_family == "length":
+            support += 0.06
+        if _looks_stripped_function_name(current_fn):
+            support += 0.04
+        support = max(0.0, min(1.0, support))
+        if support >= threshold:
+            candidates.append((support, obj_id, obj))
+    candidates.sort(key=lambda item: (-item[0], item[1]))
+    return candidates
+
+
+def _is_symbol_poor_object(obj: Dict[str, Any]) -> bool:
+    if not obj:
+        return False
+    tf = dict(obj.get("type_facts", {}) or {})
+    if bool(tf.get("symbol_backed")):
+        return False
+    members = [str(member).strip() for member in (obj.get("members", []) or []) if str(member).strip()]
+    if members:
+        return False
+    site_fns = _object_site_functions(obj)
+    if not site_fns:
+        return True
+    return any(_looks_stripped_function_name(fn) for fn in site_fns)
+
+
+def _looks_stripped_function_name(fn: str) -> bool:
+    lowered = str(fn or "").strip().lower()
+    if not lowered:
+        return False
+    return bool(
+        lowered.startswith("fun_")
+        or lowered.startswith("lab_")
+        or lowered.startswith("sub_")
+        or lowered.startswith("thunk_fun_")
+    )
+
+
+def _inferred_source_context(source: Dict[str, Any]) -> str:
+    label = str(source.get("label", "") or "")
+    if label == "DMA_BACKED_BUFFER":
+        return "DMA"
+    if label in {"ISR_FILLED_BUFFER", "ISR_MMIO_READ"}:
+        return "ISR"
+    fn_ctx = _context_from_function_hint(str(source.get("function_name", "") or ""))
+    if fn_ctx != "UNKNOWN":
+        return fn_ctx
+    if label == "MMIO_READ":
+        return "MAIN"
+    return "UNKNOWN"
+
+
+def _inferred_proxy_consumer_context(
+    *,
+    current_fn: str,
+    source: Dict[str, Any],
+    bridge_steps: Sequence[Dict[str, Any]],
+) -> str:
+    current_ctx = _context_from_function_hint(current_fn)
+    source_ctx = _inferred_source_context(source)
+    if source_ctx in {"DMA", "ISR"}:
+        if current_ctx in {"MAIN", "TASK", "ISR"}:
+            return current_ctx
+        return "MAIN"
+    if current_ctx == "TASK":
+        return "TASK"
+    if bridge_steps:
+        return "TASK"
+    source_fn = str(source.get("function_name", "") or "")
+    if _looks_stripped_function_name(current_fn) and source_fn and source_fn != current_fn:
+        return "TASK"
+    if current_ctx != "UNKNOWN":
+        return current_ctx
+    return "MAIN"
+
+
+def _context_from_function_hint(fn: str) -> str:
+    lowered = str(fn or "").strip().lower()
+    if not lowered:
+        return "UNKNOWN"
+    if "irq" in lowered:
+        return "ISR"
+    if lowered in {"main", "reset_handler", "startup"}:
+        return "MAIN"
+    if any(tok in lowered for tok in ("task", "thread", "worker", "process")):
+        return "TASK"
+    if _looks_stripped_function_name(lowered):
+        return "UNKNOWN"
+    return "MAIN"
+
+
+def _dedupe_channel_steps(steps: Sequence[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    seen = set()
+    out: List[Dict[str, Any]] = []
+    for step in steps or []:
+        if str(step.get("kind", "")) != "CHANNEL":
+            out.append(dict(step))
+            continue
+        key = (
+            str(step.get("object_id", "") or ""),
+            str(step.get("edge", "") or ""),
+        )
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(dict(step))
+    return out
 
 
 def _ensure_synthetic_param_object(
@@ -1435,6 +1917,72 @@ def _object_site_functions(obj: Dict[str, Any]) -> set[str]:
     return out
 
 
+def _source_matches_object(source: Dict[str, Any], obj: Dict[str, Any]) -> bool:
+    label = str(source.get("label", "") or "")
+    if label not in {"DMA_BACKED_BUFFER", "ISR_FILLED_BUFFER"}:
+        return True
+    try:
+        addr = int(source.get("address", 0) or 0)
+    except Exception:
+        addr = 0
+    if addr > 0 and (_object_contains_addr(obj, addr) or _slice_contains_addr(obj, addr)):
+        return True
+    for cluster in _source_binding_clusters(source):
+        if _object_contains_addr(obj, cluster) or _slice_contains_addr(obj, cluster):
+            return True
+    obj_tf = dict(obj.get("type_facts", {}) or {})
+    obj_cluster = _parse_hex(str(obj_tf.get("buffer_cluster", "") or ""))
+    if obj_cluster > 0 and obj_cluster in _source_binding_clusters(source):
+        return True
+    return False
+
+
+def _source_binding_clusters(source: Dict[str, Any]) -> List[int]:
+    tf = dict(source.get("facts", {}) or {})
+    clusters: List[int] = []
+
+    def _add(value: Any) -> None:
+        try:
+            if isinstance(value, int):
+                cluster = value
+            else:
+                cluster = _parse_hex(str(value or ""))
+        except Exception:
+            cluster = 0
+        if cluster > 0 and cluster not in clusters:
+            clusters.append(cluster)
+
+    _add(tf.get("buffer_cluster"))
+    for row in list(tf.get("buffer_cluster_candidates", []) or []):
+        if isinstance(row, dict):
+            _add(row.get("cluster"))
+        else:
+            _add(row)
+    try:
+        addr = int(source.get("address", 0) or 0)
+    except Exception:
+        addr = 0
+    if 0x20000000 <= addr <= 0x3FFFFFFF:
+        _add(addr)
+    return clusters
+
+
+def _source_binding_confidence(source: Dict[str, Any]) -> float:
+    tf = dict(source.get("facts", {}) or {})
+    try:
+        return max(0.0, min(1.0, float(tf.get("buffer_binding_confidence", 0.0) or 0.0)))
+    except Exception:
+        return 0.0
+
+
+def _object_binding_confidence(obj: Dict[str, Any]) -> float:
+    tf = dict(obj.get("type_facts", {}) or {})
+    try:
+        return max(0.0, min(1.0, float(tf.get("buffer_binding_confidence", 0.0) or 0.0)))
+    except Exception:
+        return 0.0
+
+
 def _source_sort_key(
     src: Dict[str, Any],
     *,
@@ -1491,6 +2039,11 @@ def _source_payload_priority(
         score += 12
     if any(tok in fn for tok in ("frame", "packet", "fifo")) and offset in {0x14, 0x18, 0x1C}:
         score -= 8
+    binding_conf = _source_binding_confidence(src)
+    if binding_conf > 0.0:
+        score += min(10, int(round(binding_conf * 12)))
+    if _source_binding_clusters(src):
+        score += 4
 
     root_kind = str((active_root or {}).get("kind", "")).lower()
     expr_low = str(expr or "").lower()
@@ -1575,6 +2128,12 @@ def _pick_producer_fn(obj: Dict[str, Any], src_context: str, fallback: str) -> s
 
 
 def _object_for_addr(addr: int, objects_by_id: Dict[str, Dict[str, Any]]) -> Optional[str]:
+    matches = _objects_for_addr(addr, objects_by_id)
+    return matches[0] if matches else None
+
+
+def _objects_for_addr(addr: int, objects_by_id: Dict[str, Dict[str, Any]]) -> List[str]:
+    scored: List[Tuple[float, str]] = []
     for obj_id, obj in objects_by_id.items():
         rng = obj.get("addr_range", [])
         if not isinstance(rng, list) or len(rng) != 2:
@@ -1582,8 +2141,21 @@ def _object_for_addr(addr: int, objects_by_id: Dict[str, Dict[str, Any]]) -> Opt
         start = _parse_hex(str(rng[0]))
         end = _parse_hex(str(rng[1]))
         if start <= addr <= end:
-            return obj_id
-    return None
+            size = max(1, end - start + 1)
+            tf = dict(obj.get("type_facts", {}) or {})
+            score = 1.0
+            score += 0.40 * _object_confidence_score(obj)
+            score -= 0.20 * _object_ambiguity_penalty(obj)
+            score += min(0.25, 64.0 / float(size))
+            if bool(tf.get("source_overlay")):
+                score += 0.18
+            if bool(tf.get("slice_overlay")):
+                score += 0.12
+            if _slice_contains_addr(obj, addr):
+                score += 0.08
+            scored.append((score, obj_id))
+    scored.sort(key=lambda item: (-item[0], item[1]))
+    return [obj_id for _, obj_id in scored]
 
 
 def _first_primary_root_expr(roots: List[Dict[str, Any]]) -> str:
@@ -1712,6 +2284,8 @@ def _build_link_debug(
             if str(step.get("kind", "")) == "BRIDGE"
         ],
         "object_hits": list(object_hits),
+        "object_hit_quality": float(slice_res.get("object_hit_quality", 0.0) or 0.0),
+        "object_hit_ambiguity": float(slice_res.get("object_hit_ambiguity", 0.0) or 0.0),
         "channel_required_hint": bool(slice_res.get("channel_required_hint", False)),
         "tunnel_attempts": int(st.get("tunnel_attempts", 0)),
         "producer_candidates": list(st.get("producer_candidates", ())),
@@ -1795,24 +2369,59 @@ def _looks_constant_expr(expr: str) -> bool:
     return bool(re.fullmatch(r"(?:0x[0-9a-fA-F]+|\d+)", expr))
 
 
+def _channel_confidence(channel_steps: Sequence[Dict[str, Any]]) -> float:
+    vals = [
+        float(step.get("channel_confidence", 0.0) or 0.0)
+        for step in (channel_steps or [])
+        if str(step.get("kind", "")) == "CHANNEL"
+    ]
+    if not vals:
+        return 0.0
+    return max(vals)
+
+
+def _channel_ambiguity(channel_steps: Sequence[Dict[str, Any]]) -> float:
+    vals = [
+        float(step.get("ambiguity_penalty", 0.0) or 0.0)
+        for step in (channel_steps or [])
+        if str(step.get("kind", "")) == "CHANNEL"
+    ]
+    if not vals:
+        return 0.0
+    return min(max(vals), 1.0)
+
+
 def _chain_score(
     *,
     sink_conf: float,
     source_reached: bool,
     has_channel: bool,
+    channel_confidence: float,
+    channel_ambiguity: float,
     check_strength: str,
+    check_binding_target: str,
+    check_capacity_scope: str,
     root_controllable: bool,
 ) -> float:
     score = 0.25 + 0.35 * max(0.0, min(1.0, sink_conf))
     if source_reached:
         score += 0.20
     if has_channel:
-        score += 0.10
+        score += 0.04 + 0.12 * max(0.0, min(1.0, channel_confidence)) - 0.08 * max(0.0, min(1.0, channel_ambiguity))
 
     if check_strength in {"absent", "weak"}:
         score += 0.15
     elif check_strength == "effective":
-        score -= 0.15
+        binding = str(check_binding_target or "").lower()
+        scope = str(check_capacity_scope or "").lower()
+        if scope == "dst_extent" and binding in {"active_root", "root_alias"}:
+            score -= 0.15
+        elif scope == "write_bound" and binding in {"active_root", "root_alias"}:
+            score -= 0.03
+        elif scope in {"read_bound", "state_gate"}:
+            score += 0.01
+        else:
+            score -= 0.01
 
     if root_controllable:
         score += 0.05
@@ -1827,6 +2436,8 @@ def _decide_verdict(
     source_reached: bool,
     root_controllable: bool,
     check_strength: str,
+    check_binding_target: str,
+    check_capacity_scope: str,
     chain_complete: bool,
     has_contradiction: bool,
     has_app_anchor: bool,
@@ -1836,6 +2447,8 @@ def _decide_verdict(
     secondary_root_only: bool,
     channel_required_hint: bool,
     has_channel: bool,
+    channel_confidence: float,
+    channel_ambiguity: float,
 ) -> Tuple[str, Dict[str, Any]]:
     confirm_threshold = 0.80
     if str(active_root_kind or "").lower() in {"format_arg", "dispatch"}:
@@ -1849,6 +2462,8 @@ def _decide_verdict(
         "source_reached": bool(source_reached),
         "root_controllable": bool(root_controllable),
         "check_strength": str(check_strength or "unknown"),
+        "check_binding_target": str(check_binding_target or ""),
+        "check_capacity_scope": str(check_capacity_scope or ""),
         "chain_complete": bool(chain_complete),
         "has_contradiction": bool(has_contradiction),
         "has_app_anchor": bool(has_app_anchor),
@@ -1858,6 +2473,8 @@ def _decide_verdict(
         "secondary_root_only": bool(secondary_root_only),
         "channel_required_hint": bool(channel_required_hint),
         "has_channel": bool(has_channel),
+        "channel_confidence": float(channel_confidence or 0.0),
+        "channel_ambiguity": float(channel_ambiguity or 0.0),
         "confirm_threshold": float(confirm_threshold),
         "reason_code": "UNKNOWN",
     }
@@ -1874,6 +2491,13 @@ def _decide_verdict(
     if channel_required_hint and not has_channel and not _is_strong_source_mode(source_resolve_mode):
         decision_basis["reason_code"] = "CHANNEL_REQUIRED_MISSING"
         return "DROP", decision_basis
+    if has_channel and str(source_resolve_mode or "") in _PROXY_SOURCE_MODES:
+        if channel_confidence < 0.42:
+            decision_basis["reason_code"] = "LOW_CONFIDENCE_PROXY_CHANNEL"
+            return "DROP", decision_basis
+        if channel_ambiguity > 0.62 and check_strength == "unknown":
+            decision_basis["reason_code"] = "AMBIGUOUS_PROXY_CHANNEL"
+            return "DROP", decision_basis
 
     if (
         _is_confirmable_root_kind(sink_label, active_root_kind)
@@ -1888,9 +2512,30 @@ def _decide_verdict(
         decision_basis["reason_code"] = "ABSENT_GUARD_CONTROLLABLE_ROOT"
         return "CONFIRMED", decision_basis
 
+    binding = str(check_binding_target or "").lower()
+    scope = str(check_capacity_scope or "").lower()
+
     if check_strength == "effective" and has_app_anchor:
-        decision_basis["reason_code"] = "EFFECTIVE_GUARD_PRESENT"
-        return "SAFE_OR_LOW_RISK", decision_basis
+        if scope == "dst_extent" and binding in {"active_root", "root_alias"}:
+            decision_basis["reason_code"] = "EFFECTIVE_DST_BOUND_PRESENT"
+            return "SAFE_OR_LOW_RISK", decision_basis
+        if scope == "write_bound" and binding in {"active_root", "root_alias"}:
+            decision_basis["reason_code"] = "PARTIAL_GUARD_WRITE_BOUND_ONLY"
+            return "SUSPICIOUS", decision_basis
+        if scope == "read_bound":
+            decision_basis["reason_code"] = "PARTIAL_GUARD_READ_BOUND_ONLY"
+            return "SUSPICIOUS", decision_basis
+        if scope == "state_gate":
+            decision_basis["reason_code"] = "STATE_GATE_ONLY"
+            return "SUSPICIOUS", decision_basis
+        if binding and binding not in {"active_root", "root_alias"}:
+            decision_basis["reason_code"] = "CHECK_BINDS_OTHER_VALUE"
+            return "SUSPICIOUS", decision_basis
+        if scope in {"root_bound", "unknown"}:
+            decision_basis["reason_code"] = "EFFECTIVE_GUARD_UNSCOPED"
+            return "SUSPICIOUS", decision_basis
+        decision_basis["reason_code"] = "WEAK_GUARDING"
+        return "SUSPICIOUS", decision_basis
 
     if chain_score < 0.45:
         decision_basis["reason_code"] = "LOW_CHAIN_SCORE"
@@ -1967,6 +2612,14 @@ def _is_weak_source_anchor(
     root_kind = str(active_root_kind or "").lower()
     hit_mode = str(object_hit_mode or "").lower()
 
+    if source_mode in _PROXY_SOURCE_MODES and not has_channel:
+        if label != "DMA_BACKED_BUFFER":
+            return True
+        if hit_mode in {"fn_expr_heuristic", "synthetic_param_object"}:
+            return True
+        if root_kind not in {"length", "index_or_bound"}:
+            return True
+
     if label == "MMIO_READ" and _is_system_mmio_address(addr):
         return True
     if _is_weak_source_function(fn) and source_mode in {"caller_bridge", "nested_caller_bridge", "transitive_caller_bridge"}:
@@ -2028,11 +2681,23 @@ def _should_prefer_tunnel(
     if not object_hits:
         return False
     source_mode = str(slice_res.get("source_resolve_mode", "none"))
+    hit_mode = str(slice_res.get("object_hit_mode", "none") or "").lower()
     if source_mode == "same_function":
+        return False
+    object_hit_quality = float(slice_res.get("object_hit_quality", 0.0) or 0.0)
+    object_hit_ambiguity = float(slice_res.get("object_hit_ambiguity", 0.0) or 0.0)
+    if source_mode in _PROXY_SOURCE_MODES and object_hit_quality < 0.45:
         return False
     for obj_id in object_hits:
         for edge in edges_by_object.get(obj_id, []):
-            if str(edge.get("src_context", "")) in {"DMA", "ISR"}:
+            src_ctx = str(edge.get("src_context", "") or "")
+            dst_ctx = str(edge.get("dst_context", "") or "")
+            if hit_mode in {"expr_object_id", "expr_member", "expr_address"} and src_ctx and dst_ctx and src_ctx != dst_ctx:
+                return True
+            edge_conf = max(0.0, min(1.0, 0.6 * float(edge.get("score", 0.0) or 0.0) + 0.3 * object_hit_quality - 0.2 * object_hit_ambiguity))
+            if src_ctx in {"DMA", "ISR"} and edge_conf >= 0.35:
+                return True
+            if source_mode in _PROXY_SOURCE_MODES and src_ctx and dst_ctx and src_ctx != dst_ctx and edge_conf >= 0.55:
                 return True
     return False
 
@@ -2051,7 +2716,7 @@ def _rank_context_objects(object_ids: Sequence[str], objects_by_id: Dict[str, Di
     scored: List[Tuple[float, str]] = []
     for obj_id in object_ids:
         obj = objects_by_id.get(obj_id, {})
-        score = 1.0
+        score = 1.0 + 0.35 * _object_confidence_score(obj) - 0.20 * _object_ambiguity_penalty(obj)
         tf = dict(obj.get("type_facts", {}) or {})
         if str(tf.get("kind_hint", "")).lower() == "payload":
             score += 0.25
@@ -2062,6 +2727,174 @@ def _rank_context_objects(object_ids: Sequence[str], objects_by_id: Dict[str, Di
         scored.append((score, obj_id))
     scored.sort(key=lambda x: (-x[0], x[1]))
     return [obj_id for _, obj_id in scored]
+
+
+def _rank_object_hits(
+    object_ids: Sequence[str],
+    objects_by_id: Dict[str, Dict[str, Any]],
+    *,
+    expr: str,
+    current_fn: str,
+    active_root: Optional[Dict[str, Any]],
+    hit_mode: str,
+) -> Tuple[List[str], float, float]:
+    if not object_ids:
+        return [], 0.0, 0.0
+
+    scored: List[Tuple[float, str, float, float]] = []
+    for idx, obj_id in enumerate(_uniq_keep_order(object_ids)):
+        obj = objects_by_id.get(obj_id, {})
+        quality = _object_confidence_score(obj)
+        ambiguity = _object_ambiguity_penalty(obj)
+        affinity = _root_object_affinity(obj, active_root=active_root, hit_mode=hit_mode)
+        expr_tokens = set(_expr_tokens(expr))
+        if expr_tokens and expr_tokens & _object_tokens(obj):
+            affinity += 0.06
+        if current_fn and current_fn.lower() in _object_site_functions(obj):
+            affinity += 0.05
+        score = quality + affinity - 0.35 * ambiguity - 0.03 * idx
+        scored.append((score, obj_id, quality, ambiguity))
+
+    scored.sort(key=lambda item: (-item[0], item[1]))
+    best_score, _, _, best_ambiguity = scored[0]
+    ordered = [obj_id for _, obj_id, _, _ in scored]
+    return ordered, round(max(0.0, min(1.0, best_score)), 4), round(max(0.0, min(1.0, best_ambiguity)), 4)
+
+
+def _root_object_affinity(
+    obj: Dict[str, Any],
+    *,
+    active_root: Optional[Dict[str, Any]],
+    hit_mode: str,
+) -> float:
+    root = dict(active_root or {})
+    tokens = _active_root_tokens(root)
+    obj_tokens = _object_tokens(obj)
+    score = 0.0
+    overlap = tokens & obj_tokens
+    if overlap:
+        score += min(0.24, 0.12 + 0.04 * len(overlap))
+
+    literal_addr = _active_root_literal_addr(root)
+    if literal_addr is not None and _object_contains_addr(obj, literal_addr):
+        score += 0.22
+        if _slice_contains_addr(obj, literal_addr):
+            score += 0.08
+
+    hit_mode_low = str(hit_mode or "").lower()
+    if hit_mode_low == "expr_object_id":
+        score += 0.25
+    elif hit_mode_low in {"expr_member", "expr_address"}:
+        score += 0.16
+    elif hit_mode_low in _STRONG_PROXY_CHANNEL_HIT_MODES:
+        score += 0.10
+    elif hit_mode_low == "local_sram_access":
+        score -= 0.08
+
+    kind_hint = str((obj.get("type_facts", {}) or {}).get("kind_hint", "") or "").lower()
+    root_family = str(root.get("family", "") or "").lower()
+    if kind_hint == "payload" and root_family in {"length", "pointer"}:
+        score += 0.06
+    return max(0.0, min(1.0, score))
+
+
+def _active_root_tokens(root: Dict[str, Any]) -> set[str]:
+    tokens: set[str] = set()
+    for key in ("path_tokens", "aliases"):
+        value = root.get(key)
+        if isinstance(value, list):
+            for row in value:
+                tokens.update(_expr_tokens(str(row)))
+    tokens.update(_expr_tokens(str(root.get("canonical_expr", "") or "")))
+    tokens.update(_expr_tokens(str(root.get("expr", "") or "")))
+    return {tok for tok in tokens if tok}
+
+
+def _active_root_literal_addr(root: Dict[str, Any]) -> Optional[int]:
+    value = root.get("literal_addr")
+    if value not in {None, ""}:
+        try:
+            return int(str(value), 16)
+        except Exception:
+            pass
+    expr = str(root.get("expr", "") or "").strip()
+    if _HEX_RE.fullmatch(expr):
+        try:
+            return int(expr, 16)
+        except Exception:
+            return None
+    return None
+
+
+def _object_contains_addr(obj: Dict[str, Any], addr: int) -> bool:
+    rng = obj.get("addr_range", [])
+    if not isinstance(rng, list) or len(rng) != 2:
+        return False
+    start = _parse_hex(str(rng[0]))
+    end = _parse_hex(str(rng[1]))
+    return start <= addr <= end
+
+
+def _slice_contains_addr(obj: Dict[str, Any], addr: int) -> bool:
+    for row in ((obj.get("slice_facts", {}) or {}).get("slices", []) or []):
+        rng = row.get("addr_range", [])
+        if not isinstance(rng, list) or len(rng) != 2:
+            continue
+        start = _parse_hex(str(rng[0]))
+        end = _parse_hex(str(rng[1]))
+        if start <= addr <= end:
+            return True
+    return False
+
+
+def _object_confidence_score(obj: Dict[str, Any]) -> float:
+    quality = dict(obj.get("quality", {}) or {})
+    if quality:
+        return float(quality.get("score", 0.0) or 0.0)
+    tf_quality = dict((obj.get("type_facts", {}) or {}).get("object_quality", {}) or {})
+    if tf_quality:
+        return float(tf_quality.get("score", obj.get("confidence", 0.0)) or 0.0)
+    tf = dict(obj.get("type_facts", {}) or {})
+    score = float(obj.get("confidence", 0.0) or 0.0)
+    if score <= 0.0:
+        score = 0.35
+    if str(tf.get("kind_hint", "")).lower() == "payload":
+        score += 0.15
+    if str(obj.get("region_kind", "")).upper() == "DMA_BUFFER":
+        score += 0.15
+    if obj.get("members"):
+        score += 0.12
+    if obj.get("writers"):
+        score += 0.06
+    if obj.get("readers"):
+        score += 0.06
+    if str(tf.get("source_label", "")).upper() in {"DMA_BACKED_BUFFER", "ISR_FILLED_BUFFER"}:
+        score += 0.10
+    return max(0.0, min(1.0, score))
+
+
+def _object_ambiguity_penalty(obj: Dict[str, Any]) -> float:
+    quality = dict(obj.get("quality", {}) or {})
+    if quality:
+        return float(quality.get("ambiguity_penalty", 0.0) or 0.0)
+    tf_quality = dict((obj.get("type_facts", {}) or {}).get("object_quality", {}) or {})
+    if tf_quality:
+        return float(tf_quality.get("ambiguity_penalty", 0.0) or 0.0)
+    producers = {str(ctx) for ctx in (obj.get("producer_contexts", []) or []) if str(ctx) and str(ctx) != "UNKNOWN"}
+    consumers = {str(ctx) for ctx in (obj.get("consumer_contexts", []) or []) if str(ctx) and str(ctx) != "UNKNOWN"}
+    site_fns = _object_site_functions(obj)
+    penalty = 0.0
+    penalty += 0.12 * max(len(producers) - 1, 0)
+    penalty += 0.12 * max(len(consumers) - 1, 0)
+    penalty += 0.05 * max(len(site_fns) - 2, 0)
+    return max(0.0, min(1.0, penalty))
+
+
+def _edge_channel_confidence(edge: Dict[str, Any], obj: Dict[str, Any]) -> float:
+    score = float(edge.get("score", 0.0) or 0.0)
+    quality = float(edge.get("object_quality", _object_confidence_score(obj)) or 0.0)
+    ambiguity = float(edge.get("ambiguity_penalty", _object_ambiguity_penalty(obj)) or 0.0)
+    return max(0.0, min(1.0, 0.55 * score + 0.45 * quality - 0.20 * ambiguity))
 
 
 def _uniq_keep_order(items: Sequence[str]) -> List[str]:

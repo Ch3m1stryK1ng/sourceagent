@@ -234,5 +234,21 @@
     "eval_dir": "/tmp/eval_mesobench_missing18_20260308_153906",
     "scope": "pipeline_scope",
     "warning": "This full GT is exhaustive within the current SourceAgent pipeline scope and source-backed focus region; manual semantic refinement may still improve subtype fidelity."
+  },
+  "evaluation_only": {
+    "canonical_cve_anchor_status": "provisional",
+    "canonical_cve_chain_ids": [
+      "chain_zephyr-CVE-2021-3329_SINK_zephyr-CVE-2021-3329_0032_31d8f4e7"
+    ],
+    "canonical_cve_sink_ids": [
+      "SINK_zephyr-CVE-2021-3329_0032"
+    ],
+    "canonical_cve_root_ids": [
+      "SR_AUTO_003_SINK_zephyr-CVE-2021-3329_0032_primary"
+    ],
+    "canonical_cve_notes": [
+      "Evaluation-only anchor: use the uart_nrfx_fifo_read loop-write path as the closest observable answer chain in this prebuilt Zephyr sample.",
+      "This anchor is intentionally provisional and does not yet carry chain-level risk GT because the currently recovered path remains structurally safe/low-risk under the visible guards."
+    ]
   }
 }

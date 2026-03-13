@@ -305,7 +305,12 @@
         "D1_evt_len"
       ],
       "must_use_channel": false,
-      "notes": "Event-path overflow chain from SPI1_DR into rxmsg-derived copy length."
+      "notes": "Event-path overflow chain from SPI1_DR into rxmsg-derived copy length.",
+      "expected_final_verdict": "CONFIRMED",
+      "expected_final_risk_band": "HIGH",
+      "expected_review_priority": "P0",
+      "risk_gt_provenance": "manual_anchor_chain_v1",
+      "risk_gt_notes": "Canonical HCI event-path overflow: SPI-fed rxmsg length reaches the vulnerable copy sink and should remain a confirmed P0 high-risk chain."
     },
     {
       "chain_id": "C2_acl_overflow",
@@ -326,7 +331,12 @@
         "D2_acl_len"
       ],
       "must_use_channel": false,
-      "notes": "ACL-path overflow chain from SPI1_DR into acl_hdr.len-controlled copy size."
+      "notes": "ACL-path overflow chain from SPI1_DR into acl_hdr.len-controlled copy size.",
+      "expected_final_verdict": "CONFIRMED",
+      "expected_final_risk_band": "HIGH",
+      "expected_review_priority": "P0",
+      "risk_gt_provenance": "manual_anchor_chain_v1",
+      "risk_gt_notes": "Canonical HCI ACL overflow: attacker-controlled acl_hdr.len drives the copy size and should remain a confirmed P0 high-risk chain."
     }
   ],
   "negative_expectations": [
@@ -339,5 +349,24 @@
   ],
   "notes": [
     "Fully annotated multi-sink semantic CVE sample with two independent confirmed chains."
-  ]
+  ],
+  "evaluation_only": {
+    "canonical_cve_anchor_status": "complete",
+    "canonical_cve_chain_ids": [
+      "C1_evt_overflow",
+      "C2_acl_overflow"
+    ],
+    "canonical_cve_sink_ids": [
+      "S1",
+      "S2"
+    ],
+    "canonical_cve_root_ids": [
+      "SR1_evt_len",
+      "SR2_acl_len"
+    ],
+    "canonical_cve_notes": [
+      "Evaluation-only anchor: C1 captures the HCI event-path overflow driven by SPI-fed rxmsg length.",
+      "C2 captures the ACL-path overflow where attacker-controlled acl_hdr.len drives the vulnerable copy size."
+    ]
+  }
 }

@@ -787,7 +787,12 @@
       ],
       "must_use_channel": true,
       "required_source_mode": "any",
-      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: spi_sam_fast_rx"
+      "notes": "Auto-promoted exhaustive chain from /tmp/eval_mesobench_missing18_20260308_153906: spi_sam_fast_rx",
+      "expected_final_verdict": "CONFIRMED",
+      "expected_final_risk_band": "HIGH",
+      "expected_review_priority": "P0",
+      "risk_gt_provenance": "manual_anchor_chain_v2",
+      "risk_gt_notes": "Second-batch Zephyr anchor: attacker-controlled radio frame state reaches spi_sam_fast_rx loop-write path and should remain a confirmed P0 high-risk chain."
     }
   ],
   "negative_expectations": [],
@@ -802,5 +807,21 @@
     "eval_dir": "/tmp/eval_mesobench_missing18_20260308_153906",
     "scope": "pipeline_scope",
     "warning": "This full GT is exhaustive within the current SourceAgent pipeline scope and source-backed focus region; manual semantic refinement may still improve subtype fidelity."
+  },
+  "evaluation_only": {
+    "canonical_cve_anchor_status": "provisional",
+    "canonical_cve_chain_ids": [
+      "chain_zephyr-CVE-2020-10064_SINK_zephyr-CVE-2020-10064_0045_e99db807"
+    ],
+    "canonical_cve_sink_ids": [
+      "SINK_zephyr-CVE-2020-10064_0045"
+    ],
+    "canonical_cve_root_ids": [
+      "SR_AUTO_004_SINK_zephyr-CVE-2020-10064_0045_primary"
+    ],
+    "canonical_cve_notes": [
+      "Evaluation-only anchor: use the confirmed spi_sam_fast_rx loop-write path as the canonical main chain for this prebuilt Zephyr sample.",
+      "Status remains provisional until the upstream advisory path is source-validated."
+    ]
   }
 }

@@ -1,5 +1,1431 @@
 [
   {
+    "dataset": "mesobench",
+    "subset": "D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples",
+    "sample_id": "contiki_cve_2020_12140_hello_world",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-2020-12140/hello-world.elf",
+    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-2020-12140/hello-world.bin",
+    "gt_type": "artifact_gt_seed",
+    "gt_ref_files": [
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/contiki_cve_2020_12140_hello_world.json",
+      "ground_truth_bundle/references/mesobench/README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "priority=high; role=primary_chain_driver; source=contiki-ng(full_upstream_repo)",
+    "gt_level": "L3",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "mesobench",
+    "subset": "D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples",
+    "sample_id": "contiki_cve_2020_12141_snmp_server",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-2020-12141/snmp-server.elf",
+    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-2020-12141/snmp-server.bin",
+    "gt_type": "artifact_gt_seed",
+    "gt_ref_files": [
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/contiki_cve_2020_12141_snmp_server.json",
+      "ground_truth_bundle/references/mesobench/README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "priority=high; role=primary_chain_driver; source=contiki-ng(full_upstream_repo)",
+    "gt_level": "L3",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "mesobench",
+    "subset": "D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples",
+    "sample_id": "contiki_halucinator_cve_2019_9183_hello_world",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-HALucinator-CVE-2019-9183/hello-world.elf",
+    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-HALucinator-CVE-2019-9183/hello-world.bin",
+    "gt_type": "artifact_gt_seed",
+    "gt_ref_files": [
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/contiki_halucinator_cve_2019_9183_hello_world.json",
+      "ground_truth_bundle/references/mesobench/README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "priority=high; role=primary_chain_driver; source=contiki-ng(full_upstream_repo)",
+    "gt_level": "L3",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "mesobench",
+    "subset": "ARMCortex-M",
+    "sample_id": "stm32cube_lwip_tcp_echo_client",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/stm32_tcp_echo_client/stm32_tcp_echo_client.elf",
+    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/stm32_tcp_echo_client/stm32_tcp_echo_client.bin",
+    "gt_type": "artifact_gt_seed",
+    "gt_ref_files": [
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/stm32cube_lwip_tcp_echo_client.json",
+      "ground_truth_bundle/references/mesobench/README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(full_upstream_repo)",
+    "gt_level": "L3",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "mesobench",
+    "subset": "ARMCortex-M",
+    "sample_id": "stm32cube_lwip_tcp_echo_server",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/stm32_tcp_echo_server/stm32_tcp_echo_server.elf",
+    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/stm32_tcp_echo_server/stm32_tcp_echo_server.bin",
+    "gt_type": "artifact_gt_seed",
+    "gt_ref_files": [
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/stm32cube_lwip_tcp_echo_server.json",
+      "ground_truth_bundle/references/mesobench/README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(full_upstream_repo)",
+    "gt_level": "L3",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "mesobench",
+    "subset": "ARMCortex-M",
+    "sample_id": "stm32cube_lwip_udp_echo_client",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/stm32_udp_echo_client/stm32_udp_echo_client.elf",
+    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/stm32_udp_echo_client/stm32_udp_echo_client.bin",
+    "gt_type": "artifact_gt_seed",
+    "gt_ref_files": [
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/stm32cube_lwip_udp_echo_client.json",
+      "ground_truth_bundle/references/mesobench/README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(full_upstream_repo)",
+    "gt_level": "L3",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "mesobench",
+    "subset": "ARMCortex-M",
+    "sample_id": "stm32cube_lwip_udp_echo_server",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/stm32_udp_echo_server/stm32_udp_echo_server.elf",
+    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/stm32_udp_echo_server/stm32_udp_echo_server.bin",
+    "gt_type": "artifact_gt_seed",
+    "gt_ref_files": [
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/stm32cube_lwip_udp_echo_server.json",
+      "ground_truth_bundle/references/mesobench/README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(full_upstream_repo)",
+    "gt_level": "L3",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "mesobench",
+    "subset": "Ground-truth Benchmark/fw",
+    "sample_id": "usbs_tcp_echo_client_payload_len_variant",
+    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one_test_payload_len/STM32469I_EVAL_tcp_echo_base.elf",
+    "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one_test_payload_len/STM32469I_EVAL_tcp_echo_base.bin",
+    "gt_type": "artifact_gt_seed",
+    "gt_ref_files": [
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/usbs_tcp_echo_client_payload_len_variant.json",
+      "ground_truth_bundle/references/mesobench/README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(upstream_base_plus_overlay)",
+    "gt_level": "L3",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "mesobench",
+    "subset": "Ground-truth Benchmark/fw",
+    "sample_id": "usbs_tcp_echo_client_vuln_bof",
+    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_bof/STM32469I_EVAL_tcp_echo_base.elf",
+    "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_bof/STM32469I_EVAL_tcp_echo_base.bin",
+    "gt_type": "artifact_gt_seed",
+    "gt_ref_files": [
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/usbs_tcp_echo_client_vuln_bof.json",
+      "ground_truth_bundle/references/mesobench/README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(upstream_base_plus_overlay)",
+    "gt_level": "L3",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "mesobench",
+    "subset": "Ground-truth Benchmark/fw",
+    "sample_id": "usbs_tcp_echo_client_vuln_bof_dhcp",
+    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_bof/STM32469I_EVAL_tcp_echo_base_DHCP/STM32469I_EVAL_tcp_echo_base.elf",
+    "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_bof/STM32469I_EVAL_tcp_echo_base_DHCP/STM32469I_EVAL_tcp_echo_base.bin",
+    "gt_type": "artifact_gt_seed",
+    "gt_ref_files": [
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/usbs_tcp_echo_client_vuln_bof_dhcp.json",
+      "ground_truth_bundle/references/mesobench/README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(upstream_base_plus_overlay)",
+    "gt_level": "L3",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "mesobench",
+    "subset": "Ground-truth Benchmark/fw",
+    "sample_id": "usbs_tcp_echo_client_vuln_off_by_one",
+    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one/STM32469I_EVAL_tcp_echo_base.elf",
+    "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one/STM32469I_EVAL_tcp_echo_base.bin",
+    "gt_type": "artifact_gt_seed",
+    "gt_ref_files": [
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/usbs_tcp_echo_client_vuln_off_by_one.json",
+      "ground_truth_bundle/references/mesobench/README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(upstream_base_plus_overlay)",
+    "gt_level": "L3",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "mesobench",
+    "subset": "Ground-truth Benchmark/fw",
+    "sample_id": "usbs_tcp_echo_client_vuln_off_by_one_dhcp",
+    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one/STM32469I_EVAL_tcp_echo_base_DHCP/STM32469I_EVAL_tcp_echo_base.elf",
+    "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one/STM32469I_EVAL_tcp_echo_base_DHCP/STM32469I_EVAL_tcp_echo_base.bin",
+    "gt_type": "artifact_gt_seed",
+    "gt_ref_files": [
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/usbs_tcp_echo_client_vuln_off_by_one_dhcp.json",
+      "ground_truth_bundle/references/mesobench/README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(upstream_base_plus_overlay)",
+    "gt_level": "L3",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "mesobench",
+    "subset": "Ground-truth Benchmark/fw",
+    "sample_id": "usbs_test_printf_fw",
+    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/test_printf_fw/STM32469I_EVAL_stm32_udp_echo_server.elf",
+    "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/test_printf_fw/STM32469I_EVAL_stm32_udp_echo_server.bin",
+    "gt_type": "artifact_gt_seed",
+    "gt_ref_files": [
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/usbs_test_printf_fw.json",
+      "ground_truth_bundle/references/mesobench/README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(upstream_base_plus_overlay)",
+    "gt_level": "L3",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "mesobench",
+    "subset": "Ground-truth Benchmark/fw",
+    "sample_id": "usbs_udp_echo_server_bof",
+    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof/STM32469I_EVAL_stm32_udp_echo_server.elf",
+    "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof/STM32469I_EVAL_stm32_udp_echo_server.bin",
+    "gt_type": "artifact_gt_seed",
+    "gt_ref_files": [
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/usbs_udp_echo_server_bof.json",
+      "ground_truth_bundle/references/mesobench/README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(upstream_base_plus_overlay)",
+    "gt_level": "L3",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "mesobench",
+    "subset": "Ground-truth Benchmark/fw",
+    "sample_id": "usbs_udp_echo_server_bof_expl",
+    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_expl/STM32469I_EVAL_stm32_udp_echo_server.elf",
+    "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_expl/STM32469I_EVAL_stm32_udp_echo_server.bin",
+    "gt_type": "artifact_gt_seed",
+    "gt_ref_files": [
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/usbs_udp_echo_server_bof_expl.json",
+      "ground_truth_bundle/references/mesobench/README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(upstream_base_plus_overlay)",
+    "gt_level": "L3",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "mesobench",
+    "subset": "Ground-truth Benchmark/fw",
+    "sample_id": "usbs_udp_echo_server_bof_instrumented",
+    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_instrumented/STM32469I_EVAL_stm32_udp_echo_server.elf",
+    "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_instrumented/STM32469I_EVAL_stm32_udp_echo_server.bin",
+    "gt_type": "artifact_gt_seed",
+    "gt_ref_files": [
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/usbs_udp_echo_server_bof_instrumented.json",
+      "ground_truth_bundle/references/mesobench/README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "priority=high; role=hard_mode_chain_driver; source=stm32cubef4(upstream_base_plus_overlay)",
+    "gt_level": "L3",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "mesobench",
+    "subset": "Ground-truth Benchmark/fw",
+    "sample_id": "usbs_udp_echo_server_bof_instrumented_patched",
+    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_instrumented_patched/STM32469I_EVAL_stm32_udp_echo_server.elf",
+    "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_instrumented_patched/STM32469I_EVAL_stm32_udp_echo_server.bin",
+    "gt_type": "artifact_gt_seed",
+    "gt_ref_files": [
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/usbs_udp_echo_server_bof_instrumented_patched.json",
+      "ground_truth_bundle/references/mesobench/README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "priority=high; role=hard_mode_chain_driver; source=stm32cubef4(upstream_base_plus_overlay)",
+    "gt_level": "L3",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "mesobench",
+    "subset": "Ground-truth Benchmark/fw",
+    "sample_id": "usbs_udp_echo_server_off_by_one",
+    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_off_by_one/STM32469I_EVAL_stm32_udp_echo_server.elf",
+    "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_off_by_one/STM32469I_EVAL_stm32_udp_echo_server.bin",
+    "gt_type": "artifact_gt_seed",
+    "gt_ref_files": [
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/usbs_udp_echo_server_off_by_one.json",
+      "ground_truth_bundle/references/mesobench/README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(upstream_base_plus_overlay)",
+    "gt_level": "L3",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "mesobench",
+    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
+    "sample_id": "zephyr_cve_2020_10064",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10064/zephyr-CVE-2020-10064.elf",
+    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10064/zephyr-CVE-2020-10064.bin",
+    "gt_type": "artifact_gt_seed",
+    "gt_ref_files": [
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/zephyr_cve_2020_10064.json",
+      "ground_truth_bundle/references/mesobench/README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "priority=high; role=primary_chain_driver; source=zephyr(full_upstream_repo)",
+    "gt_level": "L3",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "mesobench",
+    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
+    "sample_id": "zephyr_cve_2020_10065",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10065/zephyr-CVE-2020-10065.elf",
+    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10065/zephyr-CVE-2020-10065.bin",
+    "gt_type": "artifact_gt_seed",
+    "gt_ref_files": [
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/zephyr_cve_2020_10065.json",
+      "ground_truth_bundle/references/mesobench/README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "priority=high; role=primary_chain_driver; source=zephyr(full_upstream_repo)",
+    "gt_level": "L3",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "mesobench",
+    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
+    "sample_id": "zephyr_cve_2020_10066",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10066/zephyr-CVE-2020-10066.elf",
+    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10066/zephyr-CVE-2020-10066.bin",
+    "gt_type": "artifact_gt_seed",
+    "gt_ref_files": [
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/zephyr_cve_2020_10066.json",
+      "ground_truth_bundle/references/mesobench/README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "priority=high; role=primary_chain_driver; source=zephyr(full_upstream_repo)",
+    "gt_level": "L3",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "mesobench",
+    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
+    "sample_id": "zephyr_cve_2021_3319",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3319/zephyr-CVE-2021-3319.elf",
+    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3319/zephyr-CVE-2021-3319.bin",
+    "gt_type": "artifact_gt_seed",
+    "gt_ref_files": [
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/zephyr_cve_2021_3319.json",
+      "ground_truth_bundle/references/mesobench/README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "priority=high; role=primary_chain_driver; source=zephyr(full_upstream_repo)",
+    "gt_level": "L3",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "mesobench",
+    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
+    "sample_id": "zephyr_cve_2021_3320",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3320/zephyr-CVE-2021-3320.elf",
+    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3320/zephyr-CVE-2021-3320.bin",
+    "gt_type": "artifact_gt_seed",
+    "gt_ref_files": [
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/zephyr_cve_2021_3320.json",
+      "ground_truth_bundle/references/mesobench/README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "priority=high; role=primary_chain_driver; source=zephyr(full_upstream_repo)",
+    "gt_level": "L3",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "mesobench",
+    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
+    "sample_id": "zephyr_cve_2021_3321",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3321/zephyr-CVE-2021-3321.elf",
+    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3321/zephyr-CVE-2021-3321.bin",
+    "gt_type": "artifact_gt_seed",
+    "gt_ref_files": [
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/zephyr_cve_2021_3321.json",
+      "ground_truth_bundle/references/mesobench/README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "priority=high; role=primary_chain_driver; source=zephyr(full_upstream_repo)",
+    "gt_level": "L3",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "mesobench",
+    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
+    "sample_id": "zephyr_cve_2021_3322",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3322/zephyr-CVE-2021-3322.elf",
+    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3322/zephyr-CVE-2021-3322.bin",
+    "gt_type": "artifact_gt_seed",
+    "gt_ref_files": [
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/zephyr_cve_2021_3322.json",
+      "ground_truth_bundle/references/mesobench/README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "priority=high; role=primary_chain_driver; source=zephyr(full_upstream_repo)",
+    "gt_level": "L3",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "mesobench",
+    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
+    "sample_id": "zephyr_cve_2021_3323",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3323/zephyr-CVE-2021-3323.elf",
+    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3323/zephyr-CVE-2021-3323.bin",
+    "gt_type": "artifact_gt_seed",
+    "gt_ref_files": [
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/zephyr_cve_2021_3323.json",
+      "ground_truth_bundle/references/mesobench/README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "priority=high; role=primary_chain_driver; source=zephyr(full_upstream_repo)",
+    "gt_level": "L3",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "mesobench",
+    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
+    "sample_id": "zephyr_cve_2021_3329",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3329/zephyr-CVE-2021-3329.elf",
+    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3329/zephyr-CVE-2021-3329.bin",
+    "gt_type": "artifact_gt_seed",
+    "gt_ref_files": [
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/zephyr_cve_2021_3329.json",
+      "ground_truth_bundle/references/mesobench/README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "priority=high; role=primary_chain_driver; source=zephyr(full_upstream_repo)",
+    "gt_level": "L3",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "mesobench",
+    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
+    "sample_id": "zephyr_cve_2021_3330",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3330/zephyr-CVE-2021-3330.elf",
+    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3330/zephyr-CVE-2021-3330.bin",
+    "gt_type": "artifact_gt_seed",
+    "gt_ref_files": [
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/zephyr_cve_2021_3330.json",
+      "ground_truth_bundle/references/mesobench/README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "priority=high; role=primary_chain_driver; source=zephyr(full_upstream_repo)",
+    "gt_level": "L3",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "mesobench",
+    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
+    "sample_id": "zephyr_false_positive_rf_size_check",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-no-CVE-false-positive-rf-size-check/zephyr-CVE-no-CVE-false-positive-rf-size-check.elf",
+    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-no-CVE-false-positive-rf-size-check/zephyr-CVE-no-CVE-false-positive-rf-size-check.bin",
+    "gt_type": "artifact_gt_seed",
+    "gt_ref_files": [
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/zephyr_false_positive_rf_size_check.json",
+      "ground_truth_bundle/references/mesobench/README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "priority=high; role=negative_control; source=zephyr(full_upstream_repo)",
+    "gt_level": "L3",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "mesobench",
+    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
+    "sample_id": "zephyr_false_positive_watchdog_callback",
+    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-no-CVE-false-positive-watchdog-callback/zephyr-CVE-no-CVE-false-positive-watchdog-callback.elf",
+    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-no-CVE-false-positive-watchdog-callback/zephyr-CVE-no-CVE-false-positive-watchdog-callback.bin",
+    "gt_type": "artifact_gt_seed",
+    "gt_ref_files": [
+      "ground_truth_bundle/mesobench/README.md",
+      "ground_truth_bundle/mesobench/samples/zephyr_false_positive_watchdog_callback.json",
+      "ground_truth_bundle/references/mesobench/README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "priority=high; role=negative_control; source=zephyr(full_upstream_repo)",
+    "gt_level": "L3",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "monolithic-firmware-collection",
+    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
+    "sample_id": "CVE-2020-10064",
+    "elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10064/zephyr-CVE-2020-10064.elf",
+    "bin_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10064/zephyr-CVE-2020-10064.bin",
+    "gt_type": "cve_labeled_sample",
+    "gt_ref_files": [
+      "ground_truth_bundle/references/monolithic/README.md",
+      "ground_truth_bundle/references/monolithic/D_FUZZWARE_README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "CVE label from directory name (CVE-2020-10064); deeper oracle usually in upstream fuzzware-experiments",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10064/zephyr-CVE-2020-10064_stripped.elf",
+    "stripped_origin": "generated"
+  },
+  {
+    "dataset": "monolithic-firmware-collection",
+    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
+    "sample_id": "CVE-2020-10065",
+    "elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10065/zephyr-CVE-2020-10065.elf",
+    "bin_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10065/zephyr-CVE-2020-10065.bin",
+    "gt_type": "cve_labeled_sample",
+    "gt_ref_files": [
+      "ground_truth_bundle/references/monolithic/README.md",
+      "ground_truth_bundle/references/monolithic/D_FUZZWARE_README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "CVE label from directory name (CVE-2020-10065); deeper oracle usually in upstream fuzzware-experiments",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10065/zephyr-CVE-2020-10065_stripped.elf",
+    "stripped_origin": "generated"
+  },
+  {
+    "dataset": "monolithic-firmware-collection",
+    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
+    "sample_id": "CVE-2020-10066",
+    "elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10066/zephyr-CVE-2020-10066.elf",
+    "bin_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10066/zephyr-CVE-2020-10066.bin",
+    "gt_type": "cve_labeled_sample",
+    "gt_ref_files": [
+      "ground_truth_bundle/references/monolithic/README.md",
+      "ground_truth_bundle/references/monolithic/D_FUZZWARE_README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "CVE label from directory name (CVE-2020-10066); deeper oracle usually in upstream fuzzware-experiments",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10066/zephyr-CVE-2020-10066_stripped.elf",
+    "stripped_origin": "generated"
+  },
+  {
+    "dataset": "monolithic-firmware-collection",
+    "subset": "D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples",
+    "sample_id": "CVE-2020-12140",
+    "elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-2020-12140/hello-world.elf",
+    "bin_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-2020-12140/hello-world.bin",
+    "gt_type": "cve_labeled_sample",
+    "gt_ref_files": [
+      "ground_truth_bundle/references/monolithic/README.md",
+      "ground_truth_bundle/references/monolithic/D_FUZZWARE_README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "CVE label from directory name (CVE-2020-12140); deeper oracle usually in upstream fuzzware-experiments",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-2020-12140/hello-world_stripped.elf",
+    "stripped_origin": "generated"
+  },
+  {
+    "dataset": "monolithic-firmware-collection",
+    "subset": "D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples",
+    "sample_id": "CVE-2020-12141",
+    "elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-2020-12141/snmp-server.elf",
+    "bin_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-2020-12141/snmp-server.bin",
+    "gt_type": "cve_labeled_sample",
+    "gt_ref_files": [
+      "ground_truth_bundle/references/monolithic/README.md",
+      "ground_truth_bundle/references/monolithic/D_FUZZWARE_README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "CVE label from directory name (CVE-2020-12141); deeper oracle usually in upstream fuzzware-experiments",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-2020-12141/snmp-server_stripped.elf",
+    "stripped_origin": "generated"
+  },
+  {
+    "dataset": "monolithic-firmware-collection",
+    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
+    "sample_id": "CVE-2021-3319",
+    "elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3319/zephyr-CVE-2021-3319.elf",
+    "bin_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3319/zephyr-CVE-2021-3319.bin",
+    "gt_type": "cve_labeled_sample",
+    "gt_ref_files": [
+      "ground_truth_bundle/references/monolithic/README.md",
+      "ground_truth_bundle/references/monolithic/D_FUZZWARE_README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "CVE label from directory name (CVE-2021-3319); deeper oracle usually in upstream fuzzware-experiments",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3319/zephyr-CVE-2021-3319_stripped.elf",
+    "stripped_origin": "generated"
+  },
+  {
+    "dataset": "monolithic-firmware-collection",
+    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
+    "sample_id": "CVE-2021-3320",
+    "elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3320/zephyr-CVE-2021-3320.elf",
+    "bin_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3320/zephyr-CVE-2021-3320.bin",
+    "gt_type": "cve_labeled_sample",
+    "gt_ref_files": [
+      "ground_truth_bundle/references/monolithic/README.md",
+      "ground_truth_bundle/references/monolithic/D_FUZZWARE_README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "CVE label from directory name (CVE-2021-3320); deeper oracle usually in upstream fuzzware-experiments",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3320/zephyr-CVE-2021-3320_stripped.elf",
+    "stripped_origin": "generated"
+  },
+  {
+    "dataset": "monolithic-firmware-collection",
+    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
+    "sample_id": "CVE-2021-3321",
+    "elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3321/zephyr-CVE-2021-3321.elf",
+    "bin_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3321/zephyr-CVE-2021-3321.bin",
+    "gt_type": "cve_labeled_sample",
+    "gt_ref_files": [
+      "ground_truth_bundle/references/monolithic/README.md",
+      "ground_truth_bundle/references/monolithic/D_FUZZWARE_README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "CVE label from directory name (CVE-2021-3321); deeper oracle usually in upstream fuzzware-experiments",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3321/zephyr-CVE-2021-3321_stripped.elf",
+    "stripped_origin": "generated"
+  },
+  {
+    "dataset": "monolithic-firmware-collection",
+    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
+    "sample_id": "CVE-2021-3322",
+    "elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3322/zephyr-CVE-2021-3322.elf",
+    "bin_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3322/zephyr-CVE-2021-3322.bin",
+    "gt_type": "cve_labeled_sample",
+    "gt_ref_files": [
+      "ground_truth_bundle/references/monolithic/README.md",
+      "ground_truth_bundle/references/monolithic/D_FUZZWARE_README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "CVE label from directory name (CVE-2021-3322); deeper oracle usually in upstream fuzzware-experiments",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3322/zephyr-CVE-2021-3322_stripped.elf",
+    "stripped_origin": "generated"
+  },
+  {
+    "dataset": "monolithic-firmware-collection",
+    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
+    "sample_id": "CVE-2021-3323",
+    "elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3323/zephyr-CVE-2021-3323.elf",
+    "bin_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3323/zephyr-CVE-2021-3323.bin",
+    "gt_type": "cve_labeled_sample",
+    "gt_ref_files": [
+      "ground_truth_bundle/references/monolithic/README.md",
+      "ground_truth_bundle/references/monolithic/D_FUZZWARE_README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "CVE label from directory name (CVE-2021-3323); deeper oracle usually in upstream fuzzware-experiments",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3323/zephyr-CVE-2021-3323_stripped.elf",
+    "stripped_origin": "generated"
+  },
+  {
+    "dataset": "monolithic-firmware-collection",
+    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
+    "sample_id": "CVE-2021-3329",
+    "elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3329/zephyr-CVE-2021-3329.elf",
+    "bin_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3329/zephyr-CVE-2021-3329.bin",
+    "gt_type": "cve_labeled_sample",
+    "gt_ref_files": [
+      "ground_truth_bundle/references/monolithic/README.md",
+      "ground_truth_bundle/references/monolithic/D_FUZZWARE_README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "CVE label from directory name (CVE-2021-3329); deeper oracle usually in upstream fuzzware-experiments",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3329/zephyr-CVE-2021-3329_stripped.elf",
+    "stripped_origin": "generated"
+  },
+  {
+    "dataset": "monolithic-firmware-collection",
+    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
+    "sample_id": "CVE-2021-3330",
+    "elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3330/zephyr-CVE-2021-3330.elf",
+    "bin_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3330/zephyr-CVE-2021-3330.bin",
+    "gt_type": "cve_labeled_sample",
+    "gt_ref_files": [
+      "ground_truth_bundle/references/monolithic/README.md",
+      "ground_truth_bundle/references/monolithic/D_FUZZWARE_README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "CVE label from directory name (CVE-2021-3330); deeper oracle usually in upstream fuzzware-experiments",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3330/zephyr-CVE-2021-3330_stripped.elf",
+    "stripped_origin": "generated"
+  },
+  {
+    "dataset": "monolithic-firmware-collection",
+    "subset": "D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples",
+    "sample_id": "CVE-HALucinator-CVE-2019-9183",
+    "elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-HALucinator-CVE-2019-9183/hello-world.elf",
+    "bin_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-HALucinator-CVE-2019-9183/hello-world.bin",
+    "gt_type": "cve_labeled_sample",
+    "gt_ref_files": [
+      "ground_truth_bundle/references/monolithic/README.md",
+      "ground_truth_bundle/references/monolithic/D_FUZZWARE_README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "CVE label from directory name (CVE-HALucinator-CVE-2019-9183); deeper oracle usually in upstream fuzzware-experiments",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-HALucinator-CVE-2019-9183/hello-world_stripped.elf",
+    "stripped_origin": "generated"
+  },
+  {
+    "dataset": "monolithic-firmware-collection",
+    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
+    "sample_id": "CVE-no-CVE-false-positive-rf-size-check",
+    "elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-no-CVE-false-positive-rf-size-check/zephyr-CVE-no-CVE-false-positive-rf-size-check.elf",
+    "bin_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-no-CVE-false-positive-rf-size-check/zephyr-CVE-no-CVE-false-positive-rf-size-check.bin",
+    "gt_type": "cve_labeled_sample",
+    "gt_ref_files": [
+      "ground_truth_bundle/references/monolithic/README.md",
+      "ground_truth_bundle/references/monolithic/D_FUZZWARE_README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "CVE label from directory name (CVE-no-CVE-false-positive-rf-size-check); deeper oracle usually in upstream fuzzware-experiments",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": true,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-no-CVE-false-positive-rf-size-check/zephyr-CVE-no-CVE-false-positive-rf-size-check_stripped.elf",
+    "stripped_origin": "existing"
+  },
+  {
+    "dataset": "monolithic-firmware-collection",
+    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
+    "sample_id": "CVE-no-CVE-false-positive-watchdog-callback",
+    "elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-no-CVE-false-positive-watchdog-callback/zephyr-CVE-no-CVE-false-positive-watchdog-callback.elf",
+    "bin_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-no-CVE-false-positive-watchdog-callback/zephyr-CVE-no-CVE-false-positive-watchdog-callback.bin",
+    "gt_type": "cve_labeled_sample",
+    "gt_ref_files": [
+      "ground_truth_bundle/references/monolithic/README.md",
+      "ground_truth_bundle/references/monolithic/D_FUZZWARE_README.md"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "CVE label from directory name (CVE-no-CVE-false-positive-watchdog-callback); deeper oracle usually in upstream fuzzware-experiments",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": true,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-no-CVE-false-positive-watchdog-callback/zephyr-CVE-no-CVE-false-positive-watchdog-callback_stripped.elf",
+    "stripped_origin": "existing"
+  },
+  {
+    "dataset": "p2im-ground_truth",
+    "subset": "global_csv",
+    "sample_id": "AtmelSAM3-GroundTruth",
+    "elf_path": "",
+    "bin_path": "",
+    "gt_type": "register_ground_truth_csv",
+    "gt_ref_files": [
+      "ground_truth_bundle/p2im_ground_truth_csv/AtmelSAM3-GroundTruth.csv"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "Global MMIO register ground truth CSV",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "p2im-ground_truth",
+    "subset": "global_csv",
+    "sample_id": "NXPK64F-GroundTruth",
+    "elf_path": "",
+    "bin_path": "",
+    "gt_type": "register_ground_truth_csv",
+    "gt_ref_files": [
+      "ground_truth_bundle/p2im_ground_truth_csv/NXPK64F-GroundTruth.csv"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "Global MMIO register ground truth CSV",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "p2im-ground_truth",
+    "subset": "global_csv",
+    "sample_id": "STM32F103-GroundTruth",
+    "elf_path": "",
+    "bin_path": "",
+    "gt_type": "register_ground_truth_csv",
+    "gt_ref_files": [
+      "ground_truth_bundle/p2im_ground_truth_csv/STM32F103-GroundTruth.csv"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "Global MMIO register ground truth CSV",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "p2im-ground_truth",
+    "subset": "global_csv",
+    "sample_id": "STM32F429-GroundTruth",
+    "elf_path": "",
+    "bin_path": "",
+    "gt_type": "register_ground_truth_csv",
+    "gt_ref_files": [
+      "ground_truth_bundle/p2im_ground_truth_csv/STM32F429-GroundTruth.csv"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "Global MMIO register ground truth CSV",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
+  },
+  {
+    "dataset": "sourceagent-microbench",
+    "subset": "microbench",
+    "sample_id": "cve_2018_16525_freertos_dns",
+    "elf_path": "microbench/cve_2018_16525_freertos_dns.elf",
+    "bin_path": "microbench/cve_2018_16525_freertos_dns.bin",
+    "gt_type": "in-source_reproduction",
+    "gt_ref_files": [
+      "microbench/cve_2018_16525_freertos_dns.c",
+      "ground_truth_bundle/microbench/samples/cve_2018_16525_freertos_dns.json",
+      "microbench/cve_2018_16525_freertos_dns.map"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "FreeRTOS DNS parser overflow reproduction; stripped ELF: cve_2018_16525_freertos_dns_stripped.elf",
+    "gt_level": "L2",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "microbench/cve_2018_16525_freertos_dns_stripped.elf",
+    "stripped_origin": "existing"
+  },
+  {
+    "dataset": "sourceagent-microbench",
+    "subset": "microbench",
+    "sample_id": "cve_2020_10065_hci_spi",
+    "elf_path": "microbench/cve_2020_10065_hci_spi.elf",
+    "bin_path": "microbench/cve_2020_10065_hci_spi.bin",
+    "gt_type": "in-source_reproduction",
+    "gt_ref_files": [
+      "microbench/cve_2020_10065_hci_spi.c",
+      "ground_truth_bundle/microbench/samples/cve_2020_10065_hci_spi.json",
+      "microbench/cve_2020_10065_hci_spi.map"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "Zephyr HCI-over-SPI overflow reproduction; stripped ELF: cve_2020_10065_hci_spi_stripped.elf",
+    "gt_level": "L2",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "microbench/cve_2020_10065_hci_spi_stripped.elf",
+    "stripped_origin": "existing"
+  },
+  {
+    "dataset": "sourceagent-microbench",
+    "subset": "microbench",
+    "sample_id": "cve_2021_34259_usb_host",
+    "elf_path": "microbench/cve_2021_34259_usb_host.elf",
+    "bin_path": "microbench/cve_2021_34259_usb_host.bin",
+    "gt_type": "in-source_reproduction",
+    "gt_ref_files": [
+      "microbench/cve_2021_34259_usb_host.c",
+      "ground_truth_bundle/microbench/samples/cve_2021_34259_usb_host.json",
+      "microbench/cve_2021_34259_usb_host.map"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "STM32Cube USB host descriptor parsing overflow reproduction; stripped ELF: cve_2021_34259_usb_host_stripped.elf",
+    "gt_level": "L2",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "microbench/cve_2021_34259_usb_host_stripped.elf",
+    "stripped_origin": "existing"
+  },
+  {
+    "dataset": "sourceagent-microbench",
+    "subset": "microbench",
+    "sample_id": "t0_copy_sink",
+    "elf_path": "microbench/t0_copy_sink.elf",
+    "bin_path": "microbench/t0_copy_sink.bin",
+    "gt_type": "artifact_complete_microbench",
+    "gt_ref_files": [
+      "microbench/t0_copy_sink.c",
+      "ground_truth_bundle/microbench/samples/t0_copy_sink.json",
+      "microbench/t0_copy_sink.map"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "Same-context memcpy/strcpy sink; stripped ELF: t0_copy_sink_stripped.elf",
+    "gt_level": "L2",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "microbench/t0_copy_sink_stripped.elf",
+    "stripped_origin": "existing"
+  },
+  {
+    "dataset": "sourceagent-microbench",
+    "subset": "microbench",
+    "sample_id": "t0_dma_backed_buffer",
+    "elf_path": "microbench/t0_dma_backed_buffer.elf",
+    "bin_path": "microbench/t0_dma_backed_buffer.bin",
+    "gt_type": "artifact_complete_microbench",
+    "gt_ref_files": [
+      "microbench/t0_dma_backed_buffer.c",
+      "ground_truth_bundle/microbench/samples/t0_dma_backed_buffer.json",
+      "microbench/t0_dma_backed_buffer.map"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "DMA-backed buffer consumed in main loop; stripped ELF: t0_dma_backed_buffer_stripped.elf",
+    "gt_level": "L2",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "microbench/t0_dma_backed_buffer_stripped.elf",
+    "stripped_origin": "existing"
+  },
+  {
+    "dataset": "sourceagent-microbench",
+    "subset": "microbench",
+    "sample_id": "t0_dma_length_overflow",
+    "elf_path": "microbench/t0_dma_length_overflow.elf",
+    "bin_path": "microbench/t0_dma_length_overflow.bin",
+    "gt_type": "artifact_complete_microbench",
+    "gt_ref_files": [
+      "microbench/t0_dma_length_overflow.c",
+      "ground_truth_bundle/microbench/samples/t0_dma_length_overflow.json",
+      "microbench/t0_dma_length_overflow.map"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "DMA-fed length drives copy overflow; stripped ELF: t0_dma_length_overflow_stripped.elf",
+    "gt_level": "L2",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "microbench/t0_dma_length_overflow_stripped.elf",
+    "stripped_origin": "existing"
+  },
+  {
+    "dataset": "sourceagent-microbench",
+    "subset": "microbench",
+    "sample_id": "t0_format_string",
+    "elf_path": "microbench/t0_format_string.elf",
+    "bin_path": "microbench/t0_format_string.bin",
+    "gt_type": "artifact_complete_microbench",
+    "gt_ref_files": [
+      "microbench/t0_format_string.c",
+      "ground_truth_bundle/microbench/samples/t0_format_string.json",
+      "microbench/t0_format_string.map"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "Format-string sink archetype; stripped ELF: t0_format_string_stripped.elf",
+    "gt_level": "L2",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "microbench/t0_format_string_stripped.elf",
+    "stripped_origin": "existing"
+  },
+  {
+    "dataset": "sourceagent-microbench",
+    "subset": "microbench",
+    "sample_id": "t0_func_ptr_dispatch",
+    "elf_path": "microbench/t0_func_ptr_dispatch.elf",
+    "bin_path": "microbench/t0_func_ptr_dispatch.bin",
+    "gt_type": "artifact_complete_microbench",
+    "gt_ref_files": [
+      "microbench/t0_func_ptr_dispatch.c",
+      "ground_truth_bundle/microbench/samples/t0_func_ptr_dispatch.json",
+      "microbench/t0_func_ptr_dispatch.map"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "Function-pointer dispatch sink archetype; stripped ELF: t0_func_ptr_dispatch_stripped.elf",
+    "gt_level": "L2",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "microbench/t0_func_ptr_dispatch_stripped.elf",
+    "stripped_origin": "existing"
+  },
+  {
+    "dataset": "sourceagent-microbench",
+    "subset": "microbench",
+    "sample_id": "t0_indirect_memcpy",
+    "elf_path": "microbench/t0_indirect_memcpy.elf",
+    "bin_path": "microbench/t0_indirect_memcpy.bin",
+    "gt_type": "artifact_complete_microbench",
+    "gt_ref_files": [
+      "microbench/t0_indirect_memcpy.c",
+      "ground_truth_bundle/microbench/samples/t0_indirect_memcpy.json",
+      "microbench/t0_indirect_memcpy.map"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "Caller-bridge into memcpy helper; stripped ELF: t0_indirect_memcpy_stripped.elf",
+    "gt_level": "L2",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "microbench/t0_indirect_memcpy_stripped.elf",
+    "stripped_origin": "existing"
+  },
+  {
+    "dataset": "sourceagent-microbench",
+    "subset": "microbench",
+    "sample_id": "t0_isr_filled_buffer",
+    "elf_path": "microbench/t0_isr_filled_buffer.elf",
+    "bin_path": "microbench/t0_isr_filled_buffer.bin",
+    "gt_type": "artifact_complete_microbench",
+    "gt_ref_files": [
+      "microbench/t0_isr_filled_buffer.c",
+      "ground_truth_bundle/microbench/samples/t0_isr_filled_buffer.json",
+      "microbench/t0_isr_filled_buffer.map"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "ISR-filled ring buffer copied in main loop; stripped ELF: t0_isr_filled_buffer_stripped.elf",
+    "gt_level": "L2",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "microbench/t0_isr_filled_buffer_stripped.elf",
+    "stripped_origin": "existing"
+  },
+  {
+    "dataset": "sourceagent-microbench",
+    "subset": "microbench",
+    "sample_id": "t0_isr_mmio_read",
+    "elf_path": "microbench/t0_isr_mmio_read.elf",
+    "bin_path": "microbench/t0_isr_mmio_read.bin",
+    "gt_type": "artifact_complete_microbench",
+    "gt_ref_files": [
+      "microbench/t0_isr_mmio_read.c",
+      "ground_truth_bundle/microbench/samples/t0_isr_mmio_read.json",
+      "microbench/t0_isr_mmio_read.map"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "ISR MMIO read without downstream sink; stripped ELF: t0_isr_mmio_read_stripped.elf",
+    "gt_level": "L2",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "microbench/t0_isr_mmio_read_stripped.elf",
+    "stripped_origin": "existing"
+  },
+  {
+    "dataset": "sourceagent-microbench",
+    "subset": "microbench",
+    "sample_id": "t0_mmio_read",
+    "elf_path": "microbench/t0_mmio_read.elf",
+    "bin_path": "microbench/t0_mmio_read.bin",
+    "gt_type": "artifact_complete_microbench",
+    "gt_ref_files": [
+      "microbench/t0_mmio_read.c",
+      "ground_truth_bundle/microbench/samples/t0_mmio_read.json",
+      "microbench/t0_mmio_read.map"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "Direct MMIO polling with copy sink; stripped ELF: t0_mmio_read_stripped.elf",
+    "gt_level": "L2",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "microbench/t0_mmio_read_stripped.elf",
+    "stripped_origin": "existing"
+  },
+  {
+    "dataset": "sourceagent-microbench",
+    "subset": "microbench",
+    "sample_id": "t0_store_loop_sink",
+    "elf_path": "microbench/t0_store_loop_sink.elf",
+    "bin_path": "microbench/t0_store_loop_sink.bin",
+    "gt_type": "artifact_complete_microbench",
+    "gt_ref_files": [
+      "microbench/t0_store_loop_sink.c",
+      "ground_truth_bundle/microbench/samples/t0_store_loop_sink.json",
+      "microbench/t0_store_loop_sink.map"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "Store, memset, and loop-write sink archetypes; stripped ELF: t0_store_loop_sink_stripped.elf",
+    "gt_level": "L2",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "microbench/t0_store_loop_sink_stripped.elf",
+    "stripped_origin": "existing"
+  },
+  {
+    "dataset": "sourceagent-microbench",
+    "subset": "microbench",
+    "sample_id": "t0_uart_rx_overflow",
+    "elf_path": "microbench/t0_uart_rx_overflow.elf",
+    "bin_path": "microbench/t0_uart_rx_overflow.bin",
+    "gt_type": "artifact_complete_microbench",
+    "gt_ref_files": [
+      "microbench/t0_uart_rx_overflow.c",
+      "ground_truth_bundle/microbench/samples/t0_uart_rx_overflow.json",
+      "microbench/t0_uart_rx_overflow.map"
+    ],
+    "trigger_inputs_count": 0,
+    "trigger_inputs": [],
+    "notes": "Manual UART loop-copy overflow; stripped ELF: t0_uart_rx_overflow_stripped.elf",
+    "gt_level": "L2",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "microbench/t0_uart_rx_overflow_stripped.elf",
+    "stripped_origin": "existing"
+  },
+  {
     "dataset": "uSBS",
     "subset": "Ground-truth Benchmark/fw",
     "sample_id": "tcp_echo_client_vuln_bof",
@@ -23,7 +1449,14 @@
       "ground_truth_bundle/uSBS_trigger_inputs/tcp_echo_client_vuln_bof/test/inputs/TCP_Echo_Server_ICMP.pcapng.input",
       "ground_truth_bundle/uSBS_trigger_inputs/tcp_echo_client_vuln_bof/test/inputs/TCP_Echo_Server_ICMP_Short.pcapng.input"
     ],
-    "notes": "uSBS benchmark case with injected bug family + replay/fuzz inputs"
+    "notes": "uSBS benchmark case with injected bug family + replay/fuzz inputs",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_bof/STM32469I_EVAL_tcp_echo_base_stripped.elf",
+    "stripped_origin": "generated"
   },
   {
     "dataset": "uSBS",
@@ -49,7 +1482,14 @@
       "ground_truth_bundle/uSBS_trigger_inputs/tcp_echo_client_vuln_off_by_one/test/inputs/TCP_Echo_Server_ICMP.pcapng.input",
       "ground_truth_bundle/uSBS_trigger_inputs/tcp_echo_client_vuln_off_by_one/test/inputs/TCP_Echo_Server_ICMP_Short.pcapng.input"
     ],
-    "notes": "uSBS benchmark case with injected bug family + replay/fuzz inputs"
+    "notes": "uSBS benchmark case with injected bug family + replay/fuzz inputs",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one/STM32469I_EVAL_tcp_echo_base_stripped.elf",
+    "stripped_origin": "generated"
   },
   {
     "dataset": "uSBS",
@@ -70,7 +1510,14 @@
       "ground_truth_bundle/uSBS_trigger_inputs/tcp_echo_client_vuln_off_by_one_test_payload_len/test/inputs/TCP_Echo_Server_ICMP.pcapng.input",
       "ground_truth_bundle/uSBS_trigger_inputs/tcp_echo_client_vuln_off_by_one_test_payload_len/test/inputs/TCP_Echo_Server_ICMP_Short.pcapng.input"
     ],
-    "notes": "uSBS benchmark case with injected bug family + replay/fuzz inputs"
+    "notes": "uSBS benchmark case with injected bug family + replay/fuzz inputs",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one_test_payload_len/STM32469I_EVAL_tcp_echo_base_stripped.elf",
+    "stripped_origin": "generated"
   },
   {
     "dataset": "uSBS",
@@ -92,7 +1539,14 @@
       "ground_truth_bundle/uSBS_trigger_inputs/test_printf_fw/test/inputs/crash/UDP_Echo_Server_Client_crash.pcap.input",
       "ground_truth_bundle/uSBS_trigger_inputs/test_printf_fw/test/inputs/crash/UDP_Echo_Server_Client_first_char.pcapng.input"
     ],
-    "notes": "uSBS benchmark case with injected bug family + replay/fuzz inputs"
+    "notes": "uSBS benchmark case with injected bug family + replay/fuzz inputs",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": true,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "uSBS/Ground-truth Benchmark/fw/test_printf_fw/STM32469I_EVAL_stm32_udp_echo_server_stripped.elf",
+    "stripped_origin": "existing"
   },
   {
     "dataset": "uSBS",
@@ -114,7 +1568,14 @@
       "ground_truth_bundle/uSBS_trigger_inputs/udp_echo_server_bof/test/inputs/crash/UDP_Echo_Server_Client_crash.pcap.input",
       "ground_truth_bundle/uSBS_trigger_inputs/udp_echo_server_bof/test/inputs/crash/UDP_Echo_Server_Client_first_char.pcapng.input"
     ],
-    "notes": "uSBS benchmark case with injected bug family + replay/fuzz inputs"
+    "notes": "uSBS benchmark case with injected bug family + replay/fuzz inputs",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof/STM32469I_EVAL_stm32_udp_echo_server_stripped.elf",
+    "stripped_origin": "generated"
   },
   {
     "dataset": "uSBS",
@@ -136,7 +1597,14 @@
       "ground_truth_bundle/uSBS_trigger_inputs/udp_echo_server_bof_expl/test/inputs/crash/UDP_Echo_Server_Client_crash.pcap.input",
       "ground_truth_bundle/uSBS_trigger_inputs/udp_echo_server_bof_expl/test/inputs/crash/UDP_Echo_Server_Client_first_char.pcapng.input"
     ],
-    "notes": "uSBS benchmark case with injected bug family + replay/fuzz inputs"
+    "notes": "uSBS benchmark case with injected bug family + replay/fuzz inputs",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_expl/STM32469I_EVAL_stm32_udp_echo_server_stripped.elf",
+    "stripped_origin": "generated"
   },
   {
     "dataset": "uSBS",
@@ -158,7 +1626,14 @@
       "ground_truth_bundle/uSBS_trigger_inputs/udp_echo_server_bof_expl_patched/test/inputs/crash/UDP_Echo_Server_Client_crash.pcap.input",
       "ground_truth_bundle/uSBS_trigger_inputs/udp_echo_server_bof_expl_patched/test/inputs/crash/UDP_Echo_Server_Client_first_char.pcapng.input"
     ],
-    "notes": "uSBS benchmark case with injected bug family + replay/fuzz inputs"
+    "notes": "uSBS benchmark case with injected bug family + replay/fuzz inputs",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": true,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_expl_patched/STM32469I_EVAL_stm32_udp_echo_server_stripped.elf",
+    "stripped_origin": "generated"
   },
   {
     "dataset": "uSBS",
@@ -180,7 +1655,14 @@
       "ground_truth_bundle/uSBS_trigger_inputs/udp_echo_server_bof_expl_patched_instrumented/test/inputs/crash/UDP_Echo_Server_Client_crash.pcap.input",
       "ground_truth_bundle/uSBS_trigger_inputs/udp_echo_server_bof_expl_patched_instrumented/test/inputs/crash/UDP_Echo_Server_Client_first_char.pcapng.input"
     ],
-    "notes": "uSBS benchmark case with injected bug family + replay/fuzz inputs"
+    "notes": "uSBS benchmark case with injected bug family + replay/fuzz inputs",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": true,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_expl_patched_instrumented/STM32469I_EVAL_stm32_udp_echo_server_stripped.elf",
+    "stripped_origin": "generated"
   },
   {
     "dataset": "uSBS",
@@ -202,7 +1684,14 @@
       "ground_truth_bundle/uSBS_trigger_inputs/udp_echo_server_bof_expl_patched_instrumented_patched/test/inputs/crash/UDP_Echo_Server_Client_crash.pcap.input",
       "ground_truth_bundle/uSBS_trigger_inputs/udp_echo_server_bof_expl_patched_instrumented_patched/test/inputs/crash/UDP_Echo_Server_Client_first_char.pcapng.input"
     ],
-    "notes": "uSBS benchmark case with injected bug family + replay/fuzz inputs"
+    "notes": "uSBS benchmark case with injected bug family + replay/fuzz inputs",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": true,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_expl_patched_instrumented_patched/STM32469I_EVAL_stm32_udp_echo_server_stripped.elf",
+    "stripped_origin": "generated"
   },
   {
     "dataset": "uSBS",
@@ -224,7 +1713,14 @@
       "ground_truth_bundle/uSBS_trigger_inputs/udp_echo_server_bof_instrumented/test/inputs/crash/UDP_Echo_Server_Client_crash.pcap.input",
       "ground_truth_bundle/uSBS_trigger_inputs/udp_echo_server_bof_instrumented/test/inputs/crash/UDP_Echo_Server_Client_first_char.pcapng.input"
     ],
-    "notes": "uSBS benchmark case with injected bug family + replay/fuzz inputs"
+    "notes": "uSBS benchmark case with injected bug family + replay/fuzz inputs",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": true,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_instrumented/STM32469I_EVAL_stm32_udp_echo_server_stripped.elf",
+    "stripped_origin": "existing"
   },
   {
     "dataset": "uSBS",
@@ -246,7 +1742,14 @@
       "ground_truth_bundle/uSBS_trigger_inputs/udp_echo_server_bof_instrumented_patched/test/inputs/crash/UDP_Echo_Server_Client_crash.pcap.input",
       "ground_truth_bundle/uSBS_trigger_inputs/udp_echo_server_bof_instrumented_patched/test/inputs/crash/UDP_Echo_Server_Client_first_char.pcapng.input"
     ],
-    "notes": "uSBS benchmark case with injected bug family + replay/fuzz inputs"
+    "notes": "uSBS benchmark case with injected bug family + replay/fuzz inputs",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": true,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_instrumented_patched/STM32469I_EVAL_stm32_udp_echo_server_stripped.elf",
+    "stripped_origin": "existing"
   },
   {
     "dataset": "uSBS",
@@ -268,7 +1771,14 @@
       "ground_truth_bundle/uSBS_trigger_inputs/udp_echo_server_double_free/test/inputs/crash/UDP_Echo_Server_Client_crash.pcap.input",
       "ground_truth_bundle/uSBS_trigger_inputs/udp_echo_server_double_free/test/inputs/crash/UDP_Echo_Server_Client_first_char.pcapng.input"
     ],
-    "notes": "uSBS benchmark case with injected bug family + replay/fuzz inputs"
+    "notes": "uSBS benchmark case with injected bug family + replay/fuzz inputs",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
   },
   {
     "dataset": "uSBS",
@@ -290,7 +1800,14 @@
       "ground_truth_bundle/uSBS_trigger_inputs/udp_echo_server_off_by_one/test/inputs/crash/UDP_Echo_Server_Client_crash.pcap.input",
       "ground_truth_bundle/uSBS_trigger_inputs/udp_echo_server_off_by_one/test/inputs/crash/UDP_Echo_Server_Client_first_char.pcapng.input"
     ],
-    "notes": "uSBS benchmark case with injected bug family + replay/fuzz inputs"
+    "notes": "uSBS benchmark case with injected bug family + replay/fuzz inputs",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": true,
+    "has_sink_only_gt": true,
+    "negative_or_patched": false,
+    "has_stripped_peer": true,
+    "stripped_elf_path": "uSBS/Ground-truth Benchmark/fw/udp_echo_server_off_by_one/STM32469I_EVAL_stm32_udp_echo_server_stripped.elf",
+    "stripped_origin": "generated"
   },
   {
     "dataset": "uSBS",
@@ -312,809 +1829,13 @@
       "ground_truth_bundle/uSBS_trigger_inputs/udp_echo_server_uaf/test/inputs/crash/UDP_Echo_Server_Client_crash.pcap.input",
       "ground_truth_bundle/uSBS_trigger_inputs/udp_echo_server_uaf/test/inputs/crash/UDP_Echo_Server_Client_first_char.pcapng.input"
     ],
-    "notes": "uSBS benchmark case with injected bug family + replay/fuzz inputs"
-  },
-  {
-    "dataset": "monolithic-firmware-collection",
-    "subset": "D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples",
-    "sample_id": "CVE-2020-12140",
-    "elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-2020-12140/hello-world.elf",
-    "bin_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-2020-12140/hello-world.bin",
-    "gt_type": "cve_labeled_sample",
-    "gt_ref_files": [
-      "ground_truth_bundle/references/monolithic/README.md",
-      "ground_truth_bundle/references/monolithic/D_FUZZWARE_README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "CVE label from directory name (CVE-2020-12140); deeper oracle usually in upstream fuzzware-experiments"
-  },
-  {
-    "dataset": "monolithic-firmware-collection",
-    "subset": "D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples",
-    "sample_id": "CVE-2020-12141",
-    "elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-2020-12141/snmp-server.elf",
-    "bin_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-2020-12141/snmp-server.bin",
-    "gt_type": "cve_labeled_sample",
-    "gt_ref_files": [
-      "ground_truth_bundle/references/monolithic/README.md",
-      "ground_truth_bundle/references/monolithic/D_FUZZWARE_README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "CVE label from directory name (CVE-2020-12141); deeper oracle usually in upstream fuzzware-experiments"
-  },
-  {
-    "dataset": "monolithic-firmware-collection",
-    "subset": "D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples",
-    "sample_id": "CVE-HALucinator-CVE-2019-9183",
-    "elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-HALucinator-CVE-2019-9183/hello-world.elf",
-    "bin_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-HALucinator-CVE-2019-9183/hello-world.bin",
-    "gt_type": "cve_labeled_sample",
-    "gt_ref_files": [
-      "ground_truth_bundle/references/monolithic/README.md",
-      "ground_truth_bundle/references/monolithic/D_FUZZWARE_README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "CVE label from directory name (CVE-HALucinator-CVE-2019-9183); deeper oracle usually in upstream fuzzware-experiments"
-  },
-  {
-    "dataset": "monolithic-firmware-collection",
-    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
-    "sample_id": "CVE-2020-10064",
-    "elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10064/zephyr-CVE-2020-10064.elf",
-    "bin_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10064/zephyr-CVE-2020-10064.bin",
-    "gt_type": "cve_labeled_sample",
-    "gt_ref_files": [
-      "ground_truth_bundle/references/monolithic/README.md",
-      "ground_truth_bundle/references/monolithic/D_FUZZWARE_README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "CVE label from directory name (CVE-2020-10064); deeper oracle usually in upstream fuzzware-experiments"
-  },
-  {
-    "dataset": "monolithic-firmware-collection",
-    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
-    "sample_id": "CVE-2020-10065",
-    "elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10065/zephyr-CVE-2020-10065.elf",
-    "bin_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10065/zephyr-CVE-2020-10065.bin",
-    "gt_type": "cve_labeled_sample",
-    "gt_ref_files": [
-      "ground_truth_bundle/references/monolithic/README.md",
-      "ground_truth_bundle/references/monolithic/D_FUZZWARE_README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "CVE label from directory name (CVE-2020-10065); deeper oracle usually in upstream fuzzware-experiments"
-  },
-  {
-    "dataset": "monolithic-firmware-collection",
-    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
-    "sample_id": "CVE-2020-10066",
-    "elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10066/zephyr-CVE-2020-10066.elf",
-    "bin_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10066/zephyr-CVE-2020-10066.bin",
-    "gt_type": "cve_labeled_sample",
-    "gt_ref_files": [
-      "ground_truth_bundle/references/monolithic/README.md",
-      "ground_truth_bundle/references/monolithic/D_FUZZWARE_README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "CVE label from directory name (CVE-2020-10066); deeper oracle usually in upstream fuzzware-experiments"
-  },
-  {
-    "dataset": "monolithic-firmware-collection",
-    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
-    "sample_id": "CVE-2021-3319",
-    "elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3319/zephyr-CVE-2021-3319.elf",
-    "bin_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3319/zephyr-CVE-2021-3319.bin",
-    "gt_type": "cve_labeled_sample",
-    "gt_ref_files": [
-      "ground_truth_bundle/references/monolithic/README.md",
-      "ground_truth_bundle/references/monolithic/D_FUZZWARE_README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "CVE label from directory name (CVE-2021-3319); deeper oracle usually in upstream fuzzware-experiments"
-  },
-  {
-    "dataset": "monolithic-firmware-collection",
-    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
-    "sample_id": "CVE-2021-3320",
-    "elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3320/zephyr-CVE-2021-3320.elf",
-    "bin_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3320/zephyr-CVE-2021-3320.bin",
-    "gt_type": "cve_labeled_sample",
-    "gt_ref_files": [
-      "ground_truth_bundle/references/monolithic/README.md",
-      "ground_truth_bundle/references/monolithic/D_FUZZWARE_README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "CVE label from directory name (CVE-2021-3320); deeper oracle usually in upstream fuzzware-experiments"
-  },
-  {
-    "dataset": "monolithic-firmware-collection",
-    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
-    "sample_id": "CVE-2021-3321",
-    "elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3321/zephyr-CVE-2021-3321.elf",
-    "bin_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3321/zephyr-CVE-2021-3321.bin",
-    "gt_type": "cve_labeled_sample",
-    "gt_ref_files": [
-      "ground_truth_bundle/references/monolithic/README.md",
-      "ground_truth_bundle/references/monolithic/D_FUZZWARE_README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "CVE label from directory name (CVE-2021-3321); deeper oracle usually in upstream fuzzware-experiments"
-  },
-  {
-    "dataset": "monolithic-firmware-collection",
-    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
-    "sample_id": "CVE-2021-3322",
-    "elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3322/zephyr-CVE-2021-3322.elf",
-    "bin_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3322/zephyr-CVE-2021-3322.bin",
-    "gt_type": "cve_labeled_sample",
-    "gt_ref_files": [
-      "ground_truth_bundle/references/monolithic/README.md",
-      "ground_truth_bundle/references/monolithic/D_FUZZWARE_README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "CVE label from directory name (CVE-2021-3322); deeper oracle usually in upstream fuzzware-experiments"
-  },
-  {
-    "dataset": "monolithic-firmware-collection",
-    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
-    "sample_id": "CVE-2021-3323",
-    "elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3323/zephyr-CVE-2021-3323.elf",
-    "bin_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3323/zephyr-CVE-2021-3323.bin",
-    "gt_type": "cve_labeled_sample",
-    "gt_ref_files": [
-      "ground_truth_bundle/references/monolithic/README.md",
-      "ground_truth_bundle/references/monolithic/D_FUZZWARE_README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "CVE label from directory name (CVE-2021-3323); deeper oracle usually in upstream fuzzware-experiments"
-  },
-  {
-    "dataset": "monolithic-firmware-collection",
-    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
-    "sample_id": "CVE-2021-3329",
-    "elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3329/zephyr-CVE-2021-3329.elf",
-    "bin_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3329/zephyr-CVE-2021-3329.bin",
-    "gt_type": "cve_labeled_sample",
-    "gt_ref_files": [
-      "ground_truth_bundle/references/monolithic/README.md",
-      "ground_truth_bundle/references/monolithic/D_FUZZWARE_README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "CVE label from directory name (CVE-2021-3329); deeper oracle usually in upstream fuzzware-experiments"
-  },
-  {
-    "dataset": "monolithic-firmware-collection",
-    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
-    "sample_id": "CVE-2021-3330",
-    "elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3330/zephyr-CVE-2021-3330.elf",
-    "bin_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3330/zephyr-CVE-2021-3330.bin",
-    "gt_type": "cve_labeled_sample",
-    "gt_ref_files": [
-      "ground_truth_bundle/references/monolithic/README.md",
-      "ground_truth_bundle/references/monolithic/D_FUZZWARE_README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "CVE label from directory name (CVE-2021-3330); deeper oracle usually in upstream fuzzware-experiments"
-  },
-  {
-    "dataset": "monolithic-firmware-collection",
-    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
-    "sample_id": "CVE-no-CVE-false-positive-rf-size-check",
-    "elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-no-CVE-false-positive-rf-size-check/zephyr-CVE-no-CVE-false-positive-rf-size-check.elf",
-    "bin_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-no-CVE-false-positive-rf-size-check/zephyr-CVE-no-CVE-false-positive-rf-size-check.bin",
-    "gt_type": "cve_labeled_sample",
-    "gt_ref_files": [
-      "ground_truth_bundle/references/monolithic/README.md",
-      "ground_truth_bundle/references/monolithic/D_FUZZWARE_README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "CVE label from directory name (CVE-no-CVE-false-positive-rf-size-check); deeper oracle usually in upstream fuzzware-experiments"
-  },
-  {
-    "dataset": "monolithic-firmware-collection",
-    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
-    "sample_id": "CVE-no-CVE-false-positive-watchdog-callback",
-    "elf_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-no-CVE-false-positive-watchdog-callback/zephyr-CVE-no-CVE-false-positive-watchdog-callback.elf",
-    "bin_path": "monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-no-CVE-false-positive-watchdog-callback/zephyr-CVE-no-CVE-false-positive-watchdog-callback.bin",
-    "gt_type": "cve_labeled_sample",
-    "gt_ref_files": [
-      "ground_truth_bundle/references/monolithic/README.md",
-      "ground_truth_bundle/references/monolithic/D_FUZZWARE_README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "CVE label from directory name (CVE-no-CVE-false-positive-watchdog-callback); deeper oracle usually in upstream fuzzware-experiments"
-  },
-  {
-    "dataset": "sourceagent-microbench",
-    "subset": "microbench",
-    "sample_id": "cve_2018_16525_freertos_dns",
-    "elf_path": "microbench/cve_2018_16525_freertos_dns.elf",
-    "bin_path": "microbench/cve_2018_16525_freertos_dns.bin",
-    "gt_type": "in-source_reproduction",
-    "gt_ref_files": [
-      "microbench/cve_2018_16525_freertos_dns.c"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "Has source-defined vulnerability path; stripped ELF: cve_2018_16525_freertos_dns_stripped.elf"
-  },
-  {
-    "dataset": "sourceagent-microbench",
-    "subset": "microbench",
-    "sample_id": "cve_2020_10065_hci_spi",
-    "elf_path": "microbench/cve_2020_10065_hci_spi.elf",
-    "bin_path": "microbench/cve_2020_10065_hci_spi.bin",
-    "gt_type": "in-source_reproduction",
-    "gt_ref_files": [
-      "microbench/cve_2020_10065_hci_spi.c"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "Has source-defined vulnerability path; stripped ELF: cve_2020_10065_hci_spi_stripped.elf"
-  },
-  {
-    "dataset": "sourceagent-microbench",
-    "subset": "microbench",
-    "sample_id": "cve_2021_34259_usb_host",
-    "elf_path": "microbench/cve_2021_34259_usb_host.elf",
-    "bin_path": "microbench/cve_2021_34259_usb_host.bin",
-    "gt_type": "in-source_reproduction",
-    "gt_ref_files": [
-      "microbench/cve_2021_34259_usb_host.c"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "Has source-defined vulnerability path; stripped ELF: cve_2021_34259_usb_host_stripped.elf"
-  },
-  {
-    "dataset": "p2im-ground_truth",
-    "subset": "global_csv",
-    "sample_id": "AtmelSAM3-GroundTruth",
-    "elf_path": "",
-    "bin_path": "",
-    "gt_type": "register_ground_truth_csv",
-    "gt_ref_files": [
-      "ground_truth_bundle/p2im_ground_truth_csv/AtmelSAM3-GroundTruth.csv"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "Global MMIO register ground truth CSV"
-  },
-  {
-    "dataset": "p2im-ground_truth",
-    "subset": "global_csv",
-    "sample_id": "NXPK64F-GroundTruth",
-    "elf_path": "",
-    "bin_path": "",
-    "gt_type": "register_ground_truth_csv",
-    "gt_ref_files": [
-      "ground_truth_bundle/p2im_ground_truth_csv/NXPK64F-GroundTruth.csv"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "Global MMIO register ground truth CSV"
-  },
-  {
-    "dataset": "p2im-ground_truth",
-    "subset": "global_csv",
-    "sample_id": "STM32F103-GroundTruth",
-    "elf_path": "",
-    "bin_path": "",
-    "gt_type": "register_ground_truth_csv",
-    "gt_ref_files": [
-      "ground_truth_bundle/p2im_ground_truth_csv/STM32F103-GroundTruth.csv"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "Global MMIO register ground truth CSV"
-  },
-  {
-    "dataset": "p2im-ground_truth",
-    "subset": "global_csv",
-    "sample_id": "STM32F429-GroundTruth",
-    "elf_path": "",
-    "bin_path": "",
-    "gt_type": "register_ground_truth_csv",
-    "gt_ref_files": [
-      "ground_truth_bundle/p2im_ground_truth_csv/STM32F429-GroundTruth.csv"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "Global MMIO register ground truth CSV"
-  },
-  {
-    "dataset": "mesobench",
-    "subset": "D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples",
-    "sample_id": "contiki_cve_2020_12140_hello_world",
-    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-2020-12140/hello-world.elf",
-    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-2020-12140/hello-world.bin",
-    "gt_type": "artifact_gt_seed",
-    "gt_ref_files": [
-      "ground_truth_bundle/mesobench/README.md",
-      "ground_truth_bundle/mesobench/samples/contiki_cve_2020_12140_hello_world.json",
-      "ground_truth_bundle/references/mesobench/README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "priority=high; role=primary_chain_driver; source=contiki-ng(full_upstream_repo)"
-  },
-  {
-    "dataset": "mesobench",
-    "subset": "D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples",
-    "sample_id": "contiki_cve_2020_12141_snmp_server",
-    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-2020-12141/snmp-server.elf",
-    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-2020-12141/snmp-server.bin",
-    "gt_type": "artifact_gt_seed",
-    "gt_ref_files": [
-      "ground_truth_bundle/mesobench/README.md",
-      "ground_truth_bundle/mesobench/samples/contiki_cve_2020_12141_snmp_server.json",
-      "ground_truth_bundle/references/mesobench/README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "priority=high; role=primary_chain_driver; source=contiki-ng(full_upstream_repo)"
-  },
-  {
-    "dataset": "mesobench",
-    "subset": "D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples",
-    "sample_id": "contiki_halucinator_cve_2019_9183_hello_world",
-    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-HALucinator-CVE-2019-9183/hello-world.elf",
-    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/contiki-ng/prebuilt_samples/CVE-HALucinator-CVE-2019-9183/hello-world.bin",
-    "gt_type": "artifact_gt_seed",
-    "gt_ref_files": [
-      "ground_truth_bundle/mesobench/README.md",
-      "ground_truth_bundle/mesobench/samples/contiki_halucinator_cve_2019_9183_hello_world.json",
-      "ground_truth_bundle/references/mesobench/README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "priority=high; role=primary_chain_driver; source=contiki-ng(full_upstream_repo)"
-  },
-  {
-    "dataset": "mesobench",
-    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
-    "sample_id": "zephyr_cve_2020_10064",
-    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10064/zephyr-CVE-2020-10064.elf",
-    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10064/zephyr-CVE-2020-10064.bin",
-    "gt_type": "artifact_gt_seed",
-    "gt_ref_files": [
-      "ground_truth_bundle/mesobench/README.md",
-      "ground_truth_bundle/mesobench/samples/zephyr_cve_2020_10064.json",
-      "ground_truth_bundle/references/mesobench/README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "priority=high; role=primary_chain_driver; source=zephyr(full_upstream_repo)"
-  },
-  {
-    "dataset": "mesobench",
-    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
-    "sample_id": "zephyr_cve_2020_10065",
-    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10065/zephyr-CVE-2020-10065.elf",
-    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10065/zephyr-CVE-2020-10065.bin",
-    "gt_type": "artifact_gt_seed",
-    "gt_ref_files": [
-      "ground_truth_bundle/mesobench/README.md",
-      "ground_truth_bundle/mesobench/samples/zephyr_cve_2020_10065.json",
-      "ground_truth_bundle/references/mesobench/README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "priority=high; role=primary_chain_driver; source=zephyr(full_upstream_repo)"
-  },
-  {
-    "dataset": "mesobench",
-    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
-    "sample_id": "zephyr_cve_2020_10066",
-    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10066/zephyr-CVE-2020-10066.elf",
-    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2020-10066/zephyr-CVE-2020-10066.bin",
-    "gt_type": "artifact_gt_seed",
-    "gt_ref_files": [
-      "ground_truth_bundle/mesobench/README.md",
-      "ground_truth_bundle/mesobench/samples/zephyr_cve_2020_10066.json",
-      "ground_truth_bundle/references/mesobench/README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "priority=high; role=primary_chain_driver; source=zephyr(full_upstream_repo)"
-  },
-  {
-    "dataset": "mesobench",
-    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
-    "sample_id": "zephyr_cve_2021_3319",
-    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3319/zephyr-CVE-2021-3319.elf",
-    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3319/zephyr-CVE-2021-3319.bin",
-    "gt_type": "artifact_gt_seed",
-    "gt_ref_files": [
-      "ground_truth_bundle/mesobench/README.md",
-      "ground_truth_bundle/mesobench/samples/zephyr_cve_2021_3319.json",
-      "ground_truth_bundle/references/mesobench/README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "priority=high; role=primary_chain_driver; source=zephyr(full_upstream_repo)"
-  },
-  {
-    "dataset": "mesobench",
-    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
-    "sample_id": "zephyr_cve_2021_3320",
-    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3320/zephyr-CVE-2021-3320.elf",
-    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3320/zephyr-CVE-2021-3320.bin",
-    "gt_type": "artifact_gt_seed",
-    "gt_ref_files": [
-      "ground_truth_bundle/mesobench/README.md",
-      "ground_truth_bundle/mesobench/samples/zephyr_cve_2021_3320.json",
-      "ground_truth_bundle/references/mesobench/README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "priority=high; role=primary_chain_driver; source=zephyr(full_upstream_repo)"
-  },
-  {
-    "dataset": "mesobench",
-    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
-    "sample_id": "zephyr_cve_2021_3321",
-    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3321/zephyr-CVE-2021-3321.elf",
-    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3321/zephyr-CVE-2021-3321.bin",
-    "gt_type": "artifact_gt_seed",
-    "gt_ref_files": [
-      "ground_truth_bundle/mesobench/README.md",
-      "ground_truth_bundle/mesobench/samples/zephyr_cve_2021_3321.json",
-      "ground_truth_bundle/references/mesobench/README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "priority=high; role=primary_chain_driver; source=zephyr(full_upstream_repo)"
-  },
-  {
-    "dataset": "mesobench",
-    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
-    "sample_id": "zephyr_cve_2021_3322",
-    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3322/zephyr-CVE-2021-3322.elf",
-    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3322/zephyr-CVE-2021-3322.bin",
-    "gt_type": "artifact_gt_seed",
-    "gt_ref_files": [
-      "ground_truth_bundle/mesobench/README.md",
-      "ground_truth_bundle/mesobench/samples/zephyr_cve_2021_3322.json",
-      "ground_truth_bundle/references/mesobench/README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "priority=high; role=primary_chain_driver; source=zephyr(full_upstream_repo)"
-  },
-  {
-    "dataset": "mesobench",
-    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
-    "sample_id": "zephyr_cve_2021_3323",
-    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3323/zephyr-CVE-2021-3323.elf",
-    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3323/zephyr-CVE-2021-3323.bin",
-    "gt_type": "artifact_gt_seed",
-    "gt_ref_files": [
-      "ground_truth_bundle/mesobench/README.md",
-      "ground_truth_bundle/mesobench/samples/zephyr_cve_2021_3323.json",
-      "ground_truth_bundle/references/mesobench/README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "priority=high; role=primary_chain_driver; source=zephyr(full_upstream_repo)"
-  },
-  {
-    "dataset": "mesobench",
-    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
-    "sample_id": "zephyr_cve_2021_3329",
-    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3329/zephyr-CVE-2021-3329.elf",
-    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3329/zephyr-CVE-2021-3329.bin",
-    "gt_type": "artifact_gt_seed",
-    "gt_ref_files": [
-      "ground_truth_bundle/mesobench/README.md",
-      "ground_truth_bundle/mesobench/samples/zephyr_cve_2021_3329.json",
-      "ground_truth_bundle/references/mesobench/README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "priority=high; role=primary_chain_driver; source=zephyr(full_upstream_repo)"
-  },
-  {
-    "dataset": "mesobench",
-    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
-    "sample_id": "zephyr_cve_2021_3330",
-    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3330/zephyr-CVE-2021-3330.elf",
-    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-2021-3330/zephyr-CVE-2021-3330.bin",
-    "gt_type": "artifact_gt_seed",
-    "gt_ref_files": [
-      "ground_truth_bundle/mesobench/README.md",
-      "ground_truth_bundle/mesobench/samples/zephyr_cve_2021_3330.json",
-      "ground_truth_bundle/references/mesobench/README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "priority=high; role=primary_chain_driver; source=zephyr(full_upstream_repo)"
-  },
-  {
-    "dataset": "mesobench",
-    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
-    "sample_id": "zephyr_false_positive_rf_size_check",
-    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-no-CVE-false-positive-rf-size-check/zephyr-CVE-no-CVE-false-positive-rf-size-check.elf",
-    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-no-CVE-false-positive-rf-size-check/zephyr-CVE-no-CVE-false-positive-rf-size-check.bin",
-    "gt_type": "artifact_gt_seed",
-    "gt_ref_files": [
-      "ground_truth_bundle/mesobench/README.md",
-      "ground_truth_bundle/mesobench/samples/zephyr_false_positive_rf_size_check.json",
-      "ground_truth_bundle/references/mesobench/README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "priority=high; role=negative_control; source=zephyr(full_upstream_repo)"
-  },
-  {
-    "dataset": "mesobench",
-    "subset": "D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples",
-    "sample_id": "zephyr_false_positive_watchdog_callback",
-    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-no-CVE-false-positive-watchdog-callback/zephyr-CVE-no-CVE-false-positive-watchdog-callback.elf",
-    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/D_FUZZWARE/new-targets/zephyr-os/prebuilt_samples/CVE-no-CVE-false-positive-watchdog-callback/zephyr-CVE-no-CVE-false-positive-watchdog-callback.bin",
-    "gt_type": "artifact_gt_seed",
-    "gt_ref_files": [
-      "ground_truth_bundle/mesobench/README.md",
-      "ground_truth_bundle/mesobench/samples/zephyr_false_positive_watchdog_callback.json",
-      "ground_truth_bundle/references/mesobench/README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "priority=high; role=negative_control; source=zephyr(full_upstream_repo)"
-  },
-  {
-    "dataset": "mesobench",
-    "subset": "ARMCortex-M",
-    "sample_id": "stm32cube_lwip_tcp_echo_client",
-    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/stm32_tcp_echo_client/stm32_tcp_echo_client.elf",
-    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/stm32_tcp_echo_client/stm32_tcp_echo_client.bin",
-    "gt_type": "artifact_gt_seed",
-    "gt_ref_files": [
-      "ground_truth_bundle/mesobench/README.md",
-      "ground_truth_bundle/mesobench/samples/stm32cube_lwip_tcp_echo_client.json",
-      "ground_truth_bundle/references/mesobench/README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(full_upstream_repo)"
-  },
-  {
-    "dataset": "mesobench",
-    "subset": "ARMCortex-M",
-    "sample_id": "stm32cube_lwip_tcp_echo_server",
-    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/stm32_tcp_echo_server/stm32_tcp_echo_server.elf",
-    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/stm32_tcp_echo_server/stm32_tcp_echo_server.bin",
-    "gt_type": "artifact_gt_seed",
-    "gt_ref_files": [
-      "ground_truth_bundle/mesobench/README.md",
-      "ground_truth_bundle/mesobench/samples/stm32cube_lwip_tcp_echo_server.json",
-      "ground_truth_bundle/references/mesobench/README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(full_upstream_repo)"
-  },
-  {
-    "dataset": "mesobench",
-    "subset": "ARMCortex-M",
-    "sample_id": "stm32cube_lwip_udp_echo_client",
-    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/stm32_udp_echo_client/stm32_udp_echo_client.elf",
-    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/stm32_udp_echo_client/stm32_udp_echo_client.bin",
-    "gt_type": "artifact_gt_seed",
-    "gt_ref_files": [
-      "ground_truth_bundle/mesobench/README.md",
-      "ground_truth_bundle/mesobench/samples/stm32cube_lwip_udp_echo_client.json",
-      "ground_truth_bundle/references/mesobench/README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(full_upstream_repo)"
-  },
-  {
-    "dataset": "mesobench",
-    "subset": "ARMCortex-M",
-    "sample_id": "stm32cube_lwip_udp_echo_server",
-    "elf_path": "firmware/monolithic-firmware-collection/ARMCortex-M/stm32_udp_echo_server/stm32_udp_echo_server.elf",
-    "bin_path": "firmware/monolithic-firmware-collection/ARMCortex-M/stm32_udp_echo_server/stm32_udp_echo_server.bin",
-    "gt_type": "artifact_gt_seed",
-    "gt_ref_files": [
-      "ground_truth_bundle/mesobench/README.md",
-      "ground_truth_bundle/mesobench/samples/stm32cube_lwip_udp_echo_server.json",
-      "ground_truth_bundle/references/mesobench/README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(full_upstream_repo)"
-  },
-  {
-    "dataset": "mesobench",
-    "subset": "Ground-truth Benchmark/fw",
-    "sample_id": "usbs_tcp_echo_client_vuln_bof",
-    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_bof/STM32469I_EVAL_tcp_echo_base.elf",
-    "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_bof/STM32469I_EVAL_tcp_echo_base.bin",
-    "gt_type": "artifact_gt_seed",
-    "gt_ref_files": [
-      "ground_truth_bundle/mesobench/README.md",
-      "ground_truth_bundle/mesobench/samples/usbs_tcp_echo_client_vuln_bof.json",
-      "ground_truth_bundle/references/mesobench/README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(upstream_base_plus_overlay)"
-  },
-  {
-    "dataset": "mesobench",
-    "subset": "Ground-truth Benchmark/fw",
-    "sample_id": "usbs_tcp_echo_client_vuln_bof_dhcp",
-    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_bof/STM32469I_EVAL_tcp_echo_base_DHCP/STM32469I_EVAL_tcp_echo_base.elf",
-    "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_bof/STM32469I_EVAL_tcp_echo_base_DHCP/STM32469I_EVAL_tcp_echo_base.bin",
-    "gt_type": "artifact_gt_seed",
-    "gt_ref_files": [
-      "ground_truth_bundle/mesobench/README.md",
-      "ground_truth_bundle/mesobench/samples/usbs_tcp_echo_client_vuln_bof_dhcp.json",
-      "ground_truth_bundle/references/mesobench/README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(upstream_base_plus_overlay)"
-  },
-  {
-    "dataset": "mesobench",
-    "subset": "Ground-truth Benchmark/fw",
-    "sample_id": "usbs_tcp_echo_client_vuln_off_by_one",
-    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one/STM32469I_EVAL_tcp_echo_base.elf",
-    "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one/STM32469I_EVAL_tcp_echo_base.bin",
-    "gt_type": "artifact_gt_seed",
-    "gt_ref_files": [
-      "ground_truth_bundle/mesobench/README.md",
-      "ground_truth_bundle/mesobench/samples/usbs_tcp_echo_client_vuln_off_by_one.json",
-      "ground_truth_bundle/references/mesobench/README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(upstream_base_plus_overlay)"
-  },
-  {
-    "dataset": "mesobench",
-    "subset": "Ground-truth Benchmark/fw",
-    "sample_id": "usbs_tcp_echo_client_payload_len_variant",
-    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one_test_payload_len/STM32469I_EVAL_tcp_echo_base.elf",
-    "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one_test_payload_len/STM32469I_EVAL_tcp_echo_base.bin",
-    "gt_type": "artifact_gt_seed",
-    "gt_ref_files": [
-      "ground_truth_bundle/mesobench/README.md",
-      "ground_truth_bundle/mesobench/samples/usbs_tcp_echo_client_payload_len_variant.json",
-      "ground_truth_bundle/references/mesobench/README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(upstream_base_plus_overlay)"
-  },
-  {
-    "dataset": "mesobench",
-    "subset": "Ground-truth Benchmark/fw",
-    "sample_id": "usbs_test_printf_fw",
-    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/test_printf_fw/STM32469I_EVAL_stm32_udp_echo_server.elf",
-    "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/test_printf_fw/STM32469I_EVAL_stm32_udp_echo_server.bin",
-    "gt_type": "artifact_gt_seed",
-    "gt_ref_files": [
-      "ground_truth_bundle/mesobench/README.md",
-      "ground_truth_bundle/mesobench/samples/usbs_test_printf_fw.json",
-      "ground_truth_bundle/references/mesobench/README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(upstream_base_plus_overlay)"
-  },
-  {
-    "dataset": "mesobench",
-    "subset": "Ground-truth Benchmark/fw",
-    "sample_id": "usbs_udp_echo_server_bof",
-    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof/STM32469I_EVAL_stm32_udp_echo_server.elf",
-    "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof/STM32469I_EVAL_stm32_udp_echo_server.bin",
-    "gt_type": "artifact_gt_seed",
-    "gt_ref_files": [
-      "ground_truth_bundle/mesobench/README.md",
-      "ground_truth_bundle/mesobench/samples/usbs_udp_echo_server_bof.json",
-      "ground_truth_bundle/references/mesobench/README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(upstream_base_plus_overlay)"
-  },
-  {
-    "dataset": "mesobench",
-    "subset": "Ground-truth Benchmark/fw",
-    "sample_id": "usbs_udp_echo_server_bof_expl",
-    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_expl/STM32469I_EVAL_stm32_udp_echo_server.elf",
-    "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_expl/STM32469I_EVAL_stm32_udp_echo_server.bin",
-    "gt_type": "artifact_gt_seed",
-    "gt_ref_files": [
-      "ground_truth_bundle/mesobench/README.md",
-      "ground_truth_bundle/mesobench/samples/usbs_udp_echo_server_bof_expl.json",
-      "ground_truth_bundle/references/mesobench/README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(upstream_base_plus_overlay)"
-  },
-  {
-    "dataset": "mesobench",
-    "subset": "Ground-truth Benchmark/fw",
-    "sample_id": "usbs_tcp_echo_client_vuln_off_by_one_dhcp",
-    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one/STM32469I_EVAL_tcp_echo_base_DHCP/STM32469I_EVAL_tcp_echo_base.elf",
-    "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/tcp_echo_client_vuln_off_by_one/STM32469I_EVAL_tcp_echo_base_DHCP/STM32469I_EVAL_tcp_echo_base.bin",
-    "gt_type": "artifact_gt_seed",
-    "gt_ref_files": [
-      "ground_truth_bundle/mesobench/README.md",
-      "ground_truth_bundle/mesobench/samples/usbs_tcp_echo_client_vuln_off_by_one_dhcp.json",
-      "ground_truth_bundle/references/mesobench/README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(upstream_base_plus_overlay)"
-  },
-  {
-    "dataset": "mesobench",
-    "subset": "Ground-truth Benchmark/fw",
-    "sample_id": "usbs_udp_echo_server_off_by_one",
-    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_off_by_one/STM32469I_EVAL_stm32_udp_echo_server.elf",
-    "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_off_by_one/STM32469I_EVAL_stm32_udp_echo_server.bin",
-    "gt_type": "artifact_gt_seed",
-    "gt_ref_files": [
-      "ground_truth_bundle/mesobench/README.md",
-      "ground_truth_bundle/mesobench/samples/usbs_udp_echo_server_off_by_one.json",
-      "ground_truth_bundle/references/mesobench/README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "priority=high; role=primary_chain_driver; source=stm32cubef4(upstream_base_plus_overlay)"
-  },
-  {
-    "dataset": "mesobench",
-    "subset": "Ground-truth Benchmark/fw",
-    "sample_id": "usbs_udp_echo_server_bof_instrumented_patched",
-    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_instrumented_patched/STM32469I_EVAL_stm32_udp_echo_server.elf",
-    "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_instrumented_patched/STM32469I_EVAL_stm32_udp_echo_server.bin",
-    "gt_type": "artifact_gt_seed",
-    "gt_ref_files": [
-      "ground_truth_bundle/mesobench/README.md",
-      "ground_truth_bundle/mesobench/samples/usbs_udp_echo_server_bof_instrumented_patched.json",
-      "ground_truth_bundle/references/mesobench/README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "priority=high; role=hard_mode_chain_driver; source=stm32cubef4(upstream_base_plus_overlay)"
-  },
-  {
-    "dataset": "mesobench",
-    "subset": "Ground-truth Benchmark/fw",
-    "sample_id": "usbs_udp_echo_server_bof_instrumented",
-    "elf_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_instrumented/STM32469I_EVAL_stm32_udp_echo_server.elf",
-    "bin_path": "firmware/uSBS/Ground-truth Benchmark/fw/udp_echo_server_bof_instrumented/STM32469I_EVAL_stm32_udp_echo_server.bin",
-    "gt_type": "artifact_gt_seed",
-    "gt_ref_files": [
-      "ground_truth_bundle/mesobench/README.md",
-      "ground_truth_bundle/mesobench/samples/usbs_udp_echo_server_bof_instrumented.json",
-      "ground_truth_bundle/references/mesobench/README.md"
-    ],
-    "trigger_inputs_count": 0,
-    "trigger_inputs": [],
-    "notes": "priority=high; role=hard_mode_chain_driver; source=stm32cubef4(upstream_base_plus_overlay)"
+    "notes": "uSBS benchmark case with injected bug family + replay/fuzz inputs",
+    "gt_level": "REFERENCE",
+    "in_gt_backed_suite": false,
+    "has_sink_only_gt": false,
+    "negative_or_patched": false,
+    "has_stripped_peer": false,
+    "stripped_elf_path": null,
+    "stripped_origin": "missing"
   }
 ]

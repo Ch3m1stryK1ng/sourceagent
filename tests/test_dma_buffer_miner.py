@@ -173,3 +173,39 @@ def test_two_config_clusters():
     funcs = {c.function_name for c in result}
     assert "dma_init" in funcs
     assert "dma2_init" in funcs
+
+
+def test_dma_candidate_rebinds_to_payload_cluster_with_reader_support():
+    stores = [
+        _mmio_store(0x40002534, func="FUN_08000080", provenance="GLOBAL_PTR"),
+        _mmio_store(0x40002538, func="FUN_08000080"),
+        _mmio_store(0x4000253C, func="FUN_08000080"),
+    ]
+    accesses = [
+        MemoryAccess(
+            address=0x08000090,
+            kind="store",
+            width=4,
+            target_addr=0x20001020,
+            function_name="FUN_08000080",
+            function_addr=0x08000080,
+        ),
+        MemoryAccess(
+            address=0x08002010,
+            kind="load",
+            width=1,
+            target_addr=0x20001024,
+            function_name="FUN_08002000",
+            function_addr=0x08002000,
+        ),
+    ]
+    mai = _make_mai(accesses=accesses, mmio_accesses=stores)
+
+    result = mine_dma_sources(mai, _make_mm())
+
+    assert len(result) == 1
+    assert result[0].address == 0x20001000
+    assert result[0].facts["buffer_cluster"] == "0x20001000"
+    assert result[0].facts["buffer_binding_confidence"] >= 0.45
+    assert "FUN_08002000" in result[0].facts["buffer_readers"]
+    assert result[0].facts["buffer_cluster_candidates"][0]["cluster"] == "0x20001000"
